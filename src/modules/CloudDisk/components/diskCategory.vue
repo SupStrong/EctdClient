@@ -1,0 +1,344 @@
+<template>
+	<div class="cloud-disk-category">
+		<div class="category-container">
+			<ul>
+				<li v-for="(item, index) in categoryMenuData" :key="index" ripple :class="{ active: data.categoryType === item.data }" @click="change(index)">
+					<i :class="item.icon" />{{ item.name }}
+					<div class="count" v-show="item.count > 0">{{ item.count }}</div>
+				</li>
+			</ul>
+			<div class="bottom">
+				<div class="tower" :style="{ background: 'url(' + towerSrc + ')' }"></div>
+				<p>{{ data.selectTips }}</p>
+			</div>
+		</div>
+		<ul class="wave-progress">
+			<li class="wave-blue">
+				<div class="wave" style="bottom: 95%"></div>
+				<p class="text" data-text="95%">95%</p>
+			</li>
+			<li class="wave-orange">
+				<div class="wave" style="bottom: 70%"></div>
+				<p class="text" data-text="70%">70%</p>
+			</li>
+			<li class="wave-purple">
+				<div class="wave" style="bottom: 45%"></div>
+				<p class="text" data-text="45%">45%</p>
+			</li>
+			<li class="wave-cyan">
+				<div class="wave" style="bottom: 20%"></div>
+				<p class="text" data-text="20%">20%</p>
+			</li>
+		</ul>
+	</div>
+</template>
+
+<script>
+export default {
+	name: 'diskCategory',
+	props: {
+		type: {
+			type: String,
+			default: function () {
+				return 'disk';
+			},
+		},
+		data: {
+			type: Object,
+		},
+	},
+	data() {
+		return {
+			typeData: [
+				{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
+				{ name: '图片', icon: 'sf-icon-image', data: 'picture' },
+				{ name: '视频', icon: 'sf-icon-video', data: 'video' },
+				{ name: '文档', icon: 'sf-icon-file-alt', data: 'document' },
+				{ name: '音乐', icon: 'sf-icon-music', data: 'music' },
+				{ name: '种子', icon: 'sf-icon-magnet', data: 'torrent' },
+				{ name: '其他', icon: 'sf-icon-puzzle-piece', data: 'other' },
+				{ name: '回收站', icon: 'sf-icon-trash', data: 'trash' },
+			], //网盘分类参数
+			shareData: [
+				{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
+				{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
+			], //分享分类参数
+			transData: [
+				{ name: '正在下载', icon: 'sf-icon-download', count: 0, data: 'download' },
+				{ name: '正在上传', icon: 'sf-icon-upload', count: 0, data: 'upload' },
+				{ name: '传输完成', icon: 'sf-icon-check-circle', count: 0, data: 'finish' },
+			], //传输分类参数,
+			ectdData: [],
+			categoryMenuData: [],
+			towerSrc: require('../assets/img/tower/Spring-bottom-0.png'),
+			timer: false,
+		};
+	},
+	mounted() {
+		this.$nextTick(() => {
+			this.categoryMenuData = this.typeData;
+			this.timer = setInterval(() => {
+				this.background();
+			}, 1000);
+		});
+	},
+	beforeDestroy() {
+		clearInterval(this.timer);
+	},
+	watch: {
+		type: function () {
+			this.$nextTick(() => {
+				this.updateData(this.type);
+			});
+		},
+	},
+	methods: {
+		background() {
+			let season = 'Spring';
+			let tag = 0;
+			let D = new Date();
+			let month = D.getMonth() + 1;
+			let hHour = D.getHours();
+			if (month > 2 && month < 6) {
+				season = 'Spring';
+			} else if (month > 5 && month < 9) {
+				season = 'Summer';
+			} else if (month > 8 && month < 12) {
+				season = 'Autumn';
+			} else if (month === 12 || month === 1 || month === 2) {
+				season = 'Winter';
+			}
+			if (hHour >= 1 && hHour <= 8) {
+				tag = 0;
+			} else if (hHour > 8 && hHour <= 16) {
+				tag = 1;
+			} else if (hHour > 16 && hHour <= 18) {
+				tag = 2;
+			} else if (hHour > 18 && hHour <= 24) {
+				tag = 3;
+			}
+			this.TowerSrc = require('../assets/img/tower/' + season + '-bottom-' + tag + '.png');
+		},
+		updateData(type) {
+			if (type === 'disk') {
+				this.categoryMenuData = this.typeData;
+			} else if (type === 'share') {
+				this.categoryMenuData = this.shareData;
+			} else if (type === 'trans') {
+				this.categoryMenuData = this.transData;
+			} else if (type === 'ectd') {
+				this.getEctdDocumentList();
+				this.categoryMenuData = this.ectdData;
+			}
+			this.change(0, type);
+		},
+		updateMenuCount(data) {
+			this.categoryMenuData[0].count = data.downloading;
+			this.categoryMenuData[1].count = data.uploading;
+			this.categoryMenuData[2].count = data.finish;
+		},
+		change(index, type = this.type) {
+			this.$emit('change', this.categoryMenuData[index], type);
+		},
+		/** 获取ectd文档列表 */
+		getEctdDocumentList() {
+			this.ectdData = [
+				{ name: '文档1', icon: 'sf-icon-upload', data: 'doucument1', country: 'china' },
+				{ name: '文档2', icon: 'sf-icon-upload', data: 'doucument2', country: 'europe' },
+				{ name: '文档3', icon: 'sf-icon-upload', data: 'doucument3', country: 'american' },
+			]; //ectd分类,应该是接口动态获取,暂时写死
+			this.categoryMenuData = this.ectdData;
+		},
+	},
+};
+</script>
+
+<style scoped lang="scss">
+.cloud-disk-category {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	display: flex;
+	.category-container {
+		width: 100%;
+		flex: 1;
+		position: relative;
+		ul {
+			margin-top: 5px;
+			li {
+				width: 100%;
+				height: 40px;
+				line-height: 40px;
+				cursor: pointer;
+				font-size: 14px;
+				margin-bottom: 8px;
+				display: flex;
+				align-items: center;
+				padding-left: 20px;
+				position: relative;
+				i {
+					width: 35px;
+					height: 35px;
+					display: block;
+					text-align: center;
+					line-height: 35px;
+					font-size: 16px;
+					margin-right: 12px;
+				}
+				.count {
+					float: right;
+					padding: 0 6px;
+				}
+				&:hover {
+					background: #f8f8f8;
+				}
+			}
+			.active {
+				color: $diskMainColor;
+				background: #3388ff2e !important;
+			}
+		}
+		/*底部*/
+		.bottom {
+			width: 100%;
+			height: 134px;
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			font-weight: normal;
+			pointer-events: none;
+			.tower {
+				width: 110px;
+				height: 100%;
+				background-size: cover !important;
+				transition: background 0.4s ease-in-out;
+			}
+			p {
+				/*文件选择提示*/
+				width: 100%;
+				position: absolute;
+				bottom: 3px;
+				right: 3px;
+				text-align: right;
+				font-size: 12px;
+				color: #505050;
+			}
+		}
+	}
+	// 进度圆大小
+	$progress-height: 160px !default;
+
+	// 文字大小
+	$progress-font: 36px !default;
+
+	// 进度颜色
+	$progress-colors: (
+		blue: #33a0ff,
+		orange: #ff744a,
+		purple: #8350d8,
+		cyan: #19c9cb,
+	) !default;
+
+	// 进度圆容器
+	.wave-progress {
+		margin: 0;
+		padding: 0;
+		font-size: 0;
+		position: absolute;
+		display: none;
+		// 进度圆单元
+		> li {
+			display: inline-block;
+			list-style: none;
+			width: $progress-height;
+			height: $progress-height;
+			position: relative;
+			overflow: hidden;
+		}
+	}
+
+	// 波纹
+	.wave {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		// 用伪元素绘制两个波纹容器
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			z-index: 10;
+			// 设置大小合适的圆形容器(足够覆盖整个进度圆)
+			width: 800px;
+			height: 800px;
+			border-radius: 45%;
+
+			// 一定透明度的白色背景色
+			background-color: rgba(255, 255, 255, 0.8);
+
+			// 挪到合适的位置
+			transform: translateX(-50%) rotate(0);
+
+			// 添加旋转动画
+			animation: rotate 6s linear infinite;
+		}
+
+		// 通过重置一个波纹的圆角大小、动画执行时间、延迟间隔
+		// 来制造波纹动画的视觉差和时间差
+		&::after {
+			border-radius: 48%;
+			transform: translateX(-50%) rotate(0);
+			animation: rotate 10s linear -5s infinite;
+			z-index: 20;
+		}
+	}
+
+	// 进度值
+	.text {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		margin: 0;
+		z-index: 30;
+		text-align: center;
+		font-size: $progress-font;
+		font-weight: 900;
+		line-height: $progress-height;
+		color: white;
+
+		// 文字重叠描边，进度值较小场景下白色文字与背景的区分
+		&::before {
+			// 使用函数取值，DOM 中这个属性必须有值，而且需要与进度值保值一致
+			content: attr(data-text);
+			position: absolute;
+			-webkit-text-stroke: 1px orange;
+			z-index: 20;
+		}
+	}
+
+	// 旋转动画
+	@keyframes rotate {
+		50% {
+			transform: translateX(-50%) rotate(180deg);
+		}
+
+		100% {
+			transform: translateX(-50%) rotate(360deg);
+		}
+	}
+
+	// 枚举进度颜色
+	@each $key, $value in $progress-colors {
+		.wave-#{ $key } {
+			background-color: $value;
+			// 文字描边颜色与背景一致
+			.text::before {
+				-webkit-text-stroke: 1px $value;
+			}
+		}
+	}
+}
+</style>
