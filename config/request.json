@@ -5,7 +5,7 @@
     "diskWebUrl": "https://disk.zjinh.cn"
   },
   "production": {
-    "url": "https://api.zjinh.cn",
+    "url": "http://118.31.70.36",
     "updateUrl": "https://update.zjinh.cn",
     "diskWebUrl": "https://disk.zjinh.cn"
   }

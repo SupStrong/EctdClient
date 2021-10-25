@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 
 export default {
 	encode(str, aStrKey, ivstr) {
+		console.log(aStrKey,"aStrKey")
 		const KeyHex = CryptoJS.enc.Utf8.parse(aStrKey);
 		const encrypted = CryptoJS.TripleDES.encrypt(str, KeyHex, {
 			mode: CryptoJS.mode.CBC,
@@ -11,6 +12,7 @@ export default {
 		return encrypted.ciphertext.toString().toUpperCase();
 	},
 	decode(str, aStrKey, ivstr) {
+		console.log(aStrKey,"aStrKey1")
 		const KeyHex = CryptoJS.enc.Utf8.parse(aStrKey);
 		//因为我们加密的时候用到的16进制字符串，需要进行转换
 		//第一步把16进制字符串转为WordArray格式npm
