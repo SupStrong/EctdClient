@@ -51,6 +51,12 @@
 						</template>
 					</template>
 					<template v-else>
+						<template v-if="data.categoryType === 'data'">
+							<button class="btn primary">
+								<span class="icon sf-icon-images"></span>
+								<span @click="createData()">创建</span>
+							</button>
+						</template>
 						<template v-if="data.categoryType === 'all'">
 							<Poptip
 								trigger="hover"
@@ -104,10 +110,7 @@
 					</button>
 				</template>
 				<template v-else-if="type === 'ectd'">
-					<button class="btn primary" @click="showEctdImport = true">新建</button>
-					<button class="btn default" @click="showEctdCreate = true">导入</button>
-					<button class="btn default">游览</button>
-					<button class="btn default">编辑</button>
+					<button class="btn primary" @click="showEctdCreate = true">新建</button>
 				</template>
 				<template v-else>
 					<!--					<button class="btn default">全部开始</button>
@@ -160,19 +163,18 @@
 			<p><i class="sf-icon-info-circle" /> 回收站仍然占用网盘空间，文件保存10天后将被自动清除</p>
 		</div>
 		<ectd-import v-model="showEctdImport"></ectd-import>
-		<ectd-create-file v-model="showEctdCreate"></ectd-create-file>
-		<!-- :displayFlag.sync="showEctdImport" -->
+		<createData v-model="showEctdCreate" status="news"></createData>
 	</div>
 </template>
 
 <script>
 import ectdImport from './ectdcpn/importFile.vue';
-import ectdCreateFile from './ectdcpn/createFile.vue';
+import createData from './createData.vue';
 export default {
 	name: 'diskNavigation',
 	components: {
 		ectdImport,
-		ectdCreateFile,
+		createData,
 	},
 	props: {
 		type: String,
@@ -219,6 +221,9 @@ export default {
 		navControl(commend) {
 			//回调函数
 			this.$emit('callback', commend);
+		},
+		createData() {
+			this.$router.push('/create-data');
 		},
 		actionControl(commend) {
 			this.$emit('action', commend);

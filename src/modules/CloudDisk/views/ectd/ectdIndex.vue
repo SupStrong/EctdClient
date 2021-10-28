@@ -3,44 +3,23 @@
 	<div class="ectd-index">
 		<Row :gutter="16" index="0" style="height: 80%">
 			<!-- 左侧文件列表 -->
-			<Col span="18">
+			<Col span="24">
 				<div class="ectd-table-container">
-					<Table :columns="colConfig" :data="tableData"></Table>
+					<Table :columns="china" :data="tableData"></Table>
 				</div>
 			</Col>
-			<!-- 右侧信息列 -->
-			<Col span="6">
-				<Row style="height: 48%">
-					<Col span="24">
-						<div class="ectd-table-container">
-							<Card :bordered="false">
-								<p slot="title">项目详情</p>
-								<p>项目名称:wwwww</p>
-								<p>负责人:wwwww</p>
-							</Card>
-						</div>
-					</Col>
-				</Row>
-				<Row style="height: 48%; margin-top: 16px">
-					<Col span="24">
-						<div class="ectd-table-container">
-							<Card :bordered="false">
-								<p slot="title">序列信息</p>
-								<p>项目名称:wwwww</p>
-								<p>负责人:wwwww</p>
-							</Card>
-						</div>
-					</Col>
-				</Row>
-			</Col>
 		</Row>
+		<createData v-model="isShow" status="edit"></createData>
 	</div>
 </template>
-
 <script>
 import { colConfig, tableData, apiColConfig, getProjectData } from './ectdTestData';
+import createData from '../../components/createData';
 export default {
 	name: 'ectdIndex',
+	components: {
+		createData,
+	},
 	props: {
 		diskInfo: { type: Object, default: () => {} },
 	},
@@ -48,6 +27,83 @@ export default {
 		return {
 			colConfig,
 			tableData,
+			china: [
+				{ title: '品牌名称', key: 'brandName', element: '<application-id>', fixed: 'left' },
+				{ title: '品牌别称', key: 'niceName', element: '<sequence-number>' },
+				{ title: '名称', key: 'name', element: '<application-type>' },
+				{ title: '含量', key: 'content', element: '<regulatory-activity-type>' },
+				{ title: '分类', key: 'classify', element: '<sequence-type>' },
+				{ title: '国籍', key: 'nationality', element: '<sequence-description>' },
+				{ title: '价格', key: 'price' },
+				{ title: '功效', key: 'effect' },
+				{ title: '详情', key: 'details' },
+				{
+					title: '图片',
+					key: 'image',
+					render: (h, params) => {
+						return h('img', {
+							attrs: {
+								src: params.row.image,
+								style: 'width:40px;height:40px;margin-right:5px;display:flex',
+							},
+						});
+					},
+				},
+				{
+					title: '操作',
+					key: 'action',
+					render: (h, params) => {
+						console.log(params);
+						return h('div', [
+							h(
+								'span',
+								{
+									style: {
+										fontSize: '14px',
+										cursor: 'pointer',
+										color: '#fc1',
+									},
+									on: {
+										click: () => {
+											this.isShow = true;
+											this.editId = params.row.id;
+										},
+									},
+									class: 'btn',
+								},
+								'编辑'
+							),
+							h(
+								'span',
+								{
+									style: {
+										fontSize: '14px',
+										padding: '5px 10px',
+										cursor: 'pointer',
+										color: 'green',
+									},
+									on: {
+										click: () => {
+											this.$confirm({
+												title: '删除',
+												tips: '确认删除此数据？',
+												callback: () => {
+													this.delPopup = true;
+												},
+											});
+										},
+									},
+									class: 'btn',
+								},
+								'删除'
+							),
+						]);
+					},
+				},
+			],
+			delPopup: false,
+			isShow: false,
+			editId: '',
 		};
 	},
 	methods: {
@@ -60,9 +116,6 @@ export default {
 		},
 		/** 获取项目信息 */
 		getProjectData() {
-			//1.列表data
-			//2.基本信息
-			//3.权限
 			getProjectData(this.diskInfo.categoryType)
 				.then((res) => {
 					this.tableData = res;
