@@ -7,7 +7,7 @@
 						<template slot-scope="props">
 							<el-form label-position="left" inline class="demo-table-expand">
 								<el-form-item label="商品名称">
-									<span>{{ props.row.name }}</span>
+									<span @dblclick="moveText(props.row.name)">{{ props.row.name }}</span>
 								</el-form-item>
 								<el-form-item label="所属店铺">
 									<span>{{ props.row.shop }}</span>
@@ -30,9 +30,9 @@
 							</el-form>
 						</template>
 					</el-table-column>
-					<el-table-column label="商品 ID" prop="id"> </el-table-column>
-					<el-table-column label="商品名称" prop="name"> </el-table-column>
-					<el-table-column label="描述" prop="desc"> </el-table-column>
+					<el-table-column label="商品 ID" prop="id"></el-table-column>
+					<el-table-column label="商品名称" prop="name"></el-table-column>
+					<el-table-column label="描述122" prop="desc"></el-table-column>
 				</el-table>
 			</el-collapse-item>
 			<el-collapse-item title="文案" name="2">
@@ -95,6 +95,11 @@ export default {
 			],
 		};
 	},
+	methods: {
+		moveText(text) {
+			console.log(text);
+		},
+	},
 };
 </script>
 <style scoped lang="scss">
@@ -108,5 +113,8 @@ export default {
 		display: block;
 		margin-bottom: 3px;
 	}
+}
+span {
+	cursor: pointer;
 }
 </style>

@@ -4,16 +4,17 @@
 		<div class="tool-swiper">
 			<div class="swiper-container G-Mb-10">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide">Slide 1</div>
-					<div class="swiper-slide">Slide 2</div>
-					<div class="swiper-slide">Slide 3</div>
+					<div class="swiper-slide" v-for="(element, index) in swiperBanner" :key="index">
+						<img :src="element" alt="" />
+					</div>
 				</div>
 				<div class="swiper-pagination"></div>
 			</div>
+			<div></div>
 			<div class="fl-row-justy tool-btn">
-				<el-button type="primary" @click="generateImg()">生成图片</el-button>
+				<!-- <el-button type="primary" @click="generateImg()">生成图片</el-button>
 				<el-button type="success" @click="clearSingleStyle()">清除单张</el-button>
-				<el-button type="warning" @click="clearAllStyle()">清除所有</el-button>
+				<el-button type="warning" @click="clearAllStyle()">清除所有</el-button> -->
 			</div>
 		</div>
 		<div>
@@ -30,6 +31,7 @@
 </template>
 <script>
 import Swiper from 'swiper';
+import $ from 'jquery';
 import bannerData from './components/dataNav.vue';
 import bannerImage from './components/imageNav.vue';
 import bannerText from './components/textNav.vue';
@@ -77,7 +79,15 @@ export default {
 				},
 			],
 			siwperIndex: 0,
+			swiperBanner: [
+				'https://img0.baidu.com/it/u=3122136587,3938996930&fm=26&fmt=auto',
+				'https://img1.baidu.com/it/u=1948442199,1328853331&fm=26&fmt=auto',
+				'https://img1.baidu.com/it/u=1783594224,1234800221&fm=26&fmt=auto',
+			],
 		};
+	},
+	created() {
+		this.init();
 	},
 	mounted() {
 		const self = this;
@@ -102,6 +112,13 @@ export default {
 		generateImg() {},
 		clearSingleStyle() {},
 		clearAllStyle() {},
+		init() {
+			let str = '你好啊';
+			console.log($('.main'));
+			// <vue-draggable-resizable>
+			// 	<p>你可以拖着我，按照自己的意愿调整大小。</p>
+			// </vue-draggable-resizable>;
+		},
 	},
 };
 </script>
@@ -126,6 +143,10 @@ export default {
 				height: 100%;
 				background-color: #42b983;
 				text-align: center;
+				img {
+					width: 100%;
+					height: 100%;
+				}
 			}
 		}
 	}

@@ -10,6 +10,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import 'swiper/dist/css/swiper.min.css';
 import 'swiper/dist/js/swiper.min';
 
+import VueDraggableResizable from 'vue-draggable-resizable';
+import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
+Vue.component('vue-draggable-resizable', VueDraggableResizable);
 const projectConfig = require('./common/projectInfo.js').default; // 引入子系统运行打包配置
 let mode = routerTool(VueRouter);
 let router = tryGetModuleRoute();

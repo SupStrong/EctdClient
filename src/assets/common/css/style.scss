@@ -304,3 +304,11 @@
 .G-cursor{
   cursor: pointer;
 }
+// 
+.handle{
+  width: 8px;
+  height: 8px;
+}
+.handle, .vdr{
+  padding: 5px;
+}
