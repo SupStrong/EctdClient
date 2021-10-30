@@ -12,9 +12,9 @@
 			</div>
 			<div></div>
 			<div class="fl-row-justy tool-btn">
-				<!-- <el-button type="primary" @click="generateImg()">生成图片</el-button>
+				<el-button type="primary" @click="generateImg()">生成图片</el-button>
 				<el-button type="success" @click="clearSingleStyle()">清除单张</el-button>
-				<el-button type="warning" @click="clearAllStyle()">清除所有</el-button> -->
+				<el-button type="warning" @click="clearAllStyle()">清除所有</el-button>
 			</div>
 		</div>
 		<div>
