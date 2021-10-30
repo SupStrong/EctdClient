@@ -106,6 +106,7 @@ export default {
 	}
 	::v-deep .el-form-item {
 		display: block;
+		margin-bottom: 3px;
 	}
 }
 </style>

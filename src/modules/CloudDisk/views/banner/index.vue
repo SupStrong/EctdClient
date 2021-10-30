@@ -42,8 +42,6 @@ export default {
 	},
 	data() {
 		return {
-			activeNames: [],
-			activeNames1: [],
 			tableData: [
 				{
 					date: '2016-05-02',
@@ -78,6 +76,7 @@ export default {
 					zip: 200333,
 				},
 			],
+			siwperIndex: 0,
 		};
 	},
 	mounted() {
@@ -86,10 +85,10 @@ export default {
 			loop: true,
 			// 如果需要分页器
 			pagination: '.swiper-pagination',
-			on: {
-				touchStart: function (event) {
-					console.log();
-				},
+			loop: false,
+			initialSlide: this.siwperIndex,
+			onSlideChangeStart: (swiper) => {
+				this.siwperIndex = swiper.activeIndex;
 			},
 		});
 	},
