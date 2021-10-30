@@ -76,3 +76,5 @@ Vue.component('Card', Card);
 // Vue.prototype.$IVIEW = {};
 Vue.prototype.$Message = Message;
 import '../assets/common/css/iview.less';
+import '../assets/common/css/style.scss';
+import '../assets/common/css/flex.scss';

@@ -1,14 +1,16 @@
 <template>
 	<main class="cloud-main">
 		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType"></diskHeader>
+		{{ navType }}
 		<section class="cloud-disk-main">
 			<div class="left">
 				<diskCategory ref="diskCategory" :data="diskInfo" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
 			<div class="right">
+				<!--  -->
 				<diskNavigation :data="diskInfo" :type="navType" :loading="loading" @callback="diskNavigationControl" @action="diskFeatureControl"></diskNavigation>
 				<div
-					v-show="navType !== 'trans' && navType != 'ectd'"
+					v-show="navType != 'trans' && navType != 'ectd' && navType != 'image'"
 					ref="diskFileArea"
 					class="cloud-disk-content"
 					:class="diskFileShowType"
@@ -93,6 +95,7 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
+				<bannerImage v-if="navType === 'image'"></bannerImage>
 			</div>
 		</section>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -114,6 +117,7 @@ import '../components/contextmenu/styles/index.css';
 import { directive, Contextmenu, ContextmenuItem } from '../components/contextmenu';
 import loading from '../components/loading';
 import ectdIndex from './ectd/ectdIndex.vue';
+import bannerImage from './banner/index.vue';
 let shareWin = null;
 export default {
 	name: 'diskIndex',
@@ -127,6 +131,7 @@ export default {
 		ContextmenuItem,
 		loading,
 		ectdIndex,
+		bannerImage,
 	},
 	data() {
 		return {

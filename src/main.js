@@ -5,6 +5,11 @@ import VueRouter from 'vue-router';
 import routerTool from './common/routerTool';
 import commonRouter from './common/router';
 import commonStore from './common/store';
+import Element from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import 'swiper/dist/css/swiper.min.css';
+import 'swiper/dist/js/swiper.min';
+
 const projectConfig = require('./common/projectInfo.js').default; // 引入子系统运行打包配置
 let mode = routerTool(VueRouter);
 let router = tryGetModuleRoute();
@@ -43,6 +48,7 @@ function tryGetModuleMain() {
 }
 tryGetModuleMain();
 require('./common/units'); //引入通用unit
+Vue.use(Element);
 Vue.prototype.$store = store;
 Vue.config.productionTip = false;
 new Vue({
