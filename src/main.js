@@ -5,6 +5,7 @@ import VueRouter from 'vue-router';
 import routerTool from './common/routerTool';
 import commonRouter from './common/router';
 import commonStore from './common/store';
+import './common/svg';
 import Element from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'swiper/dist/css/swiper.min.css';

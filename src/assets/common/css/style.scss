@@ -175,7 +175,7 @@
 }
 
 .G-Mt-10 {
-  margin-top: 10px;
+  margin-top: 10px!important;
 }
 
 .G-Mt-15 {
@@ -311,4 +311,25 @@
 }
 .handle, .vdr{
   padding: 5px;
+}
+//
+.el-drawer {
+	border-left: 1px solid #999;
+	box-shadow: 0 0;
+}
+.el-drawer__wrapper{
+  width: 567px!important;
+  right: 0!important;
+  float: right;
+  left: auto!important;
+}
+.el-drawer__container{
+  width: 567px;
+  float: right;
+}
+.el-drawer.rtl{
+  width: 100%!important;
+}
+.v-modal{
+  z-index: 0!important;
 }
