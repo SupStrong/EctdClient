@@ -27,7 +27,7 @@ function tryGetModuleRoute() {
 		return new VueRouter(route);
 	} catch (e) {
 		return new VueRouter({
-			mode: mode,
+			mode: "history",
 			routes: commonRouter,
 		});
 	}
