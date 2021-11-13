@@ -14,7 +14,7 @@
 				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :ref="'swiper' + index" :key="index" οndragstart="return false">
 					<img
 						class="swiper-img"
-						:src="element.content ? 'http://localhost:3000/uploads/disk/' + element.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
+						:src="element.content ? 'http://118.31.70.36/uploads/disk/' + element.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
 						alt=""
 						οndragstart="return false"
 					/>

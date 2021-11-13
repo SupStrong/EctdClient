@@ -3,7 +3,7 @@
 		<img
 			v-for="(item, index) in imgData"
 			class="image"
-			:src="'http://localhost:3000/uploads/disk/' + item.content"
+			:src="'http://118.31.70.36/uploads/disk/' + item.content"
 			:key="index"
 			alt=""
 			@dblclick="clickFun(item)"
@@ -32,7 +32,7 @@ export default {
 			});
 		},
 		clickFun(val) {
-			this.$emit('change', { val: 'http://localhost:3000/uploads/disk/' + val.content, type: 'image' });
+			this.$emit('change', { val: 'http://118.31.70.36/uploads/disk/' + val.content, type: 'image' });
 		},
 	},
 };
