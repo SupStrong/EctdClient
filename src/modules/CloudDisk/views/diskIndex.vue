@@ -1,14 +1,20 @@
 <template>
 	<main class="cloud-main">
 		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType"></diskHeader>
-		{{ navType }}
 		<section class="cloud-disk-main">
 			<div class="left">
 				<diskCategory ref="diskCategory" :data="diskInfo" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
 			<div class="right">
 				<!--  -->
-				<diskNavigation :data="diskInfo" :type="navType" :loading="loading" @callback="diskNavigationControl" @action="diskFeatureControl"></diskNavigation>
+				<diskNavigation
+					:data="diskInfo"
+					:type="navType"
+					:loading="loading"
+					@callback="diskNavigationControl"
+					@action="diskFeatureControl"
+					@change="changeGenerate"
+				></diskNavigation>
 				<div
 					v-show="navType != 'trans' && navType != 'ectd' && navType != 'image'"
 					ref="diskFileArea"
@@ -56,15 +62,15 @@
 							<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
 								<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
 								<contextmenu-item divider></contextmenu-item>
-								<contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item>
-								<contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item>
-								<contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item>
+								<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
+								<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
+								<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
 								<contextmenu-item divider></contextmenu-item>
-								<contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item>
+								<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
 							</template>
 							<contextmenu-item divider v-else></contextmenu-item>
 							<template v-if="diskInfo.categoryType === 'trash'">
-								<contextmenu-item @click="diskFeatureControl('restore')">还原</contextmenu-item>
+								<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
 							</template>
 							<template v-if="navType !== 'share'">
 								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
@@ -95,7 +101,7 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
-				<bannerImage v-if="navType === 'image'"></bannerImage>
+				<bannerImage v-if="navType === 'image'" @change="childChange" :popupData.sync="generateData"></bannerImage>
 			</div>
 		</section>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -185,6 +191,10 @@ export default {
 				noticeFlag: true, //提醒声音
 			},
 			noticeSrc: false,
+			generateData: {
+				type: 'table',
+				isDrawer: true,
+			},
 		};
 	},
 	directives: {
@@ -229,7 +239,6 @@ export default {
 		if (this.$isElectron) {
 			this.initDiskProfile(() => {
 				this.$getUserInfo();
-
 				this.getDiskData();
 				this.$api.localFile.read('setting', (setting) => {
 					this.settingConfig = Object.assign(this.settingConfig, setting);
@@ -286,6 +295,18 @@ export default {
 					callback && callback();
 				}
 			});
+		},
+		childChange(data) {
+			this.generateData = {
+				type: data.type,
+				isDrawer: true,
+			};
+		},
+		changeGenerate(data) {
+			this.generateData = {
+				type: data.type,
+				isDrawer: true,
+			};
 		},
 		initTransData() {
 			this.$nextTick(() => {
@@ -713,6 +734,7 @@ export default {
 					parentId: parentId || this.diskInfo.id,
 				},
 				(data, fileData) => {
+					console.log(data, fileData, 'xxx');
 					this.uploadList = data;
 					if (fileData && type !== 'folder') {
 						this.diskData.push(this.$api.disk.diskData(fileData));
@@ -806,6 +828,7 @@ export default {
 			}
 		},
 		diskFeatureControl(commend) {
+			console.log(commend, 'commendcommend');
 			let isDragMove = this.draggingFilesStyle.display === 'flex';
 			switch (commend) {
 				case 'quick-open':
@@ -984,10 +1007,20 @@ export default {
 							if (this.validateFileName(value)) {
 								return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
 							}
+							let arr = [];
+							if (this.diskInfo.navData.length) {
+								this.diskInfo.navData.map((item, index) => {
+									arr.push(item.name);
+								});
+								arr.push(value);
+							} else {
+								arr.push(value);
+							}
 							this.$api.disk.newFolder(
 								{
 									parentId: this.diskInfo.id,
 									name: value,
+									parentName: arr.join('/'),
 								},
 								(rs) => {
 									this.diskData.push(this.$api.disk.diskData(rs.data));
@@ -1009,10 +1042,14 @@ export default {
 							if (this.validateFileName(value)) {
 								return this.$Message.error('文件名称不能包含【\\\\\\\\/:*?\\"<>|】');
 							}
+							console.log(this.diskInfo.selectFiles, 'this.diskInfo.selectFiles[0].id');
+							let parentArr = this.diskInfo.selectFiles[0].parentName.split('/');
+							parentArr[parentArr.length - 1] = value;
 							this.$api.disk.rename(
 								{
 									id: this.diskInfo.selectFiles[0].id,
 									name: value,
+									parentName: parentArr.join('/'),
 								},
 								() => {
 									this.diskInfo.select.name = value;
@@ -1024,20 +1061,16 @@ export default {
 					break;
 				case 'trash': //移入回收站
 					let data = this.getSelectData();
-					this.confirm({
-						title: '移入回收站',
-						tips: '是否将所选' + data.length + '个项目移入回收站',
-						callback: () => {
-							this.$api.disk.trash(
-								{
-									id: data,
-								},
-								() => {
-									this.removeSelect(data);
-									this.$Message.success('移入回收站成功');
-								}
-							);
-						},
+					this.$confirm('移入回收站', '是否将所选' + data.length + '个项目移入回收站', {}).then(() => {
+						this.$api.disk.trash(
+							{
+								id: data,
+							},
+							() => {
+								this.removeSelect(data);
+								this.$Message.success('移入回收站成功');
+							}
+						);
 					});
 					break;
 				case 'restore': //文件还原

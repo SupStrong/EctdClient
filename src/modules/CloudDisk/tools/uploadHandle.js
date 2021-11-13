@@ -35,6 +35,7 @@ export default {
 	},
 	chunkSize: 4194304, //4MB ,单位B
 	init(files, data, callback, paused) {
+		console.log(files, data, callback, paused, 'files, data, callback, paused');
 		this.paused = paused;
 		this.callbackFun = callback;
 		files.forEach((item) => {
@@ -115,6 +116,7 @@ export default {
 			}
 			this.uploadList[index]['_stateText'] = this.stateText[value];
 		}
+		console.log(fileData, 'sb');
 		this.callbackFun(Object.values(this.uploadList), fileData ? fileData : false);
 	},
 	getChunk(file, index, chunk = 0) {
@@ -157,8 +159,10 @@ export default {
 			},
 			(rs) => {
 				this.updateFinish(index, rs.data);
+				console.log('111111');
 			},
 			(rs) => {
+				console.log('222222');
 				//曾经上传过，返回已经上传的分片数量 从该处开始
 				// this.uploading++;
 				this.setData(index, '_state', 'progress');

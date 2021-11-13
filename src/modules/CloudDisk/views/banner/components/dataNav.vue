@@ -4,33 +4,36 @@
 			<el-table-column type="expand">
 				<template slot-scope="props">
 					<el-form label-position="left" inline class="demo-table-expand">
-						<el-form-item label="商品名称">
+						<el-form-item label="名称">
 							<span @dblclick="clickFun(props.row.name)">{{ props.row.name }}</span>
 						</el-form-item>
-						<el-form-item label="所属店铺">
-							<span @dblclick="clickFun()">{{ props.row.shop }}</span>
+						<el-form-item label="品牌">
+							<span @dblclick="clickFun(props.row.brandName)">{{ props.row.brandName }}</span>
 						</el-form-item>
-						<el-form-item label="商品 ID">
-							<span @dblclick="clickFun()">{{ props.row.id }}</span>
+						<el-form-item label="别称">
+							<span @dblclick="clickFun(props.row.nickName)">{{ props.row.nickName }}</span>
 						</el-form-item>
-						<el-form-item label="店铺 ID">
-							<span @dblclick="clickFun()">{{ props.row.shopId }}</span>
+						<el-form-item label="含量">
+							<span @dblclick="clickFun(props.row.content)">{{ props.row.content }}</span>
 						</el-form-item>
-						<el-form-item label="商品分类">
-							<span>{{ props.row.category }}</span>
+						<el-form-item label="分类">
+							<span @dblclick="clickFun(props.row.categoryName)">{{ props.row.categoryName }}</span>
 						</el-form-item>
-						<el-form-item label="店铺地址">
-							<span>{{ props.row.address }}</span>
+						<el-form-item label="国籍">
+							<span @dblclick="clickFun(props.row.nationality)">{{ props.row.nationality }}</span>
 						</el-form-item>
-						<el-form-item label="商品描述">
-							<span>{{ props.row.desc }}</span>
+						<el-form-item label="价格">
+							<span @dblclick="clickFun(props.row.price)">{{ props.row.price }}</span>
+						</el-form-item>
+						<el-form-item label="功效">
+							<span @dblclick="clickFun(props.row.effect)">{{ props.row.effect }}</span>
 						</el-form-item>
 					</el-form>
 				</template>
 			</el-table-column>
-			<el-table-column label="商品 ID" prop="id"> </el-table-column>
-			<el-table-column label="商品名称" prop="name"> </el-table-column>
-			<el-table-column label="描述" prop="desc"> </el-table-column>
+			<el-table-column label="品牌" prop="name"> </el-table-column>
+			<el-table-column label="别称" prop="nickName"> </el-table-column>
+			<el-table-column label="价格" prop="price"> </el-table-column>
 		</el-table>
 	</el-drawer>
 </template>
@@ -38,47 +41,15 @@
 export default {
 	data() {
 		return {
-			tableData: [
-				{
-					id: '12987122',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333',
-				},
-				{
-					id: '12987123',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333',
-				},
-				{
-					id: '12987125',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333',
-				},
-				{
-					id: '12987126',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333',
-				},
-			],
+			tableData: [],
 		};
 	},
 	props: { data: { type: Boolean, default: true } },
+	created() {
+		this.$api.sample.list({}, (rs) => {
+			this.tableData = rs.data.rows;
+		});
+	},
 	methods: {
 		clickFun(val) {
 			this.$emit('change', { val: val, type: 'text' });

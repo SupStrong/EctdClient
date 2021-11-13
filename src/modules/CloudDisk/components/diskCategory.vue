@@ -143,9 +143,11 @@ export default {
 		/** 获取ectd文档列表 */
 		getEctdDocumentList() {
 			this.ectdData = [
-				{ name: '样品详情', icon: 'sf-icon-upload', data: 'doucument1', country: 'china' },
-				{ name: '品牌分类', icon: 'sf-icon-upload', data: 'doucument2', country: 'europe' },
-				{ name: '品类分类', icon: 'sf-icon-upload', data: 'doucument3', country: 'american' },
+				{ name: '样品列表', icon: 'sf-icon-upload', data: 'document1', country: 'sample' },
+				{ name: '品牌列表', icon: 'sf-icon-upload', data: 'document2', country: 'brand' },
+				{ name: '分类列表', icon: 'sf-icon-upload', data: 'document3', country: 'category' },
+				{ name: '单位列表', icon: 'sf-icon-upload', data: 'document4', country: 'company' },
+				{ name: '文案列表', icon: 'sf-icon-upload', data: 'document5', country: 'imgText' },
 			]; //ectd分类,应该是接口动态获取,暂时写死
 			this.categoryMenuData = this.ectdData;
 		},

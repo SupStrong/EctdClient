@@ -11,7 +11,7 @@
 			<Checkbox v-model="item.active"></Checkbox>
 		</div>
 		<span class="icon">
-			<img :src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : itemIcon(item)" draggable="false" alt="" />
+			<img :src="item.content ? 'http://localhost:3000/uploads/disk/' + item.content : itemIcon(item)" draggable="false" alt="" />
 		</span>
 		<p>{{ item.name }}</p>
 		<div class="time">{{ item.updatedAt }}</div>

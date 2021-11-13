@@ -2,66 +2,101 @@
 	<div class="main">
 		<!-- 轮播图 -->
 		<div class="tool-swiper">
-			<div class="swiper-container G-Mb-10" ref="html2canvas">
-				<div class="swiper-wrapper">
-					<div class="swiper-slide test" v-for="(element, index) in swiperBanner" :key="index">
-						<img class="swiper-img" :src="element" alt="" />
-						<vue-draggable-resizable
-							class-name-active="my-active-class"
-							v-for="(c_element, c_index) in imgToData"
-							:parent="true"
-							:key="c_index"
-							:lock-aspect-ratio="true"
-							@resizing="onResize"
-							@resizestop="onResizeStop"
-							v-show="c_element.index == swiperIndex"
-							w="auto"
-							h="auto"
-							:style="{ zoom: r }"
-							@dragging="(left, top) => dragging(element.id, left, top)"
-							@dragstop="(left, top) => dragstop(element.id, left, top)"
+			<el-carousel
+				indicator-position="outside"
+				class="swiper-wrapper"
+				height="640"
+				ref="carousel"
+				:initial-index="swiperIndex"
+				:autoplay="false"
+				@change="changeSwiper"
+			>
+				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :ref="'swiper' + index" :key="index" οndragstart="return false">
+					<img
+						class="swiper-img"
+						:src="element.content ? 'http://localhost:3000/uploads/disk/' + element.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
+						alt=""
+						οndragstart="return false"
+					/>
+					<vue-draggable-resizable
+						class-name-active="my-active-class"
+						style="border: 0; display: flex; align-items: center; justify-content: center"
+						v-for="(c_element, c_index) in imgToData"
+						:parent="true"
+						:key="c_index"
+						:lock-aspect-ratio="true"
+						:style="c_element.index != swiperIndex ? 'display:none;' : 'display: flex;'"
+						w="auto"
+						h="auto"
+						@resizing="(left, top, width, height) => onResize(c_element, left, top, width, height)"
+						@activated="onActivated"
+						@deactivated="onDeactivated"
+						@resizestop="onResizeStop"
+					>
+						<p
+							:ref="c_element.rand"
+							:class="c_element.class || 'G-font-6'"
+							style="font-size: 26px; white-space: nowrap; display: -webkit-inline-box"
+							v-if="c_element.type == 'text'"
+							v-html="c_element.val"
+						></p>
+						<img
+							:src="c_element.val"
+							v-if="c_element.type == 'image'"
+							:style="{
+								width: '100%',
+								height: 'auto',
+							}"
+							alt=""
+						/>
+						<svg
+							class="icon"
+							v-if="c_element.type == 'icon'"
+							:style="{
+								width: '100%',
+								height: 'auto',
+							}"
+							:key="index"
 						>
-							<p v-if="c_element.type == 'text'">{{ c_element.val }}</p>
-							<img :src="c_element.val" v-if="c_element.type == 'image'" style="width: 80px; height: auto" alt="" />
-							<svg class="icon" v-if="c_element.type == 'icon'" style="width: 40px; height: 40px" :key="index">
-								<use draggable="false" ondragstart="return false;" :xlink:href="'#' + c_element.val"></use>
-							</svg>
-						</vue-draggable-resizable>
+							<use draggable="false" dragstart="return false;" :xlink:href="'#' + c_element.val"></use>
+						</svg>
+					</vue-draggable-resizable>
+				</el-carousel-item>
+			</el-carousel>
+			<div class="imgDom"></div>
+			<!-- <div class="swiper-container G-Mb-10" ref="html2canvas">
+				<div class="swiper-wrapper swiper-no-swiping">
+					<div class="swiper-slide test" v-for="(element, index) in swiperBanner" :ref="'swiper' + index" :key="index" οndragstart="return false">
+						
 					</div>
 				</div>
 				<div class="swiper-pagination"></div>
-			</div>
-			<!-- <div class="fl-row-justy tool-btn">
-				<el-button type="primary" @click="selectFile()">生成图片</el-button>
-				<span></span>
-				<el-button>下一版</el-button>
 			</div> -->
-		</div>
-		<div class="fl-row-justy tool-btn">
-			<el-button type="primary" @click="generateImg()">生成图片</el-button>
-			<el-button type="success" @click="clearSingleStyle()">清除单张</el-button>
-			<el-button type="warning" @click="clearAllStyle()">清除所有</el-button>
-		</div>
-		<div>
-			<el-tabs v-model="activeName" @tab-click="handleClick">
-				<el-tab-pane label="布局" name="first"> </el-tab-pane>
-				<el-tab-pane label="滤镜" name="second"> </el-tab-pane>
-			</el-tabs>
-		</div>
-		<div>
-			<div class="tool-r">
-				<el-button class="G-Mt-10" @click="drawerPopup('data')">样品数据</el-button>
-				<el-button class="G-Mt-10" @click="drawerPopup('text')">文案</el-button>
-				<el-button class="G-Mt-10" @click="drawerPopup('image')">插画</el-button>
-				<el-button class="G-Mt-10" @click="drawerPopup('icon')">表情</el-button>
-				<el-button class="G-Mt-10" @click="drawerPopup('classify')">分类</el-button>
+			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
+			<div class="fl-row-justy tool-btn G-Mt-10">
+				<el-input placeholder="请输入当前查询的文件夹" v-model="currentSwiper"></el-input>
+				<el-button type="primary" @click="getCurrentSwiper()">查询文件夹</el-button>
 			</div>
+			<div class="fl-row-justy tool-btn G-Mt-10">
+				<el-button type="primary" @click="generateImg()" v-loading.fullscreen.lock="fullscreenLoading">生成图片</el-button>
+			</div>
+		</div>
+		<div>
 			<div class="popup">
-				<bannerData v-if="popupData.val == 'data'" :data="popupData" @change="addToData"></bannerData>
-				<bannerImage v-else-if="popupData.val == 'image'" :data="popupData" @change="addToData"></bannerImage>
-				<bannerText v-else-if="popupData.val == 'text'" :data="popupData" @change="addToData"></bannerText>
-				<bannerIcon v-else-if="popupData.val == 'icon'" :data="popupData" @change="addToData"></bannerIcon>
-				<bannerclassify v-else-if="popupData.val == 'classify'" :data="popupData" @change="addToData"></bannerclassify>
+				<bannerData v-if="popupData.type == 'data'" :data="popupData" @change="addToData"></bannerData>
+				<bannerImage v-else-if="popupData.type == 'image'" :data="popupData" @change="addToData"></bannerImage>
+				<bannerText v-else-if="popupData.type == 'text'" :data="popupData" @change="addToData"></bannerText>
+				<bannerIcon v-else-if="popupData.type == 'icon'" :data="popupData" @change="addToData"></bannerIcon>
+				<bannerclassify v-else-if="popupData.type == 'classify'" :data="popupData" @change="addToData"></bannerclassify>
+				<bannerFilter v-else-if="popupData.type == 'filter'" :data="popupData" @change="addToData"></bannerFilter>
+				<bannerTableNav
+					v-else-if="popupData.type == 'table'"
+					:data="popupData"
+					:listData="imgStyleToData"
+					@select="resetData"
+					@delete="deleteToData"
+					@change="addToData"
+				></bannerTableNav>
 			</div>
 		</div>
 	</div>
@@ -75,7 +110,9 @@ import bannerImage from './components/imageNav.vue';
 import bannerText from './components/textNav.vue';
 import bannerIcon from './components/iconNav.vue';
 import bannerclassify from './components/classifyNav.vue';
-
+import bannerFilter from './components/filterNav.vue';
+import bannerTableNav from './components/tableNav.vue';
+import uploadHandle from '../../tools/uploadHandle';
 export default {
 	components: {
 		bannerData,
@@ -83,30 +120,53 @@ export default {
 		bannerText,
 		bannerIcon,
 		bannerclassify,
+		bannerFilter,
+		bannerTableNav,
+	},
+	props: {
+		popupData: {
+			type: Object,
+			default: function () {
+				return {
+					type: 'data',
+					isDrawer: false,
+				};
+			},
+		},
 	},
 	data() {
 		return {
 			swiperIndex: 0,
-			swiperBanner: [
-				'https://img0.baidu.com/it/u=3122136587,3938996930&fm=26&fmt=auto',
-				'https://img1.baidu.com/it/u=1948442199,1328853331&fm=26&fmt=auto',
-				'https://img1.baidu.com/it/u=1783594224,1234800221&fm=26&fmt=auto',
-			],
-			popupData: {
-				val: '',
-				isDrawer: false,
-			},
+			swiperBanner: [],
+			currentFolder: {},
 			imgToData: [],
+			imgStyleToData: [],
+			fontArr: [],
 			r: 1,
+			currentSwiper: '',
+			diskData: [],
+			maxFileSize: 4294967296, //4GB
+			maxFileSizeText: '0B',
+			diskInfo: {},
+			settingConfig: {
+				maxUpTrans: 3,
+				maxDownTrans: 3,
+				noticeBubble: true, //气泡提示
+				noticeFlag: true, //提醒声音
+			},
+			fullscreenLoading: false,
 		};
 	},
-	created() {},
+	created() {
+		this.getData();
+	},
 	mounted() {
 		new Swiper('.swiper-container', {
 			loop: true,
 			// 如果需要分页器
 			pagination: '.swiper-pagination',
 			loop: false,
+			noSwiping: true,
 			initialSlide: this.swiperIndex,
 			onSlideChangeStart: (swiper) => {
 				this.swiperIndex = swiper.activeIndex;
@@ -116,11 +176,74 @@ export default {
 	// computed: {},
 	methods: {
 		//点击方法
-		generateImg(divText, imgText) {
-			$('.tool-swiper').attr('style', `height:${$('.swiper-wrapper .test').eq(0).height()}px;overflow:hidden`);
-			$('.swiper-wrapper').css({
-				transform: 'translate3d(0px, 0px, 0px)',
+		getData() {
+			this.$api.brand.list({}, (rs) => {
+				console.log(rs, 'resss');
 			});
+		},
+		verifyUploadSize(files) {
+			let result = [];
+			let totalSize = 0;
+			for (let i = 0; i < files.length; i++) {
+				if (files[i].size < this.maxFileSize) {
+					result.push(files[i]);
+					totalSize = totalSize + files[i].size;
+				} else {
+					this.$Message.warning(files[i].name + '超过' + this.maxFileSizeText + '已过滤');
+				}
+			}
+			let uploadingSize = this.uploadList.reduce((a, b) => {
+				if (b._state !== 'finish') {
+					a = a + b.size;
+				}
+				return a;
+			}, 0);
+			if (totalSize && totalSize > this.diskInfo.size.left - uploadingSize) {
+				this.$Message.error('剩余空间不足');
+				return [];
+			}
+			return result;
+		},
+		prepareUpload() {},
+		transFinish(item, type) {
+			if (this.settingConfig.noticeBubble) {
+				this.$notify(item.name, type === 'upload' ? '上传完成' : '下载完成');
+			}
+		},
+		getCurrentSwiper() {
+			if (this.currentSwiper === '') {
+				this.$Message.info('不可以查询空文件夹哦！');
+				return;
+			}
+			this.$api.disk.search({ parentName: this.currentSwiper }, (rs) => {
+				this.swiperBanner = rs.data.allImg;
+				this.currentFolder = rs.data.parent_data;
+			});
+		},
+		changeSwiper(index) {
+			this.swiperIndex = index;
+		},
+		initDiskInfo(callback) {
+			this.maxFileSizeText = this.maxFileSize.fileSize();
+			this.$api.disk.info((rs) => {
+				this.diskInfo.size = rs.data;
+				callback && callback();
+			});
+		},
+		generateImg() {
+			if (!this.swiperBanner.length) {
+				this.$Message.info('不能点击哦');
+				return;
+			}
+			let arr = this.currentFolder.parentName.split('/');
+			arr[arr.length - 1] = '样品';
+			let str = arr.join('/');
+			this.$api.disk.isFolderList({ parentName: str.toString() }, (rs) => {
+				console.log(rs, 'resss');
+			});
+			return;
+			this.fullscreenLoading = true;
+			this.$refs.carousel.setActiveItem(0);
 			let self = this;
 			let length = $('.swiper-wrapper .test').length;
 			let imgsSrc = [];
@@ -129,19 +252,13 @@ export default {
 			var w = parseInt(window.getComputedStyle(_canvas).width);
 			var h = parseInt(window.getComputedStyle(_canvas).height);
 			//将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
-			canvas2.width = w * 2;
-			canvas2.height = h * 2;
-			canvas2.style.width = w + 'px';
-			canvas2.style.height = h + 'px';
 			window.pageYoffset = 0;
 			document.documentElement.scrollTop = 0;
 			document.body.scrollTop = 0;
 			var context = canvas2.getContext('2d');
-			context.scale(2, 2);
 			for (let i = 0; i < length; i++) {
 				setTimeout(() => {
-					$('.tool-swiper').attr('style', `height:${$('.swiper-wrapper .test').eq(i).height()}px;overflow:hidden`);
-					$('.swiper-wrapper').attr('style', `transform:translate3d(-${480 * i}px, 0px, 0px)`);
+					this.$refs.carousel.setActiveItem(i + 1);
 					html2canvas(document.querySelector('.tool-swiper'), {
 						logging: false,
 						scrollY: 0,
@@ -149,7 +266,7 @@ export default {
 						useCORS: true,
 						allowTaint: false,
 						tainTaint: false,
-						scale: 1,
+						scale: 8,
 						height: $('.tool-swiper').height(), // 下面解决当页面滚动之后生成图片出现白边问题
 						width: $('.tool-swiper').width(),
 						windowWidth: document.body.scrollWidth,
@@ -157,70 +274,140 @@ export default {
 						x: 0,
 						y: 0,
 					}).then(function (canvas) {
-						//document.body.appendChild(canvas);
-						//canvas转换成url，然后利用a标签的download属性，直接下载，绕过上传服务器再下载
-						// $('.imgDom').append('<img style="width:360px" src="' + canvas.toDataURL() + '" />');
-						for (let j = 0; j < 1; j++) {
-							imgsSrc.push(canvas.toDataURL());
-							if (imgsSrc.length === length) {
-								console.log(imgsSrc, 'imgsSrcimgsSrc');
-								// self.packageImages(imgsSrc);
-							}
+						imgsSrc.push(canvas.toDataURL());
+						if (imgsSrc.length === self.swiperBanner.length) {
+							self.packageImages(imgsSrc);
 						}
 					});
 				}, 0);
 			}
 		},
-		clearSingleStyle() {},
-		clearAllStyle() {},
-		addToData(data) {
-			this.imgToData.push({ ...data, ...{ index: this.swiperIndex } });
+		dataURLtoFile(dataurl, filename) {
+			//将base64转换为文件
+			var arr = dataurl.split(','),
+				mime = arr[0].match(/:(.*?);/)[1],
+				bstr = atob(arr[1]),
+				n = bstr.length,
+				u8arr = new Uint8Array(n);
+			while (n--) {
+				u8arr[n] = bstr.charCodeAt(n);
+			}
+			return new File([u8arr], filename, { type: mime });
 		},
-		drawerPopup(val) {
-			this.popupData = {
-				isDrawer: true,
-				val,
-			};
+		resetData(data) {
+			this.imgToData.map((item, index) => {
+				if (item.rand === data.rand) {
+					this.$set(this.imgToData, index, { ...this.imgToData[index], class: data.class, val: data.val });
+				}
+			});
+		},
+		deleteToData(data) {
+			let newImgToData = [];
+			this.imgToData.map((item, index) => {
+				if (item.rand !== data.rand) {
+					newImgToData.push(item);
+				}
+			});
+			this.imgToData = newImgToData;
+			this.imgStyleToData = newImgToData;
+		},
+		addToData(data) {
+			if (data.type === 'filter') {
+				$('.test').eq(this.swiperIndex).find('img').removeClass().addClass('swiper-img').addClass(data.val);
+				return;
+			}
+			this.imgToData.push({
+				...data,
+				...{
+					index: this.swiperIndex,
+					rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+				},
+			});
+		},
+		setFontStyle(item) {
+			$('.test').eq(this.swiperIndex).find('p').css({
+				color: item.color,
+				'text-shadow': item.shadow,
+				'font-family': item.font,
+			});
 		},
 		packageImages(imgsSrc) {
-			var imgBase64 = []; //base64图片
-			var imageSuffix = []; //图片后缀
-			var zip = new JSZip();
-			var img = zip.folder('images');
-			for (let i = 0; i < imgsSrc.length; i++) {
-				imageSuffix.push('.png');
-				imgBase64.push(imgsSrc[i]);
-				if (imgsSrc.length === imgBase64.length) {
-					for (let j = 0; j < imgsSrc.length; j++) {
-						img.file(j + imageSuffix[j], imgBase64[j].replace(/^data:image\/(png|jpg);base64,/, ''), {
-							base64: true,
-						});
-					}
-					zip
-						.generateAsync({
-							type: 'blob',
-						})
-						.then(function (content) {
-							// see FileSaver.js
-							console.log(content, 'contentcontent');
-							saveAs(content, 'images.zip');
-							$('#status').text('处理完成。。。。。');
-						});
+			let arr = this.currentFolder.parentName.split('/');
+			arr[arr.length - 1] = '样品';
+			this.$api.disk.newFolder(
+				{
+					parentId: this.currentFolder.parentId,
+					name: '样品',
+					parentName: arr.join('/'),
+					type: 'news',
+				},
+				(rs) => {
+					imgsSrc.map((item, index) => {
+						let files = [];
+						files[0] = this.dataURLtoFile(item, new Date().getTime() + '.jpg');
+						uploadHandle.init(
+							files,
+							{
+								parentId: rs.data.id,
+							},
+							(data, fileData) => {
+								this.uploadList = data;
+								if (fileData) {
+									this.diskData.push(this.$api.disk.diskData(fileData));
+									this.transFinish(fileData, 'upload');
+									this.initDiskInfo();
+								}
+							},
+							undefined
+						);
+					});
+					this.fullscreenLoading = false;
+					this.$Message.success('生成成功');
 				}
-			}
+			);
 		},
-		onResize(x, y, width, height) {
-			// this.resizing = true;
-			// this.x = x;
-			// this.y = y;
-			// this.width = width;
-			// this.height = height;
-			// this.r = width / 80;
-			// console.log(x, y, width / 80, height / 80);
-			// scale(1, 2)
+		onResize(data, x, y, width, height) {
+			let dom_height = this.$refs[data.rand][data.index].offsetHeight;
+			let dom_width = this.$refs[data.rand][data.index].offsetWidth;
+			this.$refs[data.rand][data.index].style.transform = `scale(${width / dom_width},${height / dom_height})`;
 		},
 		onResizeStop(x, y, width, height) {
 			this.resizing = false;
+		},
+		onActivated() {
+			this.$emit('change', { type: 'table', isDrawer: true });
+			this.imgStyleToData = [];
+			this.imgToData.map((item, index) => {
+				if (item.type === 'text') {
+					let obj = {
+						...item,
+						'font-size': this.getStyle(this.$refs[item.rand][item.index], 'fontSize'),
+						color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
+						'font-family': this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
+						'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
+						class: this.$refs[item.rand][item.index].getAttribute('class'),
+					};
+					this.imgStyleToData.push(obj);
+				}
+			});
+			console.log(this.imgStyleToData, 'this.imgStyleToData');
+		},
+		getStyle(obj, attr) {
+			var ie = !+'\v1'; //简单判断ie6~8
+			if (attr === 'backgroundPosition') {
+				//IE6~8不兼容backgroundPosition写法，识别backgroundPositionX/Y
+				if (ie) {
+					return obj.currentStyle.backgroundPositionX + ' ' + obj.currentStyle.backgroundPositionY;
+				}
+			}
+			if (obj.currentStyle) {
+				return obj.currentStyle[attr];
+			} else {
+				return document.defaultView.getComputedStyle(obj, null)[attr];
+			}
+		},
+		onDeactivated() {
+			// this.$emit('change', { type: '', isDrawer: false });
 		},
 	},
 };
@@ -228,35 +415,29 @@ export default {
 <style scoped lang="scss">
 .main {
 	display: flex;
-	justify-content: space-between;
+	position: relative;
+	z-index: 999;
+	// justify-content: space-between;
 }
 .tool-swiper {
 	width: 480px;
+	height: 640px;
 	.tool-btn {
 		width: 480px;
 	}
+	.swiper-img {
+		position: absolute;
+		height: 100%;
+	}
 	.swiper-container {
 		width: 480px;
-		height: 640px;
+		height: 670px;
 		float: left;
 		cursor: pointer;
-		.swiper-wrapper {
-			.swiper-slide {
-				width: 100%;
-				height: 100%;
-				background-color: transparent;
-				text-align: center;
-				position: relative;
-				.swiper-img {
-					width: 100%;
-					// height: 100%;
-					position: absolute;
-					left: 0;
-					right: 0;
-				}
-			}
-		}
 	}
+}
+.swiper-wrapper {
+	display: inherit;
 }
 .tool-r {
 	display: inline-grid;
@@ -264,5 +445,44 @@ export default {
 .my-active-class {
 	box-sizing: content-box;
 	border: 1px solid red;
+}
+// .my-class {
+// 	border: 0;
+// }
+.G-Mt-10 {
+	margin-top: 10px;
+}
+.handle,
+.vdr {
+	padding: 0;
+}
+::v-deep .el-carousel__indicators--outside {
+	display: none;
+}
+::v-deep .el-carousel__container {
+	height: 640px;
+}
+::v-deep .handle-tm,
+::v-deep .handle-mr,
+::v-deep .handle-bm,
+::v-deep .handle-ml {
+	width: 0 !important;
+	height: 0 !important;
+	padding: 0 !important;
+	background: transparent;
+	border: 0;
+}
+::v-deep .swiper-pagination-bullet-active {
+	width: 15px;
+	height: 15px;
+}
+::v-deep .swiper-pagination-bullet {
+	width: 15px;
+	height: 15px;
+}
+::v-deep .swiper-container-horizontal > .swiper-pagination-bullets,
+.swiper-pagination-custom,
+.swiper-pagination-fraction {
+	bottom: 0;
 }
 </style>

@@ -29,6 +29,7 @@
     "simple-syntax-highlighter": "^1.4.4",
     "view-design": "^4.6.1",
     "vue": "^2.6.12",
+    "vue-drag-resize": "^1.5.4",
     "vue-draggable-resizable": "^2.3.0",
     "vue-lazyload": "^1.3.3",
     "vue-router": "^3.5.1",

@@ -3,12 +3,11 @@
 		<img
 			v-for="(item, index) in imgData"
 			class="image"
-			:src="'http://118.31.70.36:3000/uploads/disk/' + item.content"
+			:src="'http://localhost:3000/uploads/disk/' + item.content"
 			:key="index"
 			alt=""
-			@click="clickFun(item)"
+			@dblclick="clickFun(item)"
 		/>
-		<!-- <p v-for="(item, index) in imgData" :key="index">{{ item.content }}</p> -->
 	</el-drawer>
 </template>
 <script>
@@ -33,7 +32,7 @@ export default {
 			});
 		},
 		clickFun(val) {
-			this.$emit('change', { val: 'http://118.31.70.36:3000/uploads/disk/' + val.content, type: 'image' });
+			this.$emit('change', { val: 'http://localhost:3000/uploads/disk/' + val.content, type: 'image' });
 		},
 	},
 };
@@ -57,5 +56,6 @@ span {
 	max-width: 70px;
 	max-height: 70px;
 	cursor: pointer;
+	display: inline;
 }
 </style>

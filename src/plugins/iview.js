@@ -32,6 +32,7 @@ import {
 	Row,
 	Col,
 	Table,
+	Page,
 	Card,
 } from 'view-design';
 
@@ -72,9 +73,13 @@ Vue.component('ISwitch', Switch);
 Vue.component('Row', Row);
 Vue.component('Col', Col);
 Vue.component('Table', Table);
+Vue.component('Page', Page);
 Vue.component('Card', Card);
 // Vue.prototype.$IVIEW = {};
 Vue.prototype.$Message = Message;
 import '../assets/common/css/iview.less';
 import '../assets/common/css/style.scss';
 import '../assets/common/css/flex.scss';
+import '../assets/common/css/fontFace.scss';
+import '../assets/common/css/default.scss';
+import '../assets/common/css/demo-site.min.scss';

@@ -1,95 +1,5 @@
-const colConfig = [
-	{ title: '序列号', key: 'serialNumber' },
-	{ title: '标准', key: 'standard' },
-	{ title: '状态', key: 'status' },
-	{ title: '描述', key: 'describe' },
-	{ title: '修改时间', key: 'changeTime' },
-	{ title: '验证报告', key: 'report' },
-	{ title: '操作', key: 'action' },
-];
-const tableData = [
-	{
-		applicationId: 'ww1111',
-		sequenceNumber: 'xgwax1',
-		applicationType: 'us V3 3ewasd',
-		regulatoryActivityType: '已归档',
-		sequenceType: '标准',
-		sequenceDescription: '首次申请首次提交',
-		changeTime: '2021-10-24',
-	},
-	{ serialNumber: 'xgwax2', standard: 'us V3 3ewasd', status: '已归档', changeTime: '2021-09-24', report: '查看', action: '动作' },
-	{ serialNumber: 'xgwax3', standard: 'us V3 3ewasd', status: '已归档', changeTime: '2021-09-24', report: '查看', action: '动作' },
-	{ serialNumber: 'xgwax4', standard: 'us V3 3ewasd', status: '已归档', changeTime: '2021-09-24', report: '查看', action: '动作' },
-	{ serialNumber: 'xgwax5', standard: 'us V3 3ewasd', status: '已归档', changeTime: '2021-10-24', report: '查看', action: '动作' },
-];
-
-const apiTableData = {
-	doucument1: [
-		{
-			id: '1',
-			brandName: 'ww1111',
-			nicename: 'xgwax1',
-			name: 'us V3 3ewasd',
-			content: '已归档',
-			classify: '标准',
-			nationality: '首次申请首次提交',
-			price: '2021-10-24',
-			effect: '2021-10-24',
-			details: '2021-10-24',
-			image: 'https://img0.baidu.com/it/u=1000551505,2077899926&fm=26&fmt=auto',
-		},
-	],
-	doucument2: [
-		{
-			trackingNo: 'ae20001',
-			sequence: '1st',
-			submissionType: '审核',
-			submissionUnit: 'wxz1001',
-			procedureType: 'ectd',
-			submissionDescription: '测试用例',
-			changeTime: '2021-10-24',
-		},
-		{
-			trackingNo: 'ae20002',
-			sequence: '1st',
-			submissionType: '审核',
-			submissionUnit: 'wxz1001',
-			procedureType: 'ectd',
-			submissionDescription: '测试用例',
-			changeTime: '2021-10-24',
-		},
-		{
-			trackingNo: 'ae20003',
-			sequence: '1st',
-			submissionType: '审核',
-			submissionUnit: 'wxz1001',
-			procedureType: 'ectd',
-			submissionDescription: '测试用例',
-			changeTime: '2021-10-24',
-		},
-		{
-			trackingNo: 'ae20004',
-			sequence: '1st',
-			submissionType: '审核',
-			submissionUnit: 'wxz1001',
-			procedureType: 'ectd',
-			submissionDescription: '测试用例',
-			changeTime: '2021-10-24',
-		},
-		{
-			trackingNo: 'ae20005',
-			sequence: '1st',
-			submissionType: '审核',
-			submissionUnit: 'wxz1001',
-			procedureType: 'ectd',
-			submissionDescription: '测试用例',
-			changeTime: '2021-10-24',
-		},
-	],
-};
-
 const apiColConfig = {
-	china: [
+	sample: [
 		{ title: '品牌名称', key: 'brandName', element: '<application-id>', fixed: 'left' },
 		{ title: '品牌别称', key: 'nicename', element: '<sequence-number>' },
 		{ title: '名称', key: 'name', element: '<application-type>' },
@@ -108,27 +18,164 @@ const apiColConfig = {
 			},
 		},
 	],
-	europe: [
-		{ title: 'id', key: 'id', element: '<procedure-tracking>,<number>' },
-		{ title: '品牌名称', key: 'name', element: '<procedure-tracking>,<number>' },
-		{ title: '别称', key: 'nikename', element: '<sequence>' },
-		{ title: '国籍', key: 'nationality', element: '<sequence>' },
+	brand: [
+		{ title: '品牌名称', key: 'name', element: '<application-id>', fixed: 'left' },
+		{ title: '别称', key: 'nickName', element: '<application-id>', fixed: 'left' },
+		{ title: '国籍', key: 'nationality', element: '<application-id>', fixed: 'left' },
+		{
+			title: '操作',
+			key: 'action',
+			render: (h, params) => {
+				console.log(params);
+				return h('div', [
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								cursor: 'pointer',
+								color: '#fc1',
+							},
+							on: {
+								click: () => {
+									this.isShow = true;
+									this.editId = params.row.id;
+								},
+							},
+							class: 'btn',
+						},
+						'编辑'
+					),
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								padding: '5px 10px',
+								cursor: 'pointer',
+								color: 'green',
+							},
+							on: {
+								click: () => {
+									this.deleteData('brand');
+								},
+							},
+							class: 'btn',
+						},
+						'删除'
+					),
+				]);
+			},
+		},
 	],
-	american: [
-		{ title: 'id', key: 'id', element: '<application-number>' },
-		{ title: '分类名称', key: 'name', element: '<application-number>' },
+	category: [
+		{ title: '分类名称', key: 'name', element: '<application-id>', fixed: 'left' },
+		{
+			title: '操作',
+			key: 'action',
+			render: (h, params) => {
+				console.log(params);
+				return h('div', [
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								cursor: 'pointer',
+								color: '#fc1',
+							},
+							on: {
+								click: () => {
+									this.isShow = true;
+									this.editId = params.row.id;
+								},
+							},
+							class: 'btn',
+						},
+						'编辑'
+					),
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								padding: '5px 10px',
+								cursor: 'pointer',
+								color: 'green',
+							},
+							on: {
+								click: () => {
+									this.$confirm({
+										title: '删除',
+										tips: '确认删除此数据？',
+										callback: () => {
+											this.delPopup = true;
+										},
+									});
+								},
+							},
+							class: 'btn',
+						},
+						'删除'
+					),
+				]);
+			},
+		},
+	],
+	company: [
+		{ title: '单位名称', key: 'name', element: '<application-id>', fixed: 'left' },
+		{
+			title: '操作',
+			key: 'action',
+			render: (h, params) => {
+				console.log(params);
+				return h('div', [
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								cursor: 'pointer',
+								color: '#fc1',
+							},
+							on: {
+								click: () => {
+									this.isShow = true;
+									this.editId = params.row.id;
+								},
+							},
+							class: 'btn',
+						},
+						'编辑'
+					),
+					h(
+						'span',
+						{
+							style: {
+								fontSize: '14px',
+								padding: '5px 10px',
+								cursor: 'pointer',
+								color: 'green',
+							},
+							on: {
+								click: () => {
+									this.$confirm({
+										title: '删除',
+										tips: '确认删除此数据？',
+										callback: () => {
+											this.delPopup = true;
+										},
+									});
+								},
+							},
+							class: 'btn',
+						},
+						'删除'
+					),
+				]);
+			},
+		},
 	],
 };
 
-const getProjectData = (param) => {
-	let simulateApi = new Promise((resolve, reject) => {
-		let data = apiTableData[param];
-		if (!data) {
-			resolve([]);
-		}
-		resolve(data);
-	});
-	return simulateApi;
-};
-
-export { colConfig, tableData, apiColConfig, apiTableData, getProjectData };
+export { apiColConfig };

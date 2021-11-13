@@ -14,26 +14,26 @@
 								<span class="icon sf-icon-download"></span>
 								<span>下载</span>
 							</button>
-							<button class="btn text" @click="actionControl('move')">
+							<!-- <button class="btn text" @click="actionControl('move')">
 								<span class="icon sf-icon-arrows"></span>
-								<span>移动到</span>
-							</button>
-							<button class="btn text" @click="actionControl('copy')">
+								<span>移动到12</span>
+							</button> -->
+							<!-- <button class="btn text" @click="actionControl('copy')">
 								<span class="icon sf-icon-copy"></span>
 								<span>复制</span>
 							</button>
 							<button class="btn text" @click="actionControl('cut')">
 								<span class="icon sf-icon-cut"></span>
 								<span>剪切</span>
-							</button>
+							</button> -->
 							<button class="btn text" @click="actionControl('trash')">
 								<span class="icon sf-icon-trash-alt"></span>
 								<span>删除</span>
 							</button>
-							<button class="btn text" @click="actionControl('rename')" v-if="data.selectFiles.length === 1">
+							<!-- <button class="btn text" @click="actionControl('rename')" v-if="data.selectFiles.length === 1">
 								<span class="icon sf-icon-file-edit"></span>
 								<span>重命名</span>
-							</button>
+							</button> -->
 							<button class="btn text" v-if="data.selectFiles.length === 1">
 								<span class="icon sf-icon-share"></span>
 								<span>分享</span>
@@ -109,11 +109,24 @@
 						取消分享
 					</button>
 				</template>
+				<template v-else-if="type === 'image'">
+					<el-button class="btn" type="primary" plain @click="changeData('data')">样品数据</el-button>
+					<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
+					<el-button class="btn" type="info" plain @click="changeData('text')">文案</el-button>
+					<el-button class="btn" type="warning" plain @click="changeData('image')">插画</el-button>
+					<el-button class="btn" type="danger" plain @click="changeData('icon')">表情</el-button>
+					<el-button class="btn" type="primary" plain @click="changeData('filter')">滤镜</el-button>
+					<el-button class="btn" type="primary" plain @click="changeData('filter')">组件</el-button>
+				</template>
 				<template v-else-if="type === 'ectd'">
-					<button class="btn primary" @click="showEctdCreate = true">新建</button>
+					<el-button class="btn" type="info" @click="showSample = true">样品</el-button>
+					<el-button class="btn" type="primary" @click="showBrand = true">品牌</el-button>
+					<el-button class="btn" type="danger" @click="showClassify = true">分类</el-button>
+					<el-button class="btn" type="info" @click="showCompany = true">单位</el-button>
+					<el-button class="btn" type="info" @click="showImgText = true">文案</el-button>
 				</template>
 				<template v-else>
-					<!--					<button class="btn default">全部开始</button>
+					<!--<button class="btn default">全部开始</button>
 					<button class="btn default">全部暂停</button>-->
 				</template>
 			</div>
@@ -163,18 +176,30 @@
 			<p><i class="sf-icon-info-circle" /> 回收站仍然占用网盘空间，文件保存10天后将被自动清除</p>
 		</div>
 		<ectd-import v-model="showEctdImport"></ectd-import>
-		<createData v-model="showEctdCreate" status="news"></createData>
+		<sampleData v-model="showSample" status="news" @input="showSample = false"></sampleData>
+		<brandData v-model="showBrand" status="news" @input="showBrand = false"></brandData>
+		<classifyData v-model="showClassify" status="news" @input="showClassify = false"></classifyData>
+		<companyData v-model="showCompany" status="news" @input="showCompany = false"></companyData>
+		<imgTextData v-model="showImgText" status="news" @input="showImgText = false"></imgTextData>
 	</div>
 </template>
 
 <script>
 import ectdImport from './ectdcpn/importFile.vue';
-import createData from './createData.vue';
+import sampleData from './sampleData.vue';
+import brandData from './brandData.vue';
+import classifyData from './classifyData.vue';
+import companyData from './companyData.vue';
+import imgTextData from './imgTextData.vue';
 export default {
 	name: 'diskNavigation',
 	components: {
 		ectdImport,
-		createData,
+		sampleData,
+		brandData,
+		classifyData,
+		companyData,
+		imgTextData,
 	},
 	props: {
 		type: String,
@@ -203,7 +228,11 @@ export default {
 			showSearch: false,
 			hoverUpload: false,
 			showEctdImport: false,
-			showEctdCreate: false,
+			showSample: false,
+			showBrand: false,
+			showClassify: false,
+			showCompany: false,
+			showImgText: false,
 		};
 	},
 	computed: {
@@ -222,6 +251,10 @@ export default {
 			//回调函数
 			this.$emit('callback', commend);
 		},
+		inputShowType(data) {
+			// this.
+			// console.log(data, 'Dada');
+		},
 		createData() {
 			this.$router.push('/create-data');
 		},
@@ -232,6 +265,9 @@ export default {
 			this.DiskShowState === 'cd-disk-block-file' ? (this.DiskShowState = 'cd-disk-list-file') : (this.DiskShowState = 'cd-disk-block-file');
 			this.$store.commit('updateFileStateIcon');
 			this.$emit('feature', 'state', this.DiskShowState);
+		},
+		changeData(val) {
+			this.$emit('change', { type: val });
 		},
 		arraySort(array, key, type) {
 			let temp, unfix;

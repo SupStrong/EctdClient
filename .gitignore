@@ -4,6 +4,7 @@ node_modules
 /split
 /build
 /dist_electron
+/src/assets/common/face
 
 # local env files
 .env.local

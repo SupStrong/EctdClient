@@ -85,6 +85,16 @@ export default {
 			error: error,
 		});
 	},
+	isFolderList: function (data, callback, error) {
+		return request({
+			name: '判断是否有样品文件夹',
+			url: '/isfolder/list',
+			method: 'get',
+			data: data,
+			callback: callback,
+			error: error,
+		});
+	},
 	folderList: function (data, callback, error) {
 		return request({
 			name: '获取文件夹',
@@ -175,7 +185,6 @@ export default {
 		});
 	},
 	uploadChunk: function (data, cancelToken, callback, error) {
-		console.log(data, 'datadatadata');
 		return request({
 			name: '上传文件切片',
 			url: '/disk/upload/chunk',
@@ -183,6 +192,15 @@ export default {
 			data: data,
 			cancelToken: cancelToken,
 			passed: true,
+			callback: callback,
+			error: error,
+		});
+	},
+	search: function (data, callback, error) {
+		return request({
+			name: '搜索',
+			url: '/disk/search',
+			data: data,
 			callback: callback,
 			error: error,
 		});
