@@ -24,11 +24,11 @@ function tryGetModuleRoute() {
 		let route = require(`./modules/${projectConfig.projectName}/router/index`).default;
 		route.routes = [...route.routes, ...commonRouter];
 		// route.mode =" route.mode ? route.mode : mode";
-		route.mode = "history"
+		route.mode = 'history';
 		return new VueRouter(route);
 	} catch (e) {
 		return new VueRouter({
-			mode: "history",
+			mode: 'history',
 			routes: commonRouter,
 		});
 	}
