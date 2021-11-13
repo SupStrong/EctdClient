@@ -3,12 +3,12 @@
 		<el-form label-position="right" label-width="80px" :model="form">
 			<el-form-item label="新增文案">
 				<el-input v-model="form.name" style="width: 290px; margin-right: 10px"></el-input>
-				<el-button type="primary" @click="onSubmit">新增文案</el-button>
+				<el-button type="danger" @click="onSubmit">新增文案</el-button>
 			</el-form-item>
 		</el-form>
 		<p class="text" v-for="(item, index) in textArr" :key="index" @dblclick="clickFun(item)">
-			<el-divider></el-divider>
 			{{ item.name }}
+			<el-divider></el-divider>
 		</p>
 	</el-drawer>
 </template>

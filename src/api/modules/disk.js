@@ -88,7 +88,7 @@ export default {
 	isFolderList: function (data, callback, error) {
 		return request({
 			name: '判断是否有样品文件夹',
-			url: '/isfolder/list',
+			url: '/disk/isfolder/list',
 			method: 'get',
 			data: data,
 			callback: callback,

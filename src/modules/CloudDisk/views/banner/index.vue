@@ -36,7 +36,8 @@
 						<p
 							:ref="c_element.rand"
 							:class="c_element.class || 'G-font-6'"
-							style="font-size: 26px; white-space: nowrap; display: -webkit-inline-box"
+							style="font-size: 26px; white-space: nowrap; display: inline-box"
+							:style="{ 'text-align': c_element.textAlign, 'writing-mode': c_element.writingMode }"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
 						></p>
@@ -74,12 +75,11 @@
 			</div> -->
 			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
 			<div class="fl-row-justy tool-btn G-Mt-10">
-				<el-input placeholder="请输入当前查询的文件夹" v-model="currentSwiper"></el-input>
-				<el-button type="primary" @click="getCurrentSwiper()">查询文件夹</el-button>
+				<el-input placeholder="请输入当前查询的文件夹" v-model="currentSwiper" value="" style="width: 220px"></el-input>
+				<el-button class="btn" type="danger" @click="getCurrentSwiper()">查询文件夹</el-button>
+				<el-button class="btn" type="warning" @click="generateImg()" v-loading.fullscreen.lock="fullscreenLoading">生成图片</el-button>
 			</div>
-			<div class="fl-row-justy tool-btn G-Mt-10">
-				<el-button type="primary" @click="generateImg()" v-loading.fullscreen.lock="fullscreenLoading">生成图片</el-button>
-			</div>
+			<div class="fl-row-justy tool-btn G-Mt-10"></div>
 		</div>
 		<div>
 			<div class="popup">
@@ -143,7 +143,7 @@ export default {
 			imgStyleToData: [],
 			fontArr: [],
 			r: 1,
-			currentSwiper: '',
+			currentSwiper: '11/11-13/1/SP',
 			diskData: [],
 			maxFileSize: 4294967296, //4GB
 			maxFileSizeText: '0B',
@@ -232,16 +232,46 @@ export default {
 		},
 		generateImg() {
 			if (!this.swiperBanner.length) {
-				this.$Message.info('不能点击哦');
+				this.$Message.info('现在没有图片哦');
 				return;
 			}
 			let arr = this.currentFolder.parentName.split('/');
 			arr[arr.length - 1] = '样品';
 			let str = arr.join('/');
 			this.$api.disk.isFolderList({ parentName: str.toString() }, (rs) => {
-				console.log(rs, 'resss');
+				if (rs.data.id !== undefined) {
+					this.$confirm('已有样品数据，是否再次生成?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+					})
+						.then(() => {
+							this.getJs(rs.data.id);
+						})
+						.catch(() => {
+							this.$message({
+								type: 'info',
+								message: '已取消删除',
+							});
+						});
+				} else {
+					this.getJs();
+				}
 			});
-			return;
+		},
+		dataURLtoFile(dataurl, filename) {
+			//将base64转换为文件
+			var arr = dataurl.split(','),
+				mime = arr[0].match(/:(.*?);/)[1],
+				bstr = atob(arr[1]),
+				n = bstr.length,
+				u8arr = new Uint8Array(n);
+			while (n--) {
+				u8arr[n] = bstr.charCodeAt(n);
+			}
+			return new File([u8arr], filename, { type: mime });
+		},
+		getJs(parentId = null) {
 			this.fullscreenLoading = true;
 			this.$refs.carousel.setActiveItem(0);
 			let self = this;
@@ -267,7 +297,7 @@ export default {
 						allowTaint: false,
 						tainTaint: false,
 						scale: 8,
-						height: $('.tool-swiper').height(), // 下面解决当页面滚动之后生成图片出现白边问题
+						height: $('.tool-swiper .test').eq(i).find('img').height(),
 						width: $('.tool-swiper').width(),
 						windowWidth: document.body.scrollWidth,
 						windowHeight: document.body.scrollHeight,
@@ -276,28 +306,26 @@ export default {
 					}).then(function (canvas) {
 						imgsSrc.push(canvas.toDataURL());
 						if (imgsSrc.length === self.swiperBanner.length) {
-							self.packageImages(imgsSrc);
+							if (parentId) {
+								self.packageImages(imgsSrc, parentId);
+							} else {
+								self.packageImages(imgsSrc);
+							}
 						}
 					});
 				}, 0);
 			}
 		},
-		dataURLtoFile(dataurl, filename) {
-			//将base64转换为文件
-			var arr = dataurl.split(','),
-				mime = arr[0].match(/:(.*?);/)[1],
-				bstr = atob(arr[1]),
-				n = bstr.length,
-				u8arr = new Uint8Array(n);
-			while (n--) {
-				u8arr[n] = bstr.charCodeAt(n);
-			}
-			return new File([u8arr], filename, { type: mime });
-		},
 		resetData(data) {
 			this.imgToData.map((item, index) => {
 				if (item.rand === data.rand) {
-					this.$set(this.imgToData, index, { ...this.imgToData[index], class: data.class, val: data.val });
+					this.$set(this.imgToData, index, {
+						...this.imgToData[index],
+						class: data.class,
+						val: data.val,
+						textAlign: data.textAlign,
+						writingMode: data.writingMode,
+					});
 				}
 			});
 		},
@@ -331,7 +359,31 @@ export default {
 				'font-family': item.font,
 			});
 		},
-		packageImages(imgsSrc) {
+		packageImages(imgsSrc, parentId = null) {
+			if (parentId) {
+				imgsSrc.map((item, index) => {
+					let files = [];
+					files[0] = this.dataURLtoFile(item, new Date().getTime() + '.jpg');
+					uploadHandle.init(
+						files,
+						{
+							parentId: parentId,
+						},
+						(data, fileData) => {
+							this.uploadList = data;
+							if (fileData) {
+								this.diskData.push(this.$api.disk.diskData(fileData));
+								this.transFinish(fileData, 'upload');
+								this.initDiskInfo();
+							}
+						},
+						undefined
+					);
+				});
+				this.fullscreenLoading = false;
+				this.$Message.success('生成成功');
+				return;
+			}
 			let arr = this.currentFolder.parentName.split('/');
 			arr[arr.length - 1] = '样品';
 			this.$api.disk.newFolder(
@@ -385,12 +437,13 @@ export default {
 						color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
 						'font-family': this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
 						'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
+						textAlign: this.getStyle(this.$refs[item.rand][item.index], 'textAlign'),
+						writingMode: this.getStyle(this.$refs[item.rand][item.index], 'writingMode'),
 						class: this.$refs[item.rand][item.index].getAttribute('class'),
 					};
 					this.imgStyleToData.push(obj);
 				}
 			});
-			console.log(this.imgStyleToData, 'this.imgStyleToData');
 		},
 		getStyle(obj, attr) {
 			var ie = !+'\v1'; //简单判断ie6~8
@@ -427,7 +480,7 @@ export default {
 	}
 	.swiper-img {
 		position: absolute;
-		height: 100%;
+		height: auto;
 	}
 	.swiper-container {
 		width: 480px;
@@ -461,6 +514,7 @@ export default {
 }
 ::v-deep .el-carousel__container {
 	height: 640px;
+	border: 1px solid #dcdfe6;
 }
 ::v-deep .handle-tm,
 ::v-deep .handle-mr,

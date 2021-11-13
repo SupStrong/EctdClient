@@ -52,7 +52,7 @@ export default {
 			navTypes: [
 				{ name: '网盘', flag: 'disk', icon: 'sf-icon-hdd' },
 				{ name: '分享', flag: 'share', icon: 'sf-icon-share-alt' },
-				{ name: '传输', flag: 'trans', icon: 'sf-icon-exchange-alt', rotate: '90deg' },
+				// { name: '传输', flag: 'trans', icon: 'sf-icon-exchange-alt', rotate: '90deg' },
 				{ name: '基础数据', flag: 'ectd', icon: 'sf-icon-share-alt' },
 				{ name: '生成图片', flag: 'image', icon: 'sf-icon-share-alt' },
 				{ name: '模板', flag: 'template', icon: 'sf-icon-share-alt' },

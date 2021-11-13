@@ -69,6 +69,7 @@ export default {
 				{ name: '传输完成', icon: 'sf-icon-check-circle', count: 0, data: 'finish' },
 			], //传输分类参数,
 			ectdData: [],
+			imageData: [{ name: '测评', icon: 'sf-icon-hdd', data: 'all' }], //网盘分类参数
 			categoryMenuData: [],
 			towerSrc: require('../assets/img/tower/Spring-bottom-0.png'),
 			timer: false,
@@ -120,6 +121,7 @@ export default {
 			this.TowerSrc = require('../assets/img/tower/' + season + '-bottom-' + tag + '.png');
 		},
 		updateData(type) {
+			console.log(type);
 			if (type === 'disk') {
 				this.categoryMenuData = this.typeData;
 			} else if (type === 'share') {
@@ -129,6 +131,8 @@ export default {
 			} else if (type === 'ectd') {
 				this.getEctdDocumentList();
 				this.categoryMenuData = this.ectdData;
+			} else if (type === 'image') {
+				this.categoryMenuData = this.imageData;
 			}
 			this.change(0, type);
 		},
