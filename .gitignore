@@ -5,6 +5,7 @@ node_modules
 /build
 /dist_electron
 /src/assets/common/face
+/src/assets/common/face.zip
 
 # local env files
 .env.local
