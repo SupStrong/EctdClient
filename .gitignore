@@ -2,6 +2,7 @@
 node_modules
 /dist
 /split
+/build
 /dist_electron
 /src/assets/common/face
 /src/assets/common/face.zip
