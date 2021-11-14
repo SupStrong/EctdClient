@@ -3,7 +3,7 @@
 		<img
 			v-for="(item, index) in imgData"
 			class="image"
-			:src="'http://118.31.70.36/uploads/disk/' + item.content"
+			:src="'http://118.31.70.36:3000/uploads/disk/' + item.content"
 			:key="index"
 			alt=""
 			@dblclick="clickFun(item)"
@@ -24,7 +24,7 @@ export default {
 	methods: {
 		getData() {
 			let obj = {
-				parentId: 1048074044,
+				parentId: 1516288205,
 				category: 'all',
 			};
 			this.$api.disk.list(obj, (rs) => {

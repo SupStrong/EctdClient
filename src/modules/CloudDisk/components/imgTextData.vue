@@ -51,6 +51,9 @@ export default {
 					this.$Message.success('新增成功');
 					this.form = {};
 					this.$emit('input', true);
+				} else {
+					this.form = {};
+					this.$emit('input', false);
 				}
 			});
 		},

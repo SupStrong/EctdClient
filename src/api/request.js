@@ -151,6 +151,8 @@ function request(options) {
 				if (response.code !== 0 && response.code !== 200) {
 					options.error && typeof options.error === 'function' ? options.error(response) : '';
 					if (tips && !options.error) {
+						options.callback && typeof options.callback === 'function' ? options.callback(response) : '';
+						resolve(response);
 						Message.error(options.name + '失败:' + response.msg);
 					}
 				} else {
