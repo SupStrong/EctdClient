@@ -2,7 +2,11 @@
 	<div>
 		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
 			<el-table :data="listData" border style="width: 100%">
-				<el-table-column fixed prop="index" label="坐标" width="50"> </el-table-column>
+				<el-table-column fixed label="当前页面" width="100">
+					<template slot-scope="scope">
+						{{ scope.row.index + 1 }}
+					</template>
+				</el-table-column>
 				<el-table-column label="文字" width="150">
 					<template slot-scope="scope">
 						<el-input v-model="scope.row.val" :value="scope.row.val" @change="handleEdit($event, scope.row)"></el-input>
@@ -17,14 +21,14 @@
 				</el-table-column>
 				<el-table-column prop="" label="排列方式" width="150">
 					<template slot-scope="scope">
-						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleWritingMode($event, scope.row)">
+						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in writingModeOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
 				<el-table-column prop="" label="居中方式" width="150">
 					<template slot-scope="scope">
-						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleCenter($event, scope.row)">
+						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in textCenterOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
@@ -107,12 +111,6 @@ export default {
 		},
 		handleDelete(value, row) {
 			this.$emit('delete', row);
-		},
-		handleWritingMode(value, row) {
-			this.$emit('select', row);
-		},
-		handleCenter(value, row) {
-			this.$emit('select', row);
 		},
 	},
 };

@@ -42,21 +42,18 @@
 							v-html="c_element.val"
 						></p>
 						<img
+							:ref="c_element.rand"
 							:src="c_element.val"
 							v-if="c_element.type == 'image'"
-							:style="{
-								width: '100%',
-								height: 'auto',
-							}"
+							@load="urlInfo($event, c_element.rand)"
+							style="width: 80px; height: 80px; white-space: nowrap; display: block"
 							alt=""
 						/>
 						<svg
 							class="icon"
+							:ref="c_element.rand"
 							v-if="c_element.type == 'icon'"
-							:style="{
-								width: '100%',
-								height: 'auto',
-							}"
+							style="width: 50px; height: 50px; white-space: nowrap; display: block"
 							:key="index"
 						>
 							<use draggable="false" dragstart="return false;" :xlink:href="'#' + c_element.val"></use>
@@ -74,6 +71,7 @@
 				<div class="swiper-pagination"></div>
 			</div> -->
 			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
+			<p>当前文件夹有{{ swiperBanner.length }}张图片</p>
 			<div class="fl-row-justy tool-btn G-Mt-10">
 				<el-input placeholder="请输入当前查询的文件夹" v-model="currentSwiper" value="" style="width: 220px"></el-input>
 				<el-button class="btn" type="danger" @click="getCurrentSwiper()">查询文件夹</el-button>
@@ -180,6 +178,13 @@ export default {
 			this.$api.brand.list({}, (rs) => {
 				console.log(rs, 'resss');
 			});
+		},
+		urlInfo(e, rand) {
+			// this.$refs[rand][this.swiperIndex].style.height = e.target.height / 4 + 'px';
+			// this.$refs[rand][this.swiperIndex].style.width = e.target.width / 4 + 'px';
+			// this.$refs[rand][this.swiperIndex].parentNode.style.height = e.target.height / 4 + 'px';
+			// this.$refs[rand][this.swiperIndex].parentNode.style.width = e.target.width / 4 + 'px';
+			// console.log(this.$refs[rand][this.swiperIndex].parentNode, 'this.$refs[rand][this.swiperIndex].parentNode');
 		},
 		verifyUploadSize(files) {
 			let result = [];
@@ -317,6 +322,9 @@ export default {
 			}
 		},
 		resetData(data) {
+			this.swiperIndex = data.index;
+			console.log('1222');
+			this.$refs.carousel.setActiveItem(data.index);
 			this.imgToData.map((item, index) => {
 				if (item.rand === data.rand) {
 					this.$set(this.imgToData, index, {
