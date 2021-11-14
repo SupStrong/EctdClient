@@ -301,7 +301,7 @@ export default {
 						useCORS: true,
 						allowTaint: false,
 						tainTaint: false,
-						scale: 8,
+						scale: 5,
 						height: $('.tool-swiper .test').eq(i).find('img').height(),
 						width: $('.tool-swiper').width(),
 						windowWidth: document.body.scrollWidth,
