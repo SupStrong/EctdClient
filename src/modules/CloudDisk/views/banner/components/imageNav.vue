@@ -24,7 +24,7 @@ export default {
 	methods: {
 		getData() {
 			let obj = {
-				parentId: 1516288205,
+				parentId: 1157146438,
 				category: 'all',
 			};
 			this.$api.disk.list(obj, (rs) => {

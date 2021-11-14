@@ -1,7 +1,7 @@
 <template>
 	<el-drawer title="表情" :wrapperClosable="false" :visible.sync="data.isDrawer" direction="rtl">
 		<div>
-			<svg class="icon" v-for="(item, index) of iconArr" style="width: 40px; height: 40px" :key="index" @click="clickFun(item)">
+			<svg class="icon" v-for="(item, index) of iconArr" style="width: 40px; height: 40px" :key="index" @dblclick="clickFun(item)">
 				<use draggable="false" ondragstart="return false;" :xlink:href="'#' + item"></use>
 			</svg>
 		</div>
