@@ -21,9 +21,9 @@
 					<vue-draggable-resizable
 						class-name-active="my-active-class"
 						style="border: 0; display: flex; align-items: center; justify-content: center"
-						v-for="(c_element, c_index) in imgToData"
+						v-for="c_element in imgToData"
 						:parent="true"
-						:key="c_index"
+						:key="c_element.rand"
 						:lock-aspect-ratio="true"
 						:style="c_element.index != swiperIndex ? 'display:none;' : 'display: flex;'"
 						w="auto"
@@ -34,6 +34,8 @@
 						@resizestop="onResizeStop"
 					>
 						<p
+							:tabindex="c_element.rand"
+							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
 							:class="c_element.class || 'G-font-6'"
 							style="font-size: 26px; white-space: nowrap; display: inline-box"
@@ -42,6 +44,8 @@
 							v-html="c_element.val"
 						></p>
 						<img
+							:tabindex="c_element.rand"
+							@keyup="imgDelete($event, c_element)"
 							:ref="c_element.rand"
 							:src="c_element.val"
 							v-if="c_element.type == 'image'"
@@ -141,7 +145,7 @@ export default {
 			imgStyleToData: [],
 			fontArr: [],
 			r: 1,
-			currentSwiper: '11/11-13/1/SP',
+			currentSwiper: '2021/11/1/SP',
 			diskData: [],
 			maxFileSize: 4294967296, //4GB
 			maxFileSizeText: '0B',
@@ -178,6 +182,45 @@ export default {
 			this.$api.brand.list({}, (rs) => {
 				console.log(rs, 'resss');
 			});
+		},
+		// 删除图片
+		imgDelete(e, val) {
+			console.log(e, 'Eee');
+			if (e.keyCode === 8) {
+				let newImgToData = [];
+				this.imgToData.map((item, index) => {
+					if (item.rand !== val.rand) {
+						newImgToData.push(item);
+					}
+				});
+				this.imgToData = newImgToData;
+				this.imgStyleToData = newImgToData;
+			} else if (e.keyCode === 67) {
+				let obj = {
+					...val,
+					rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+				};
+				this.imgToData.push(obj);
+			}
+		},
+		// 删除文案
+		textDelete(e, val) {
+			if (e.keyCode === 8) {
+				let newImgToData = [];
+				this.imgToData.map((item, index) => {
+					if (item.rand !== val.rand) {
+						newImgToData.push(item);
+					}
+				});
+				this.imgToData = newImgToData;
+				this.imgStyleToData = newImgToData;
+			} else if (e.keyCode === 67) {
+				let obj = {
+					...val,
+					rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+				};
+				this.imgToData.push(obj);
+			}
 		},
 		urlInfo(e, rand) {
 			// this.$refs[rand][this.swiperIndex].style.height = e.target.height / 4 + 'px';
