@@ -6,9 +6,10 @@
 				<el-button type="danger" @click="onSubmit">新增文案</el-button>
 			</el-form-item>
 		</el-form>
-		<p class="text" v-for="(item, index) in textArr" :key="index" @dblclick="clickFun(item)">
+		<p class="text" v-for="(item, index) in oftenArr" :key="index" style="float: left" @dblclick="clickFun(item)">{{ item }}</p>
+		<p class="text" v-for="(item, index) in textArr" :key="index" @dblclick="clickFun(item.name)">
 			{{ item.name }}
-			<el-divider></el-divider>
+			<!-- <el-divider></el-divider> -->
 		</p>
 	</el-drawer>
 </template>
@@ -16,6 +17,55 @@
 export default {
 	data() {
 		return {
+			oftenArr: [
+				'平衡水油',
+				'深层清洁',
+				'舒缓保湿',
+				'温和清洁',
+				'保湿滋润',
+				'清洁肌肤',
+				'美白保湿',
+				'温和保湿',
+				'控油清洁',
+				'控油清洁',
+				'抑制闭口',
+				'清理污垢',
+				'唤醒肤底',
+				'清爽控油',
+				'清洁面部',
+				'水润肌肤',
+				'保湿保湿',
+				'控油祛痘',
+				'便宜大碗',
+				'敏感肌冲',
+				'平价洁面',
+				'温和洗脸',
+				'控油修复',
+				'调养肌肤',
+				'亮白肌肤',
+				'质地清滑',
+				'混油皮',
+				'干皮',
+				'油痘肌',
+				'全肤质',
+				'控油、收缩毛孔',
+				'调节水油平衡',
+				'修护、细腻毛孔',
+				'修护受损',
+				'强韧屏障',
+				'提亮肤色',
+				'油痘肌用',
+				'油皮用',
+				'洗出鸡蛋肌',
+				'霸屏油痘圈',
+				'超温和洁面',
+				'告别油腻、痘痘肌肤',
+				'深度清洁',
+				'抗痘痘',
+				'补水',
+				'去红',
+				'急救',
+			],
 			textArr: [],
 			form: {
 				name: '',
@@ -29,7 +79,7 @@ export default {
 	},
 	methods: {
 		clickFun(val) {
-			this.$emit('change', { val: val.name, type: 'text' });
+			this.$emit('change', { val: val, type: 'text' });
 		},
 		getData() {
 			this.$api.imgText.list({}, (rs) => {

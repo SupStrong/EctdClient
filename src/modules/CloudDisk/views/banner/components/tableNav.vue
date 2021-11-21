@@ -14,7 +14,7 @@
 				</el-table-column>
 				<el-table-column prop="" label="样式" width="120">
 					<template slot-scope="scope">
-						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row)">
+						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row, 'text')">
 							<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" :class="item.value"> </el-option>
 						</el-select>
 					</template>
@@ -104,7 +104,7 @@ export default {
 		},
 	},
 	created() {
-		for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < 22; i++) {
 			let obj = {
 				value: `G-font-${i}`,
 				label: `常用字体${i}`,
@@ -130,7 +130,11 @@ export default {
 			}
 			this.$emit('select', item);
 		},
-		handleEdit(value, row) {
+		handleEdit(value, row, type) {
+			if (type == 'text') {
+				row.color = '';
+				row['text-shadow'] = '';
+			}
 			this.$emit('select', row);
 		},
 		handleDelete(value, row) {

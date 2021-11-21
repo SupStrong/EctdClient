@@ -69,7 +69,10 @@ export default {
 				{ name: '传输完成', icon: 'sf-icon-check-circle', count: 0, data: 'finish' },
 			], //传输分类参数,
 			ectdData: [],
-			imageData: [{ name: '测评', icon: 'sf-icon-hdd', data: 'all' }], //网盘分类参数
+			imageData: [
+				{ name: '实拍', icon: 'sf-icon-hdd', data: 'all' },
+				{ name: '测评', icon: 'sf-icon-hdd', data: 'lattice' },
+			], //网盘分类参数
 			categoryMenuData: [],
 			towerSrc: require('../assets/img/tower/Spring-bottom-0.png'),
 			timer: false,

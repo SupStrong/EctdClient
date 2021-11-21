@@ -109,7 +109,7 @@
 				<div class="swiper-pagination"></div>
 			</div> -->
 			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
-			<p>当前文件夹有{{ swiperBanner.length }}张图片</p>
+			<p>当前文件夹有{{ swiperBanner.length }}张图片122</p>
 			<!-- <draggable class="drav" @start="start" @end="end"> -->
 
 			<div class="current-swiper">

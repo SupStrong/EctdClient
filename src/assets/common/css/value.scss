@@ -255,6 +255,23 @@ $musicHoverColor:rgba(209,209,214,0.28);
   }
 }
 .G-font-16{
+  font-family: 'Family-120';
+  color: rgb(84, 85, 171);
+  text-shadow: rgb(255 255 255) 1px 0px, rgb(255 255 255) 0px 1px, rgb(255 255 255) -1px 0px, rgb(255 255 255) 0px -1px;
+  span{
+    font-family: "Family-120";
+  }
+}
+.G-font-17{
+  font-family: 'Family-120';
+  color: rgb(254, 152, 3);
+  text-shadow: rgb(255 255 255) 1px 0px, rgb(255 255 255) 0px 1px, rgb(255 255 255) -1px 0px, rgb(255 255 255) 0px -1px;
+  span{
+    font-family: "Family-120";
+  }
+}
+
+.G-font-18{
 	background: white;
 	border-radius: 5px 5px 7px 5px;
 	padding: 2px 5px;
@@ -264,7 +281,7 @@ $musicHoverColor:rgba(209,209,214,0.28);
   font-weight: bold;
   box-sizing: border-box!important;
 }
-.G-font-17{
+.G-font-19{
 	// color: #f2ebd9;
 	background: #f2ebd9;
 	padding: 2px 25px;
@@ -275,7 +292,7 @@ $musicHoverColor:rgba(209,209,214,0.28);
   box-sizing: border-box!important;
 	display:table;
 }
-.G-font-18{
+.G-font-20{
 	background: #e7b7a6;
 	padding: 2px 25px;
 	color: #705243;
@@ -285,15 +302,15 @@ $musicHoverColor:rgba(209,209,214,0.28);
   box-sizing: border-box;
 	display:table;
 }
-.G-font-19{
+.G-font-21{
 	background: white;
 	border: 1px solid #fe860e;
 	color: #fe860e;
 	display: inline-block;
-	padding: 0 18px;
-	font-weight: bold;
+	padding: 3px 18px;
 	display:table;
 	border-radius: 20px;
   box-sizing: border-box;
+  font-weight: 500!important;
 }
 

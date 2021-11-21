@@ -101,7 +101,9 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
-				<bannerImage v-if="navType === 'image'" @change="childChange" :popupData.sync="generateData"></bannerImage>
+				{{ diskInfo.categoryType }}
+				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
+				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
 			</div>
 		</section>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -124,6 +126,7 @@ import { directive, Contextmenu, ContextmenuItem } from '../components/contextme
 import loading from '../components/loading';
 import ectdIndex from './ectd/ectdIndex.vue';
 import bannerImage from './banner/index.vue';
+import latticeIndex from './banner/lattice.vue';
 let shareWin = null;
 export default {
 	name: 'diskIndex',
@@ -138,6 +141,7 @@ export default {
 		loading,
 		ectdIndex,
 		bannerImage,
+		latticeIndex,
 	},
 	data() {
 		return {
@@ -192,8 +196,10 @@ export default {
 			},
 			noticeSrc: false,
 			generateData: {
-				type: 'table',
-				isDrawer: true,
+				type: '',
+				isDrawer: false,
+				// type: 'table',
+				// isDrawer: true,
 			},
 		};
 	},
