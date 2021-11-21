@@ -1075,39 +1075,31 @@ export default {
 					break;
 				case 'restore': //文件还原
 					let restoreData = this.getSelectData();
-					this.confirm({
-						title: '移出回收站',
-						tips: '是否将所选' + restoreData.length + '个项目移出回收站',
-						callback: () => {
-							this.$api.disk.recover(
-								{
-									id: restoreData,
-								},
-								() => {
-									this.removeSelect(restoreData);
-									this.$Message.success('还原成功');
-								}
-							);
-						},
+					this.$confirm('移出回收站', '是否将所选' + restoreData.length + '个项目移出回收站', {}).then(() => {
+						this.$api.disk.recover(
+							{
+								id: restoreData,
+							},
+							() => {
+								this.removeSelect(restoreData);
+								this.$Message.success('还原成功');
+							}
+						);
 					});
 					break;
 				case 'delete': //文件删除
 					let deleteData = this.getSelectData();
-					this.confirm({
-						title: '删除',
-						tips: '是否将所选' + deleteData.length + '个项目彻底删除',
-						callback: () => {
-							this.$api.disk.delete(
-								{
-									id: deleteData,
-								},
-								() => {
-									this.removeSelect(deleteData);
-									this.initDiskInfo();
-									this.$Message.success('删除成功');
-								}
-							);
-						},
+					this.$confirm('删除', '是否将所选' + deleteData.length + '个项目彻底删除', {}).then(() => {
+						this.$api.disk.delete(
+							{
+								id: deleteData,
+							},
+							() => {
+								this.removeSelect(deleteData);
+								this.initDiskInfo();
+								this.$Message.success('删除成功');
+							}
+						);
 					});
 					break;
 				case 'info':
@@ -1139,23 +1131,19 @@ export default {
 				case 'share':
 					let file = this.diskInfo.selectFiles[0];
 					if (file.share) {
-						this.confirm({
-							title: '取消分享',
-							tips: '取消后将无法通过链接访问该分享',
-							callback: () => {
-								this.$api.disk.cancelShare(
-									{
-										id: file.id,
-									},
-									() => {
-										this.diskInfo.select.share = '';
-										this.$Message.success('分享已取消');
-										if (this.navType === 'share') {
-											this.removeSelect([file.id]);
-										}
+						this.$confirm('取消分享', '取消后将无法通过链接访问该分享', {}).then(() => {
+							this.$api.disk.cancelShare(
+								{
+									id: file.id,
+								},
+								() => {
+									this.diskInfo.select.share = '';
+									this.$Message.success('分享已取消');
+									if (this.navType === 'share') {
+										this.removeSelect([file.id]);
 									}
-								);
-							},
+								}
+							);
 						});
 						return;
 					}

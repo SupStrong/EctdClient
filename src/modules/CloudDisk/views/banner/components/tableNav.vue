@@ -2,7 +2,7 @@
 	<div>
 		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
 			<el-table :data="listData" border style="width: 100%">
-				<el-table-column fixed label="当前页面" width="100">
+				<el-table-column fixed label="页" width="40">
 					<template slot-scope="scope">
 						{{ scope.row.index + 1 }}
 					</template>
@@ -12,18 +12,28 @@
 						<el-input v-model="scope.row.val" :value="scope.row.val" @change="handleEdit($event, scope.row)"></el-input>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="样式" width="150">
+				<el-table-column prop="" label="样式" width="120">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" :class="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="排列方式" width="150">
+				<el-table-column prop="" label="排列方式" width="120">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in writingModeOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column prop="" label="文字颜色" width="100">
+					<template slot-scope="scope">
+						<el-color-picker v-model="scope.row['color']" @change="editTextColor($event, scope.row, 'color')"></el-color-picker>
+					</template>
+				</el-table-column>
+				<el-table-column prop="" label="文字阴影色" width="100" center>
+					<template slot-scope="scope">
+						<el-color-picker v-model="scope.row['textColor']" @change="editTextColor($event, scope.row, 'textShadow')"></el-color-picker>
 					</template>
 				</el-table-column>
 				<el-table-column prop="" label="居中方式" width="150">
@@ -94,7 +104,7 @@ export default {
 		},
 	},
 	created() {
-		for (let i = 0; i < 15; i++) {
+		for (let i = 0; i < 20; i++) {
 			let obj = {
 				value: `G-font-${i}`,
 				label: `常用字体${i}`,
@@ -105,6 +115,20 @@ export default {
 	methods: {
 		handleClick(row) {
 			console.log(row);
+		},
+		editTextColor(val, item, type) {
+			console.log(val, 'vvv');
+			if (type === 'color') {
+				item['color'] = val;
+			}
+			if (type === 'textShadow' && val != null) {
+				item['text-shadow'] = `${val} 1px 0px, ${val} 0px 1px, ${val} -1px 0px, ${val} 0px -1px`;
+				item['textColor'] = `${val}`;
+			} else if (type === 'textShadow' && val == null) {
+				item['text-shadow'] = '';
+				item['textColor'] = '';
+			}
+			this.$emit('select', item);
 		},
 		handleEdit(value, row) {
 			this.$emit('select', row);
