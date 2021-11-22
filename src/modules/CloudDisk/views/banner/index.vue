@@ -55,12 +55,13 @@
 							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
 							:class="c_element.class || 'G-font-6'"
-							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; line-height: 1.1; font-weight: 700"
+							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; font-weight: 500; line-height: 1"
 							:style="{
 								'text-align': c_element.textAlign,
 								'writing-mode': c_element.writingMode,
 								color: c_element['color'],
 								'text-shadow': c_element['text-shadow'],
+								'font-family': c_element['fontFamily'],
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
@@ -551,6 +552,7 @@ export default {
 						writingMode: data.writingMode,
 						color: data.color,
 						'text-shadow': data['text-shadow'],
+						fontFamily: data['fontFamily'],
 						textColor: data['textColor'],
 					});
 				}
@@ -669,7 +671,7 @@ export default {
 						...item,
 						'font-size': this.getStyle(this.$refs[item.rand][item.index], 'fontSize'),
 						color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
-						'font-family': this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
+						fontFamily: this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
 						'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
 						textColor: splitArrr.split(' 1px 0px 0px, ')[0],
 						textAlign: this.getStyle(this.$refs[item.rand][item.index], 'textAlign'),

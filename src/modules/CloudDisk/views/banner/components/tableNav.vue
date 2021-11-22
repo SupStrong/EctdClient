@@ -26,6 +26,16 @@
 						</el-select>
 					</template>
 				</el-table-column>
+				<el-table-column prop="" label="字体" width="120">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.fontFamily" placeholder="请选择" @change="handleEdit($event, scope.row)">
+							<el-option v-for="item in fontFamilyArr" :key="item.value" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
+								<!-- {{ item.value }} -->
+								<img src="http://118.31.70.36:3000/uploads/disk/1a8b70f1b264eb02ca56b9ccdf8d1df8.jpg" alt="" />
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
 				<el-table-column prop="" label="文字颜色" width="100">
 					<template slot-scope="scope">
 						<el-color-picker v-model="scope.row['color']" @change="editTextColor($event, scope.row, 'color')"></el-color-picker>
@@ -57,6 +67,11 @@ export default {
 	data() {
 		return {
 			options: [],
+			fontFamily: [
+				98, 13, 14, 18, 19, 48, 49, 54, 55, 56, 57, 62, 74, 76, 79, 80, 89, 103, 105, 106, 107, 111, 112, 114, 118, 120, 121, 123, 124, 126, 127, 129, 131, 139,
+				154, 162, 183, 186, 192, 198, 199, 203,
+			],
+			fontFamilyArr: [],
 			textCenterOptions: [
 				{
 					value: 'start',
@@ -107,9 +122,17 @@ export default {
 		for (let i = 0; i < 22; i++) {
 			let obj = {
 				value: `G-font-${i}`,
-				label: `常用字体${i}`,
+				label: `常用样式${i}`,
 			};
 			this.options.push(obj);
+		}
+		for (let i = 0; i < this.fontFamily.length; i++) {
+			let obj = {
+				value: `Family-${this.fontFamily[i]}`,
+				label: `字体${i}`,
+			};
+			this.fontFamilyArr.push(obj);
+			console.log(this.fontFamilyArr, 'fontFamilyArr');
 		}
 	},
 	methods: {

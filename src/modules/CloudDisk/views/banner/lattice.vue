@@ -55,7 +55,7 @@
 							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
 							:class="c_element.class || 'G-font-6'"
-							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; line-height: 1.1; font-weight: 700"
+							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; font-weight: 700"
 							:style="{
 								'text-align': c_element.textAlign,
 								'writing-mode': c_element.writingMode,

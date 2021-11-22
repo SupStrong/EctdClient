@@ -128,20 +128,16 @@ export default {
 					if (count > 0) {
 						tips = `${count}个传输任务未完成，${type}将${this.$isElectron ? '暂停' : '取消'}传输<br>`;
 					}
-					this.$confirm({
-						title: type,
-						tips: tips + (command === 'switch' ? '确认退出当前账号吗' : '确认退出C-Disk吗'),
-						callback: () => {
-							this.quitFlag = true;
-							if (this.$isElectron) {
-								this.$emit('exit');
-								this.$ipc.send('system', command === 'switch' ? 'logoff' : 'exit');
-							} else {
-								this.$api.user.logout(() => {
-									this.$router.push('/login');
-								});
-							}
-						},
+					this.$confirm(type, command === 'switch' ? '确认退出当前账号吗' : '确认退出C-Disk吗', {}).then(() => {
+						this.quitFlag = true;
+						if (this.$isElectron) {
+							this.$emit('exit');
+							this.$ipc.send('system', command === 'switch' ? 'logoff' : 'exit');
+						} else {
+							this.$api.user.logout(() => {
+								this.$router.push('/login');
+							});
+						}
 					});
 					break;
 			}

@@ -17,6 +17,7 @@
 						<img src="http://118.31.70.36:3000/uploads/disk/ea5b93653d12630aea095319ed612a54.jpg" alt="" />
 					</div>
 				</div>
+				<p class="style1">嘻嘻哈哈</p>
 				<!-- <span>间距</span>
 				<el-input type="text" style="width: 100px" />
 				<el-color-picker v-model="scope.row['color']" @change="editTextColor($event, scope.row, 'color')"></el-color-picker>
@@ -151,5 +152,22 @@ export default {
 	padding: 0 18px;
 	font-weight: bold;
 	border-radius: 20px;
+}
+.style1 {
+	padding: 3px 10px;
+	background: white;
+	display: inline-block;
+	border-radius: 5px;
+	position: relative;
+}
+.style1::before {
+	content: '';
+	background-image: url('./image/7.png');
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top: -20px;
+	right: -20px;
+	background-size: cover;
 }
 </style>
