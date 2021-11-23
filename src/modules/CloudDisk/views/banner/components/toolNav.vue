@@ -162,7 +162,6 @@ export default {
 }
 .style1::before {
 	content: '';
-	background-image: url('./image/7.png');
 	width: 100px;
 	height: 100px;
 	position: absolute;

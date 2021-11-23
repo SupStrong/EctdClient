@@ -54,6 +54,7 @@
 							:tabindex="c_element.rand"
 							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
+							class="img_text"
 							:class="c_element.class || 'G-font-6'"
 							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; font-weight: 500; line-height: 1"
 							:style="{
@@ -62,10 +63,13 @@
 								color: c_element['color'],
 								'text-shadow': c_element['text-shadow'],
 								'font-family': c_element['fontFamily'],
+								'--bgurl': 'url(' + c_element['imgHref'] + ')',
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
-						></p>
+						>
+							<!-- imgHref -->
+						</p>
 						<img
 							:tabindex="c_element.rand"
 							@keyup="imgDelete($event, c_element)"
@@ -554,6 +558,7 @@ export default {
 						'text-shadow': data['text-shadow'],
 						fontFamily: data['fontFamily'],
 						textColor: data['textColor'],
+						imgHref: data['imgHref'],
 					});
 				}
 			});
@@ -786,5 +791,15 @@ export default {
 		width: 80px;
 		border: 1px solid red;
 	}
+}
+.img_text::before {
+	content: '';
+	background-image: var(--bgurl);
+	left: 0;
+	background-size: cover;
+	top: 0;
+	width: 20px;
+	height: 20px;
+	position: absolute;
 }
 </style>

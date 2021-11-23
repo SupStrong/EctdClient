@@ -26,12 +26,20 @@
 						</el-select>
 					</template>
 				</el-table-column>
+				<el-table-column prop="" label="文字图片" width="120">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.imgHref" placeholder="请选择" @change="handleEdit($event, scope.row)">
+							<el-option v-for="(item, index) in textImgOptions" :key="index" :label="item.value" :value="item.value">
+								<img :src="item.value" alt="" />
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
 				<el-table-column prop="" label="字体" width="120">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.fontFamily" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in fontFamilyArr" :key="item.value" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
-								<!-- {{ item.value }} -->
-								<img src="http://118.31.70.36:3000/uploads/disk/1a8b70f1b264eb02ca56b9ccdf8d1df8.jpg" alt="" />
+								{{ item.value }}
 							</el-option>
 						</el-select>
 					</template>
@@ -71,6 +79,7 @@ export default {
 				98, 13, 14, 18, 19, 48, 49, 54, 55, 56, 57, 62, 74, 76, 79, 80, 89, 103, 105, 106, 107, 111, 112, 114, 118, 120, 121, 123, 124, 126, 127, 129, 131, 139,
 				154, 162, 183, 186, 192, 198, 199, 203,
 			],
+			textImgOptions: [],
 			fontFamilyArr: [],
 			textCenterOptions: [
 				{
@@ -133,6 +142,14 @@ export default {
 			};
 			this.fontFamilyArr.push(obj);
 			console.log(this.fontFamilyArr, 'fontFamilyArr');
+		}
+		// 文字图片
+		for (let i = 1; i <= 14; i++) {
+			let obj = {
+				value: require(`../image/${i}.png`),
+			};
+			console.log(obj, 'OOOO');
+			this.textImgOptions.push(obj);
 		}
 	},
 	methods: {
