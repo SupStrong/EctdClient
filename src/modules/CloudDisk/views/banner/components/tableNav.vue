@@ -2,7 +2,7 @@
 	<div>
 		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
 			<el-table :data="listData" border style="width: 100%">
-				<el-table-column fixed label="页" width="40">
+				<el-table-column fixed="left" label="页" width="40">
 					<template slot-scope="scope">
 						{{ scope.row.index + 1 }}
 					</template>
@@ -128,7 +128,7 @@ export default {
 		},
 	},
 	created() {
-		for (let i = 0; i < 22; i++) {
+		for (let i = 0; i < 23; i++) {
 			let obj = {
 				value: `G-font-${i}`,
 				label: `常用样式${i}`,

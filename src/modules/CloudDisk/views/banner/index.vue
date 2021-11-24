@@ -56,7 +56,16 @@
 							:ref="c_element.rand"
 							class="img_text"
 							:class="c_element.class || 'G-font-6'"
-							style="font-size: 26px; white-space: nowrap; display: inline-box; white-space: pre; font-weight: 500; line-height: 1"
+							style="
+								font-size: 26px;
+								white-space: nowrap;
+								display: inline-box;
+								white-space: pre;
+								font-weight: 500;
+								line-height: 1;
+								text-align: center;
+								letter-spacing: -3px;
+							"
 							:style="{
 								'text-align': c_element.textAlign,
 								'writing-mode': c_element.writingMode,
@@ -77,7 +86,7 @@
 							:src="c_element.val"
 							v-if="c_element.type == 'image'"
 							@load="urlInfo($event, c_element.rand)"
-							style="width: 50px; height: 50px; white-space: nowrap; display: block"
+							style="width: 40px; height: 40px; white-space: nowrap; display: block"
 							alt=""
 						/>
 						<div
@@ -523,7 +532,7 @@ export default {
 						useCORS: true,
 						allowTaint: false,
 						tainTaint: false,
-						scale: 5,
+						scale: 10,
 						height: $('.tool-swiper .test').eq(i).find('.div2').length ? 640 : $('.tool-swiper .test').eq(i).find('img').height(),
 						width: $('.tool-swiper').width(),
 						windowWidth: document.body.scrollWidth,
@@ -793,13 +802,22 @@ export default {
 	}
 }
 .img_text::before {
-	content: '';
-	background-image: var(--bgurl);
-	left: 0;
-	background-size: cover;
-	top: 0;
-	width: 20px;
-	height: 20px;
-	position: absolute;
+	// content: '';
+	// background-image: var(--bgurl);
+	// left: 0;
+	// background-size: cover;
+	// background-size: cover;
+	// position: absolute;
+	// background-size: cover;
+	// top: -18px;
+	// width: 60px;
+	// height: 60px;
+	// position: absolute;
+	// left: 95px;
+}
+
+img[src=''],
+img:not([src]) {
+	// opacity: 0;
 }
 </style>

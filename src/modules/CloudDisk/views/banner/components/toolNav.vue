@@ -16,6 +16,12 @@
 					<div class="image1-dotted" @dblclick="clickFun('image1-dotted')">
 						<img src="http://118.31.70.36:3000/uploads/disk/ea5b93653d12630aea095319ed612a54.jpg" alt="" />
 					</div>
+					<div class="image1-normal" @dblclick="clickFun('image1-normal')">
+						<img src="http://118.31.70.36:3000/uploads/disk/ea5b93653d12630aea095319ed612a54.jpg" alt="" />
+					</div>
+					<div class="image1-dashed" @dblclick="clickFun('image1-dashed')">
+						<img src="http://118.31.70.36:3000/uploads/disk/ea5b93653d12630aea095319ed612a54.jpg" alt="" />
+					</div>
 				</div>
 				<p class="style1">嘻嘻哈哈</p>
 				<!-- <span>间距</span>
