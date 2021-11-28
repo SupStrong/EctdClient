@@ -96,6 +96,7 @@
 							v-if="c_element.type == 'tool'"
 							:class="c_element.val"
 							alt=""
+							style="display: grid; overflow: scroll"
 						>
 							<input type="file" @change="changeUpload($event, c_element)" />
 							<img :src="c_element.img" alt="" />
@@ -337,7 +338,6 @@ export default {
 			// 上传图片
 			var file = e.target.files[0];
 			if (!/\.(gif|jpg|jpeg|png|bmp|GIF|JPG|PNG)$/.test(e.target.value)) {
-				alert('图片类型必须是.gif,jpeg,jpg,png,bmp中的一种');
 				return false;
 			}
 			let reader = new FileReader();
