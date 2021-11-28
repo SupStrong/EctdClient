@@ -6,7 +6,6 @@
 				<diskCategory ref="diskCategory" :data="diskInfo" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
 			<div class="right">
-				<!--  -->
 				<diskNavigation
 					:data="diskInfo"
 					:type="navType"
@@ -101,7 +100,6 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
-				{{ diskInfo.categoryType }}
 				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
 				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
 			</div>

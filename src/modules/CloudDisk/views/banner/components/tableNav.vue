@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
-			<el-table :data="listData" border style="width: 100%">
+			<el-table :data="listData" border style="width: 100%" @row-click="changeRow">
 				<el-table-column fixed="left" label="页" width="40">
 					<template slot-scope="scope">
 						{{ scope.row.index + 1 }}
@@ -12,21 +12,21 @@
 						<el-input v-model="scope.row.val" :value="scope.row.val" @change="handleEdit($event, scope.row)"></el-input>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="样式" width="120">
+				<el-table-column prop="" label="样式" width="150">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row, 'text')">
 							<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" :class="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="排列方式" width="120">
+				<el-table-column prop="" label="排列方式" width="140">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in writingModeOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="文字图片" width="120">
+				<!-- <el-table-column prop="" label="文字图片" width="120">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.imgHref" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="(item, index) in textImgOptions" :key="index" :label="item.value" :value="item.value">
@@ -34,13 +34,20 @@
 							</el-option>
 						</el-select>
 					</template>
-				</el-table-column>
-				<el-table-column prop="" label="字体" width="120">
+				</el-table-column> -->
+				<el-table-column prop="" label="字体" width="150">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.fontFamily" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="item in fontFamilyArr" :key="item.value" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
 								{{ item.value }}
 							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column prop="" label="居中方式" width="150">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
+							<el-option v-for="item in textCenterOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
@@ -52,13 +59,6 @@
 				<el-table-column prop="" label="文字阴影色" width="100" center>
 					<template slot-scope="scope">
 						<el-color-picker v-model="scope.row['textColor']" @change="editTextColor($event, scope.row, 'textShadow')"></el-color-picker>
-					</template>
-				</el-table-column>
-				<el-table-column prop="" label="居中方式" width="150">
-					<template slot-scope="scope">
-						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
-							<el-option v-for="item in textCenterOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
-						</el-select>
 					</template>
 				</el-table-column>
 				<el-table-column fixed="right" label="操作" width="100">
@@ -138,7 +138,7 @@ export default {
 		for (let i = 0; i < this.fontFamily.length; i++) {
 			let obj = {
 				value: `Family-${this.fontFamily[i]}`,
-				label: `字体${i}`,
+				label: `Family-${this.fontFamily[i]}`,
 			};
 			this.fontFamilyArr.push(obj);
 			console.log(this.fontFamilyArr, 'fontFamilyArr');
@@ -155,6 +155,10 @@ export default {
 	methods: {
 		handleClick(row) {
 			console.log(row);
+		},
+		changeRow(row) {
+			this.$emit('changeIndex', row.index);
+			// row.index
 		},
 		editTextColor(val, item, type) {
 			console.log(val, 'vvv');

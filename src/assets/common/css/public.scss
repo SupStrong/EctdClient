@@ -92,47 +92,6 @@ ul,li{
 .cloud-version {
   display: none;
 }
-/*滚动条*/
-*::-webkit-scrollbar{
-  width:7px;
-  height:7px;
-  background:none;
-}
-*::-webkit-scrollbar-button{
-  display:none;
-}
-*::-webkit-scrollbar-track{
-  background:none;
-}
-*::-webkit-scrollbar-track-piece {
-  display:none;
-}
-*::-webkit-scrollbar-thumb{
-  background : #EAECF0;
-  position   : absolute;
-  width      : 3px;
-  right      : 0;
-  top        : 0;
-  bottom     : 0;
-  visibility : hidden\9; /* Target only IE7 and IE8 with this hack */
-  opacity    : .01;
-  -webkit-transition    : .2s;
-  -moz-transition       : .2s;
-  -o-transition         : .2s;
-  transition            : .2s;
-  -moz-border-radius    : 3px;
-  -webkit-border-radius : 3px;
-  border-radius         : 3px;
-}
-*::-webkit-scrollbar-thumb:active,*::-webkit-scrollbar-thumb:hover{
-  background : rgba(0,0,0,.50);
-}
-*::-webkit-scrollbar-corner {
-  display:none;
-}
-*::-webkit-scrollbar-resizer  {
-  display:none;
-}
 .v-modal{
   opacity: 0!important;
 }

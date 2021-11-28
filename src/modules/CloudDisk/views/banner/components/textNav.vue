@@ -7,6 +7,7 @@
 			</el-form-item>
 		</el-form>
 		<p class="text" v-for="(item, index) in oftenArr" :key="index" style="float: left" @dblclick="clickFun(item)">{{ item }}</p>
+		<hr />
 		<p class="text" v-for="(item, index) in textArr" :key="index" @dblclick="clickFun(item.name)">
 			{{ item.name }}
 			<!-- <el-divider></el-divider> -->
@@ -65,6 +66,24 @@ export default {
 				'补水',
 				'去红',
 				'急救',
+				'清爽',
+				'柔顺',
+				'不紧绷',
+				'洗卸二合一',
+				'两种植物提取物',
+				'白花春黄菊提取物',
+				'金盏菊提取物',
+				'母菊提取物',
+				'矢车菊提取物',
+				'白花春黄菊提取物',
+				'清爽',
+				'光解酶具备',
+				'DNA修复和保护',
+				'让皮肤恢复活力',
+				'淡化黑斑',
+				'提升光泽度',
+				'提高紧致度',
+				'减少皱纹和细纹',
 			],
 			textArr: [],
 			form: {

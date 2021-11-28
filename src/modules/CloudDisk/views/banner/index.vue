@@ -99,6 +99,7 @@
 						>
 							<input type="file" @change="changeUpload($event, c_element)" />
 							<img :src="c_element.img" alt="" />
+							<!-- <img src="http://118.31.70.36:3000/uploads/disk/1a8b70f1b264eb02ca56b9ccdf8d1df8.jpg" alt="" /> -->
 						</div>
 
 						<svg
@@ -158,6 +159,7 @@
 					:listData="imgStyleToData"
 					@select="resetData"
 					@delete="deleteToData"
+					@changeIndex="changeIndex"
 					@change="addToData"
 				></bannerTableNav>
 				<toolNav v-if="popupData.type == 'tool'" :data="popupData" @change="addToData"> </toolNav>
@@ -168,6 +170,7 @@
 <script>
 import Swiper from 'swiper';
 import $ from 'jquery';
+import * as imageConversion from 'image-conversion';
 import draggable from 'vuedraggable';
 import html2canvas from 'html2canvas';
 import bannerData from './components/dataNav.vue';
@@ -214,7 +217,7 @@ export default {
 			imgStyleToData: [],
 			fontArr: [],
 			r: 1,
-			currentSwiper: '2021/11/1/SP',
+			currentSwiper: '11-25/1',
 			diskData: [],
 			maxFileSize: 4294967296, //4GB
 			maxFileSizeText: '0B',
@@ -250,9 +253,10 @@ export default {
 	methods: {
 		//点击方法
 		getData() {
-			this.$api.brand.list({}, (rs) => {
-				console.log(rs, 'resss');
-			});
+			this.$api.brand.list({}, (rs) => {});
+		},
+		changeIndex(val) {
+			this.$refs.carousel.setActiveItem(val);
 		},
 		defineStyle() {
 			let arr = [
@@ -532,7 +536,7 @@ export default {
 						useCORS: true,
 						allowTaint: false,
 						tainTaint: false,
-						scale: 10,
+						scale: 7,
 						height: $('.tool-swiper .test').eq(i).find('.div2').length ? 640 : $('.tool-swiper .test').eq(i).find('img').height(),
 						width: $('.tool-swiper').width(),
 						windowWidth: document.body.scrollWidth,
@@ -603,25 +607,33 @@ export default {
 			});
 		},
 		packageImages(imgsSrc, parentId = null) {
+			let that = this;
 			if (parentId) {
 				imgsSrc.map((item, index) => {
 					let files = [];
-					files[0] = this.dataURLtoFile(item, new Date().getTime() + '.jpg');
-					uploadHandle.init(
-						files,
-						{
-							parentId: parentId,
-						},
-						(data, fileData) => {
-							this.uploadList = data;
-							if (fileData) {
-								this.diskData.push(this.$api.disk.diskData(fileData));
-								this.transFinish(fileData, 'upload');
-								this.initDiskInfo();
-							}
-						},
-						undefined
-					);
+					files[0] = that.dataURLtoFile(item, new Date().getTime() + '.jpg');
+					// return;
+					imageConversion.compress(files[0], 0.6).then((res) => {
+						const reader = new FileReader();
+						reader.readAsDataURL(res);
+						reader.onload = function (e) {
+							uploadHandle.init(
+								[that.dataURLtoFile(e.target.result, new Date().getTime() + '.jpg')],
+								{
+									parentId: parentId,
+								},
+								(data, fileData) => {
+									that.uploadList = data;
+									if (fileData) {
+										// this.diskData.push(this.$api.disk.diskData(fileData));
+										this.transFinish(fileData, 'upload');
+										this.initDiskInfo();
+									}
+								},
+								undefined
+							);
+						};
+					});
 				});
 				this.fullscreenLoading = false;
 				this.$Message.success('生成成功');
@@ -819,5 +831,9 @@ export default {
 img[src=''],
 img:not([src]) {
 	// opacity: 0;
+}
+*::-webkit-scrollbar {
+	width: 0 !important;
+	height: 0 !important;
 }
 </style>

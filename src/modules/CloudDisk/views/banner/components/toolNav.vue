@@ -23,12 +23,12 @@
 						<img src="http://118.31.70.36:3000/uploads/disk/ea5b93653d12630aea095319ed612a54.jpg" alt="" />
 					</div>
 				</div>
-				<p class="style1">嘻嘻哈哈</p>
-				<!-- <span>间距</span>
-				<el-input type="text" style="width: 100px" />
-				<el-color-picker v-model="scope.row['color']" @change="editTextColor($event, scope.row, 'color')"></el-color-picker>
-				<el-button @click="addSpacing()">增加间距</el-button>
-				<el-button @click="cancelSpacing()">取消</el-button> -->
+				<!-- <span>放大镜</span>
+				<div style="display: flex">
+					<div class="image-normal" @dblclick="clickFun('image-normal')">
+						<img src="http://118.31.70.36:3000/uploads/disk/1a8b70f1b264eb02ca56b9ccdf8d1df8.jpg" alt="" />
+					</div>
+				</div> -->
 				<span hidden>常见字体</span>
 				<div hidden>
 					<p class="name1">补水</p>
