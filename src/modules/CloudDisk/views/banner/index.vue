@@ -263,6 +263,7 @@ export default {
 			let arr = [
 				['G-width-100 G-height-100'],
 				['G-width-100 G-height-50', 'G-width-100 G-height-50'],
+				['G-width-100 G-height-33', 'G-width-100 G-height-66'],
 				['G-width-100 G-height-33', 'G-width-100 G-height-33', 'G-width-100 G-height-33'],
 				['G-width-50 G-height-50', 'G-width-50 G-height-50', 'G-width-50 G-height-50', 'G-width-50 G-height-50'],
 				['G-width-50 G-height-50', 'G-width-50 G-height-50', 'G-width-100 G-height-50'],

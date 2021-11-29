@@ -7,6 +7,10 @@
 			<div class="G-width-100 G-height-50" data-dom="true"></div>
 			<div class="G-width-100 G-height-50" data-dom="true"></div>
 		</div>
+		<div class="div1" data-type="1">
+			<div class="G-width-100 G-height-33" data-dom="true"></div>
+			<div class="G-width-100 G-height-66" data-dom="true"></div>
+		</div>
 		<div class="div1" data-type="2">
 			<div class="G-width-100 G-height-33" data-dom="true"></div>
 			<div class="G-width-100 G-height-33" data-dom="true"></div>
