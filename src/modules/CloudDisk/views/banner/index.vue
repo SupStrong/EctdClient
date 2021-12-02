@@ -1,6 +1,6 @@
 <template>
 	<div class="main">
-		<!-- 轮播图 -->
+		<!-- 轮播图sd -->
 		<div class="tool-swiper">
 			<el-carousel
 				indicator-position="outside"
@@ -45,10 +45,11 @@
 						:style="c_element.index != swiperIndex ? 'display:none;' : 'display: flex;'"
 						w="auto"
 						h="auto"
+						:x="c_element.x"
+						:y="c_element.y"
 						@resizing="(left, top, width, height) => onResize(c_element, left, top, width, height)"
+						@dragstop="(left, top, width, height) => dragstop(c_element, left, top, width, height)"
 						@activated="(left, top, width, height) => onActivated(c_element, index)"
-						@deactivated="onDeactivated"
-						@resizestop="onResizeStop"
 					>
 						<p
 							:tabindex="c_element.rand"
@@ -72,7 +73,7 @@
 								color: c_element['color'],
 								'text-shadow': c_element['text-shadow'],
 								'font-family': c_element['fontFamily'],
-								'--bgurl': 'url(' + c_element['imgHref'] + ')',
+								'font-style': c_element['fontStyle'],
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
@@ -125,7 +126,7 @@
 				<div class="swiper-pagination"></div>
 			</div> -->
 			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
-			<p>当前文件夹有{{ swiperBanner.length }}张图片</p>
+			<p>当前文件夹有{{ swiperBanner.length }}张图片，当前是第{{ this.swiperIndex + 1 }}张图片</p>
 			<!-- <draggable class="drav" @start="start" @end="end"> -->
 
 			<div class="current-swiper">
@@ -142,6 +143,7 @@
 				<el-input placeholder="请输入当前查询的文件夹" v-model="currentSwiper" value="" style="width: 220px"></el-input>
 				<el-button class="btn" type="danger" @click="getCurrentSwiper()">查询文件夹</el-button>
 				<el-button class="btn" type="warning" @click="generateImg()" v-loading.fullscreen.lock="fullscreenLoading">生成图片</el-button>
+				<el-button class="btn" type="warning" @click="saveTemplate()">保存模板</el-button>
 			</div>
 			<div class="fl-row-justy tool-btn G-Mt-10"></div>
 		</div>
@@ -300,7 +302,7 @@ export default {
 					children: newCont,
 				};
 			});
-			console.log(newData, 'newDatanewDatanewData');
+			// console.log(JSON.stringify(newData), 'newDatanewDatanewData');
 			this.swiperBanner = newData;
 			// this.swiperBanner = newData;
 			// this.swiperBanner = [
@@ -325,6 +327,7 @@ export default {
 			// 	},
 			// ];
 		},
+		saveTemplate() {},
 		funS(val) {
 			let newArray = [];
 			let j = 0;
@@ -675,14 +678,17 @@ export default {
 			);
 		},
 		onResize(data, x, y, width, height) {
+			console.log(x, y, width, height, data, 'xxx');
 			let dom_height = this.$refs[data.rand][data.index].offsetHeight;
 			let dom_width = this.$refs[data.rand][data.index].offsetWidth;
 			this.$refs[data.rand][data.index].style.transform = `scale(${width / dom_width},${height / dom_height})`;
 		},
-		onResizeStop(x, y, width, height) {
-			this.resizing = false;
+		dragstop(data, x, y, width, height) {
+			data.x = x;
+			data.y = y;
 		},
 		onActivated(ele, index) {
+			console.log(ele, index, 'x');
 			let width = this.$refs[ele.rand][this.swiperIndex].offsetWidth;
 			let height = this.$refs[ele.rand][this.swiperIndex].offsetHeight;
 			this.$refs[ele.rand][this.swiperIndex].style.width = width + 'px';
@@ -700,6 +706,8 @@ export default {
 						color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
 						fontFamily: this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
 						'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
+						'font-style': this.getStyle(this.$refs[item.rand][item.index], 'fontStyle'),
+						transformScale: this.getStyle(this.$refs[item.rand][item.index], 'transform'),
 						textColor: splitArrr.split(' 1px 0px 0px, ')[0],
 						textAlign: this.getStyle(this.$refs[item.rand][item.index], 'textAlign'),
 						writingMode: this.getStyle(this.$refs[item.rand][item.index], 'writingMode'),
@@ -716,6 +724,9 @@ export default {
 				if (ie) {
 					return obj.currentStyle.backgroundPositionX + ' ' + obj.currentStyle.backgroundPositionY;
 				}
+			}
+			if (attr === 'transform') {
+				return obj.style['transform'];
 			}
 			if (obj.currentStyle) {
 				return obj.currentStyle[attr];

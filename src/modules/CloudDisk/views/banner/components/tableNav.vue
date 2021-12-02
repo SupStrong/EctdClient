@@ -19,6 +19,27 @@
 						</el-select>
 					</template>
 				</el-table-column>
+				<el-table-column prop="" label="样式1" width="100">
+					<template slot-scope="scope">
+						<el-select v-model="newV" placeholder="请选择" @change="handleEdit($event, scope.row, 'ku')">
+							<el-option
+								v-for="(item, index) in saveStyleData"
+								:key="item"
+								:label="item"
+								:value="item"
+								:style="{
+									'text-align': item.textAlign,
+									'writing-mode': item.writingMode,
+									color: item['color'],
+									'text-shadow': item['text-shadow'],
+									'font-family': item['fontFamily'],
+									'font-style': item['fontStyle'],
+								}"
+								>样式{{ index }}</el-option
+							>
+						</el-select>
+					</template>
+				</el-table-column>
 				<el-table-column prop="" label="排列方式" width="140">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
@@ -61,9 +82,10 @@
 						<el-color-picker v-model="scope.row['textColor']" @change="editTextColor($event, scope.row, 'textShadow')"></el-color-picker>
 					</template>
 				</el-table-column>
-				<el-table-column fixed="right" label="操作" width="100">
+				<el-table-column fixed="right" label="操作" width="140">
 					<template slot-scope="scope">
 						<el-button @click="handleDelete($event, scope.row)" type="text" size="small">删除</el-button>
+						<el-button @click="saveStyle($event, scope.row)" type="text" size="small">保存样式</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -71,6 +93,7 @@
 	</div>
 </template>
 <script>
+import { Row } from 'view-design';
 export default {
 	data() {
 		return {
@@ -79,8 +102,10 @@ export default {
 				98, 13, 14, 18, 19, 48, 49, 54, 55, 56, 57, 62, 74, 76, 79, 80, 89, 103, 105, 106, 107, 111, 112, 114, 118, 120, 121, 123, 124, 126, 127, 129, 131, 139,
 				154, 162, 183, 186, 192, 198, 199, 203,
 			],
+			newV: {},
 			textImgOptions: [],
 			fontFamilyArr: [],
+			saveStyleData: [],
 			textCenterOptions: [
 				{
 					value: 'start',
@@ -128,6 +153,8 @@ export default {
 		},
 	},
 	created() {
+		// 获取库里的样式
+		this.getStyle();
 		for (let i = 0; i < 23; i++) {
 			let obj = {
 				value: `G-font-${i}`,
@@ -141,27 +168,44 @@ export default {
 				label: `Family-${this.fontFamily[i]}`,
 			};
 			this.fontFamilyArr.push(obj);
-			console.log(this.fontFamilyArr, 'fontFamilyArr');
 		}
 		// 文字图片
 		for (let i = 1; i <= 14; i++) {
 			let obj = {
 				value: require(`../image/${i}.png`),
 			};
-			console.log(obj, 'OOOO');
 			this.textImgOptions.push(obj);
 		}
 	},
 	methods: {
-		handleClick(row) {
-			console.log(row);
+		getStyle() {
+			this.$api.styleAll.list({}, (rs) => {
+				if (rs.code === 0) {
+					// this.$Message.success('新增成功');
+					let newData = [];
+					rs.data.rows.map((item, index) => {
+						newData.push(JSON.parse(item.styleLevel));
+					});
+					this.saveStyleData = newData;
+				}
+			});
+		},
+		saveStyle(e, row) {
+			let obj = {
+				styleLevel: JSON.stringify(row),
+			};
+			this.$api.styleAll.create(obj, (rs) => {
+				if (rs.code === 0) {
+					this.$Message.success('新增成功');
+					this.getStyle();
+				}
+			});
 		},
 		changeRow(row) {
 			this.$emit('changeIndex', row.index);
 			// row.index
 		},
 		editTextColor(val, item, type) {
-			console.log(val, 'vvv');
 			if (type === 'color') {
 				item['color'] = val;
 			}
@@ -175,6 +219,23 @@ export default {
 			this.$emit('select', item);
 		},
 		handleEdit(value, row, type) {
+			// row = this.newV;
+			if (type == 'ku') {
+				row = {
+					...row,
+					class: this.newV['class'],
+					color: this.newV['color'],
+					'font-size': this.newV['font-size'],
+					'font-style': this.newV['font-style'],
+					fontFamily: this.newV['fontFamily'],
+					'text-shadow': this.newV['text-shadow'],
+					textAlign: this.newV['textAlign'],
+					textColor: this.newV['textColor'],
+					transformScale: this.newV['transformScale'],
+					writingMode: this.newV['writingMode'],
+				};
+			}
+
 			if (type == 'text') {
 				row.color = '';
 				row['text-shadow'] = '';
