@@ -11,7 +11,7 @@
 				:autoplay="false"
 				@change="changeSwiper"
 			>
-				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :ref="'swiper' + index" :key="index" οndragstart="return false">
+				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :ref="'swiper1' + index" :key="index" οndragstart="return false">
 					<img
 						v-if="!element.children"
 						class="swiper-img"
@@ -21,8 +21,8 @@
 					/>
 					<div v-if="element.children" style="width: 100%; height: 100%; position: absolute">
 						<div class="div2" style="width: 100%; height: 100%">
-							<draggable @start="start" @end="end" style="width: 100%; height: 100%">
-								<div v-for="item in element.children" :key="item" class="box-style" :class="item.style" style="overflow-y: auto">
+							<draggable style="width: 100%; height: 100%">
+								<div v-for="(item, d_index) in element.children" :key="d_index" class="box-style" :class="item.style" style="overflow-y: auto">
 									<img
 										:src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
 										style="width: 100%; height: 100%"
@@ -39,17 +39,18 @@
 						class-name-active="my-active-class"
 						style="border: 0; display: flex; align-items: center; justify-content: center"
 						v-for="(c_element, index) in imgToData"
-						:parent="true"
-						:key="c_element.rand"
+						:key="index"
 						:lock-aspect-ratio="true"
-						:style="c_element.index != swiperIndex ? 'display:none;' : 'display: flex;'"
 						w="auto"
 						h="auto"
 						:x="c_element.x"
 						:y="c_element.y"
-						@resizing="(left, top, width, height) => onResize(c_element, left, top, width, height)"
+						:style="{
+							visibility: c_element['index'] != swiperIndex ? 'hidden' : 'inherit',
+						}"
 						@dragstop="(left, top, width, height) => dragstop(c_element, left, top, width, height)"
 						@activated="(left, top, width, height) => onActivated(c_element, index)"
+						@resizing="(left, top, width, height) => onResize(c_element, left, top, width, height, index)"
 					>
 						<p
 							:tabindex="c_element.rand"
@@ -74,12 +75,11 @@
 								'text-shadow': c_element['text-shadow'],
 								'font-family': c_element['fontFamily'],
 								'font-style': c_element['fontStyle'],
+								transform: c_element['transformScale'] || '',
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
-						>
-							<!-- imgHref -->
-						</p>
+						></p>
 						<img
 							:tabindex="c_element.rand"
 							@keyup="imgDelete($event, c_element)"
@@ -88,6 +88,9 @@
 							v-if="c_element.type == 'image'"
 							@load="urlInfo($event, c_element.rand)"
 							style="width: 40px; height: 40px; white-space: nowrap; display: block"
+							:style="{
+								transform: c_element['transformScale'],
+							}"
 							alt=""
 						/>
 						<div
@@ -101,36 +104,15 @@
 						>
 							<input type="file" @change="changeUpload($event, c_element)" />
 							<img :src="c_element.img" alt="" />
-							<!-- <img src="http://118.31.70.36:3000/uploads/disk/1a8b70f1b264eb02ca56b9ccdf8d1df8.jpg" alt="" /> -->
 						</div>
-
-						<svg
-							class="icon"
-							:ref="c_element.rand"
-							v-if="c_element.type == 'icon'"
-							style="width: 50px; height: 50px; white-space: nowrap; display: block"
-							:key="index"
-						>
-							<use draggable="false" dragstart="return false;" :xlink:href="'#' + c_element.val"></use>
-						</svg>
 					</vue-draggable-resizable>
 				</el-carousel-item>
 			</el-carousel>
 			<div class="imgDom"></div>
-			<!-- <div class="swiper-container G-Mb-10" ref="html2canvas">
-				<div class="swiper-wrapper swiper-no-swiping">
-					<div class="swiper-slide test" v-for="(element, index) in swiperBanner" :ref="'swiper' + index" :key="index" οndragstart="return false">
-						
-					</div>
-				</div>
-				<div class="swiper-pagination"></div>
-			</div> -->
-			<!-- <div class="fl-row-justy tool-btn" style="height: 300px; border: 1px solid red"></div> -->
 			<p>当前文件夹有{{ swiperBanner.length }}张图片，当前是第{{ this.swiperIndex + 1 }}张图片</p>
-			<!-- <draggable class="drav" @start="start" @end="end"> -->
 
 			<div class="current-swiper">
-				<div v-for="item in newSwiperBanner" :key="item" style="margin-right: 10px">
+				<div v-for="(item, index) in newSwiperBanner" :key="index" style="margin-right: 10px">
 					<img :src="'http://118.31.70.36:3000/uploads/disk/' + item.content" style="width: 60px; height: 60px; margin: 0; margin-bottom: 10px" alt="" />
 					<el-input type="text" v-model="item.sort" min="1" placeholder="当前" />
 				</div>
@@ -207,6 +189,7 @@ export default {
 				return {
 					type: 'data',
 					isDrawer: false,
+					currentIndex: '',
 				};
 			},
 		},
@@ -254,12 +237,34 @@ export default {
 	},
 	// computed: {},
 	methods: {
+		setLeftScale(ele) {
+			// let scale = ele.transformScale !== undefined ? ele.transformScale.match(/\d+(.\d+)?/g)[0] : 1;
+			return ele.x * 1;
+		},
 		//点击方法
 		getData() {
 			this.$api.brand.list({}, (rs) => {});
 		},
 		changeIndex(val) {
 			this.$refs.carousel.setActiveItem(val);
+		},
+		getCurrentTemplate() {
+			let that = this;
+
+			this.$api.templateAll.get({ id: 29 }, (rs) => {
+				this.newSwiperBanner = JSON.parse(rs.data.newSwiperBanner);
+				this.swiperBanner = JSON.parse(rs.data.swiperBanner);
+				this.currentSwiper = JSON.parse(rs.data.currentSwiper);
+				this.$nextTick(function () {
+					JSON.parse(rs.data.imgToData).map((item, index) => {
+						that.$set(this.imgToData, index, {
+							...item,
+							rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+						});
+					});
+					this.imgStyleToData = JSON.parse(rs.data.imgToData);
+				});
+			});
 		},
 		defineStyle() {
 			let arr = [
@@ -273,12 +278,11 @@ export default {
 				['G-width-100 G-height-60', 'G-width-50 G-height-40', 'G-width-50 G-height-40'],
 			];
 			let data = this.newSwiperBanner;
-			console.log(data, 'data');
 			let newData = [];
 			let val = [];
 			data.map((item, index) => {
 				let split = String(item.sort).split('/');
-				if (split[0] == 1 || item.sort == '1') {
+				if (split[0] === 1 || item.sort === '1') {
 					let obj = {
 						...item,
 						style: arr[0],
@@ -302,37 +306,32 @@ export default {
 					children: newCont,
 				};
 			});
-			// console.log(JSON.stringify(newData), 'newDatanewDatanewData');
 			this.swiperBanner = newData;
-			// this.swiperBanner = newData;
-			// this.swiperBanner = [
-			// 	{
-			// 		content: 'http://118.31.70.36:3000/uploads/disk/01054f21ded2ff49238991245130e2fe.jpg',
-			// 	},
-			// 	{
-			// 		children: [
-			// 			{
-			// 				content: 'http://118.31.70.36:3000/uploads/disk/01054f21ded2ff49238991245130e2fe.jpg',
-			// 			},
-			// 			{
-			// 				content: 'https://img2.baidu.com/it/u=1532752388,171944695&fm=26&fmt=auto',
-			// 			},
-			// 			{
-			// 				content: 'https://img2.baidu.com/it/u=1532752388,171944695&fm=26&fmt=auto',
-			// 			},
-			// 			{
-			// 				content: 'https://img2.baidu.com/it/u=1532752388,171944695&fm=26&fmt=auto',
-			// 			},
-			// 		],
-			// 	},
-			// ];
 		},
-		saveTemplate() {},
+		saveTemplate() {
+			let newData = [];
+			newData = this.imgToData.filter((item, index) => {
+				return item.type !== 'tool';
+			});
+			let obj = {
+				imgToData: JSON.stringify(newData),
+				swiperBanner: JSON.stringify(this.swiperBanner),
+				currentSwiper: JSON.stringify(this.currentSwiper),
+				newSwiperBanner: JSON.stringify(this.newSwiperBanner),
+			};
+			this.$api.templateAll.create(obj, (rs) => {
+				if (rs.code === 0) {
+					this.$Message.success('新增成功');
+					this.form = {};
+					this.getData();
+				}
+			});
+		},
 		funS(val) {
 			let newArray = [];
 			let j = 0;
 			for (let i in this.newSwiperBanner) {
-				if (this.newSwiperBanner[i].sort == val) {
+				if (this.newSwiperBanner[i].sort === val) {
 					newArray[j++] = this.newSwiperBanner[i];
 				}
 			}
@@ -340,37 +339,39 @@ export default {
 		},
 		changeUpload(e, data) {
 			// 上传图片
-			var file = e.target.files[0];
-			if (!/\.(gif|jpg|jpeg|png|bmp|GIF|JPG|PNG)$/.test(e.target.value)) {
-				return false;
-			}
-			let reader = new FileReader();
-			reader.onload = (e) => {
-				let file;
-				if (typeof e.target.result === 'object') {
-					// 把Array Buffer转化为blob 如果是base64不需要
-					file = window.URL.createObjectURL(new Blob([e.target.result]));
-				} else {
-					file = e.target.result;
+			imageConversion.compress(e.target.files[0], 0.5).then((res) => {
+				var file = res;
+				if (!/\.(gif|jpg|jpeg|png|bmp|GIF|JPG|PNG)$/.test(e.target.value)) {
+					return false;
 				}
-				this.defaultImg = '';
-				// this.cropperOptions.img = data;
-				// items.img = data;
-				let obj = JSON.parse(JSON.stringify(this.imgToData));
-				this.imgToData = obj;
-				this.swiperIndex = data.index;
-				this.$refs.carousel.setActiveItem(data.index);
-				this.imgToData.map((item, index) => {
-					if (item.rand === data.rand) {
-						this.$set(this.imgToData, index, {
-							...this.imgToData[index],
-							img: file,
-						});
+				let reader = new FileReader();
+				reader.onload = (e) => {
+					let file;
+					if (typeof e.target.result === 'object') {
+						// 把Array Buffer转化为blob 如果是base64不需要
+						file = window.URL.createObjectURL(new Blob([e.target.result]));
+					} else {
+						file = e.target.result;
 					}
-				});
-				// this.imgToData[]
-			};
-			reader.readAsDataURL(file);
+					this.defaultImg = '';
+					// this.cropperOptions.img = data;
+					// items.img = data;
+					let obj = JSON.parse(JSON.stringify(this.imgToData));
+					this.imgToData = obj;
+					this.swiperIndex = data.index;
+					this.$refs.carousel.setActiveItem(data.index);
+					this.imgToData.map((item, index) => {
+						if (item.rand === data.rand) {
+							this.$set(this.imgToData, index, {
+								...this.imgToData[index],
+								img: file,
+							});
+						}
+					});
+					// this.imgToData[]
+				};
+				reader.readAsDataURL(file);
+			});
 		},
 		// 删除图片
 		imgDelete(e, val) {
@@ -415,7 +416,6 @@ export default {
 			// this.$refs[rand][this.swiperIndex].style.width = e.target.width / 4 + 'px';
 			// this.$refs[rand][this.swiperIndex].parentNode.style.height = e.target.height / 4 + 'px';
 			// this.$refs[rand][this.swiperIndex].parentNode.style.width = e.target.width / 4 + 'px';
-			// console.log(this.$refs[rand][this.swiperIndex].parentNode, 'this.$refs[rand][this.swiperIndex].parentNode');
 		},
 		verifyUploadSize(files) {
 			let result = [];
@@ -452,7 +452,6 @@ export default {
 				return;
 			}
 			this.$api.disk.search({ parentName: this.currentSwiper }, (rs) => {
-				// this.swiperBanner = rs.data.allImg;
 				let newData = rs.data.allImg.map((item) => {
 					return {
 						...item,
@@ -462,6 +461,7 @@ export default {
 				this.swiperBanner = newData;
 				this.newSwiperBanner = newData;
 				this.currentFolder = rs.data.parent_data;
+				this.getCurrentTemplate();
 			});
 		},
 		changeSwiper(index) {
@@ -616,8 +616,7 @@ export default {
 				imgsSrc.map((item, index) => {
 					let files = [];
 					files[0] = that.dataURLtoFile(item, new Date().getTime() + '.jpg');
-					// return;
-					imageConversion.compress(files[0], 0.6).then((res) => {
+					imageConversion.compress(files[0], 1200).then((res) => {
 						const reader = new FileReader();
 						reader.readAsDataURL(res);
 						reader.onload = function (e) {
@@ -629,9 +628,8 @@ export default {
 								(data, fileData) => {
 									that.uploadList = data;
 									if (fileData) {
-										// this.diskData.push(this.$api.disk.diskData(fileData));
-										this.transFinish(fileData, 'upload');
-										this.initDiskInfo();
+										that.transFinish(fileData, 'upload');
+										that.initDiskInfo();
 									}
 								},
 								undefined
@@ -677,10 +675,10 @@ export default {
 				}
 			);
 		},
-		onResize(data, x, y, width, height) {
-			console.log(x, y, width, height, data, 'xxx');
+		onResize(data, x, y, width, height, index) {
 			let dom_height = this.$refs[data.rand][data.index].offsetHeight;
 			let dom_width = this.$refs[data.rand][data.index].offsetWidth;
+			this.$set(this.imgToData[index], 'transformScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][data.index].style.transform = `scale(${width / dom_width},${height / dom_height})`;
 		},
 		dragstop(data, x, y, width, height) {
@@ -688,14 +686,13 @@ export default {
 			data.y = y;
 		},
 		onActivated(ele, index) {
-			console.log(ele, index, 'x');
 			let width = this.$refs[ele.rand][this.swiperIndex].offsetWidth;
 			let height = this.$refs[ele.rand][this.swiperIndex].offsetHeight;
 			this.$refs[ele.rand][this.swiperIndex].style.width = width + 'px';
 			this.$refs[ele.rand][this.swiperIndex].style.height = height + 'px';
-			// this.$refs[ele.rand + index][this.swiperIndex].style.width = width + 'px';
-			// this.$refs[ele.rand + index][this.swiperIndex].style.height = height + 'px';
-			this.$emit('change', { type: 'table', isDrawer: true });
+			this.$refs[ele.rand][this.swiperIndex].parentNode.style.width = width + 'px';
+			this.$refs[ele.rand][this.swiperIndex].parentNode.style.height = height + 'px';
+			this.$emit('change', { type: 'table', isDrawer: true, currentIndex: ele.rand });
 			this.imgStyleToData = [];
 			this.imgToData.map((item, index) => {
 				if (item.type === 'text') {
@@ -804,6 +801,17 @@ export default {
 	padding: 0 !important;
 	background: transparent;
 	border: 0;
+}
+::v-deep .handle-tl,
+::v-deep .handle-tm,
+::v-deep .handle-tr,
+::v-deep .handle-mr,
+::v-deep .handle-br,
+::v-deep .handle-bm,
+::v-deep .handle-bl,
+::v-deep .handle-ml {
+	position: absolute;
+	z-index: 999;
 }
 ::v-deep .swiper-pagination-bullet-active {
 	width: 15px;

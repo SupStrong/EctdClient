@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
-			<el-table :data="listData" border style="width: 100%" @row-click="changeRow">
+			<el-table :data="listData" border style="width: 100%" @row-click="changeRow" :row-class-name="tableRowClassName">
 				<el-table-column fixed="left" label="页" width="40">
 					<template slot-scope="scope">
 						{{ scope.row.index + 1 }}
@@ -15,7 +15,7 @@
 				<el-table-column prop="" label="样式" width="150">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row, 'text')">
-							<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" :class="item.value"> </el-option>
+							<el-option v-for="(item, index) in options" :key="index" :label="item.label" :value="item.value" :class="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
@@ -24,9 +24,9 @@
 						<el-select v-model="newV" placeholder="请选择" @change="handleEdit($event, scope.row, 'ku')">
 							<el-option
 								v-for="(item, index) in saveStyleData"
-								:key="item"
-								:label="item"
-								:value="item"
+								:key="index"
+								:label="item.label"
+								:value="item.value"
 								:style="{
 									'text-align': item.textAlign,
 									'writing-mode': item.writingMode,
@@ -43,23 +43,14 @@
 				<el-table-column prop="" label="排列方式" width="140">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
-							<el-option v-for="item in writingModeOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+							<el-option v-for="(item, index) in writingModeOptions" :key="index" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<!-- <el-table-column prop="" label="文字图片" width="120">
-					<template slot-scope="scope">
-						<el-select v-model="scope.row.imgHref" placeholder="请选择" @change="handleEdit($event, scope.row)">
-							<el-option v-for="(item, index) in textImgOptions" :key="index" :label="item.value" :value="item.value">
-								<img :src="item.value" alt="" />
-							</el-option>
-						</el-select>
-					</template>
-				</el-table-column> -->
 				<el-table-column prop="" label="字体" width="150">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.fontFamily" placeholder="请选择" @change="handleEdit($event, scope.row)">
-							<el-option v-for="item in fontFamilyArr" :key="item.value" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
+							<el-option v-for="(item, index) in fontFamilyArr" :key="index" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
 								{{ item.value }}
 							</el-option>
 						</el-select>
@@ -68,7 +59,7 @@
 				<el-table-column prop="" label="居中方式" width="150">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
-							<el-option v-for="item in textCenterOptions" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+							<el-option v-for="(item, index) in textCenterOptions" :key="index" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
@@ -93,7 +84,6 @@
 	</div>
 </template>
 <script>
-import { Row } from 'view-design';
 export default {
 	data() {
 		return {
@@ -146,9 +136,9 @@ export default {
 			},
 		},
 		listData: {
-			type: Object,
+			type: Array,
 			default: function () {
-				return {};
+				return [];
 			},
 		},
 	},
@@ -170,21 +160,31 @@ export default {
 			this.fontFamilyArr.push(obj);
 		}
 		// 文字图片
-		for (let i = 1; i <= 14; i++) {
-			let obj = {
-				value: require(`../image/${i}.png`),
-			};
-			this.textImgOptions.push(obj);
-		}
+		// for (let i = 1; i <= 14; i++) {
+		// 	let obj = {
+		// 		value: require(`../image/${i}.png`),
+		// 	};
+		// 	this.textImgOptions.push(obj);
+		// }
 	},
 	methods: {
+		tableRowClassName({ row, rowIndex }) {
+			console.log(row, 'xxx');
+			if (row.rand === this.data.currentIndex) {
+				console.log(row.currentIndex, 'xxx');
+				return 'G-skyblue';
+			}
+			return '';
+		},
 		getStyle() {
 			this.$api.styleAll.list({}, (rs) => {
 				if (rs.code === 0) {
-					// this.$Message.success('新增成功');
 					let newData = [];
 					rs.data.rows.map((item, index) => {
-						newData.push(JSON.parse(item.styleLevel));
+						newData.push({
+							value: JSON.parse(item.styleLevel),
+							lable: `样式${index}`,
+						});
 					});
 					this.saveStyleData = newData;
 				}
@@ -220,7 +220,7 @@ export default {
 		},
 		handleEdit(value, row, type) {
 			// row = this.newV;
-			if (type == 'ku') {
+			if (type === 'ku') {
 				row = {
 					...row,
 					class: this.newV['class'],
@@ -236,7 +236,7 @@ export default {
 				};
 			}
 
-			if (type == 'text') {
+			if (type === 'text') {
 				row.color = '';
 				row['text-shadow'] = '';
 			}
@@ -248,4 +248,8 @@ export default {
 	},
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+::v-deep .G-skyblue {
+	background: skyblue !important;
+}
+</style>

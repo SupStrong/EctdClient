@@ -196,6 +196,7 @@ export default {
 			generateData: {
 				type: '',
 				isDrawer: false,
+				currentIndex: '',
 				// type: 'table',
 				// isDrawer: true,
 			},
@@ -304,12 +305,14 @@ export default {
 			this.generateData = {
 				type: data.type,
 				isDrawer: true,
+				currentIndex: data.currentIndex,
 			};
 		},
 		changeGenerate(data) {
 			this.generateData = {
 				type: data.type,
 				isDrawer: true,
+				currentIndex: data.currentIndex,
 			};
 		},
 		initTransData() {
