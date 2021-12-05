@@ -6,6 +6,7 @@
 			<p>
 				当前应用：<span class="name">{{ this.$projectInfo.logoText }}</span> ver:{{ version }}
 			</p>
+
 			<p>我们需要以下信息进行问题反馈</p>
 			<input v-model="feedBackObject.title" placeholder="简单的描述" />
 			<textarea v-model="feedBackObject.content" placeholder="遇到的问题，报错信息等" />
