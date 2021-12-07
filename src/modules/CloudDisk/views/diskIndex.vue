@@ -15,7 +15,7 @@
 					@change="changeGenerate"
 				></diskNavigation>
 				<div
-					v-show="navType != 'trans' && navType != 'ectd' && navType != 'image'"
+					v-show="navType != 'trans' && navType != 'ectd' && navType != 'image' && navType != 'template'"
 					ref="diskFileArea"
 					class="cloud-disk-content"
 					:class="diskFileShowType"
@@ -100,8 +100,11 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
+				<!-- 生成图片 -->
 				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
 				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
+				<!-- 模板 -->
+				<templateIndex v-if="navType === 'template' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></templateIndex>
 			</div>
 		</section>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -123,8 +126,12 @@ import '../components/contextmenu/styles/index.css';
 import { directive, Contextmenu, ContextmenuItem } from '../components/contextmenu';
 import loading from '../components/loading';
 import ectdIndex from './ectd/ectdIndex.vue';
+// 生成图片
 import bannerImage from './banner/index.vue';
 import latticeIndex from './banner/lattice.vue';
+// 模板
+import templateIndex from './template/index.vue';
+
 let shareWin = null;
 export default {
 	name: 'diskIndex',
@@ -140,6 +147,7 @@ export default {
 		ectdIndex,
 		bannerImage,
 		latticeIndex,
+		templateIndex,
 	},
 	data() {
 		return {

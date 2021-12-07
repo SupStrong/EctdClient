@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="30" direction="rtl">
+		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="50" direction="rtl">
 			<el-table :data="listData" border style="width: 100%" @row-click="changeRow" :row-class-name="tableRowClassName">
 				<el-table-column fixed="left" label="页" width="40">
 					<template slot-scope="scope">
@@ -12,7 +12,7 @@
 						<el-input v-model="scope.row.val" :value="scope.row.val" @change="handleEdit($event, scope.row)"></el-input>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="样式" width="150">
+				<el-table-column prop="" label="样式" width="110">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.class" placeholder="请选择" @change="handleEdit($event, scope.row, 'text')">
 							<el-option v-for="(item, index) in options" :key="index" :label="item.label" :value="item.value" :class="item.value"> </el-option>
@@ -40,14 +40,14 @@
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="排列方式" width="140">
+				<el-table-column prop="" label="排列" width="100">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.writingMode" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="(item, index) in writingModeOptions" :key="index" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="字体" width="150">
+				<el-table-column prop="" label="字体" width="90">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.fontFamily" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="(item, index) in fontFamilyArr" :key="index" :label="item.label" :value="item.value" :style="{ 'font-family': item.value }">
@@ -56,27 +56,41 @@
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="居中方式" width="150">
+				<el-table-column prop="" label="颜色" width="50">
+					<template slot-scope="scope">
+						<el-color-picker
+							size="mini"
+							v-model="scope.row['color']"
+							show-alpha
+							@active-change="editTextColor($event, scope.row, 'color')"
+							@change="editTextColor($event, scope.row, 'color')"
+							:predefine="predefineColors"
+						></el-color-picker>
+					</template>
+				</el-table-column>
+				<el-table-column prop="" label="阴影" width="50" center>
+					<template slot-scope="scope">
+						<el-color-picker
+							size="mini"
+							v-model="scope.row['textColor']"
+							show-alpha
+							@active-change="editTextColor($event, scope.row, 'textShadow')"
+							@change="editTextColor($event, scope.row, 'textShadow')"
+							:predefine="predefineColors"
+						></el-color-picker>
+					</template>
+				</el-table-column>
+				<el-table-column prop="" label="居中" width="80">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="(item, index) in textCenterOptions" :key="index" :label="item.label" :value="item.value"> </el-option>
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="文字颜色" width="100">
-					<template slot-scope="scope">
-						<el-color-picker v-model="scope.row['color']" @change="editTextColor($event, scope.row, 'color')"></el-color-picker>
-					</template>
-				</el-table-column>
-				<el-table-column prop="" label="文字阴影色" width="100" center>
-					<template slot-scope="scope">
-						<el-color-picker v-model="scope.row['textColor']" @change="editTextColor($event, scope.row, 'textShadow')"></el-color-picker>
-					</template>
-				</el-table-column>
-				<el-table-column fixed="right" label="操作" width="140">
+				<el-table-column fixed="right" label="操作" width="110">
 					<template slot-scope="scope">
 						<el-button @click="handleDelete($event, scope.row)" type="text" size="small">删除</el-button>
-						<el-button @click="saveStyle($event, scope.row)" type="text" size="small">保存样式</el-button>
+						<el-button @click="saveStyle($event, scope.row)" type="text" size="small">保存</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -96,24 +110,40 @@ export default {
 			textImgOptions: [],
 			fontFamilyArr: [],
 			saveStyleData: [],
+			predefineColors: [
+				'#ff4500',
+				'#ff8c00',
+				'#ffd700',
+				'#90ee90',
+				'#00ced1',
+				'#1e90ff',
+				'#c71585',
+				'rgba(255, 69, 0, 0.68)',
+				'rgb(255, 120, 0)',
+				'hsv(51, 100, 98)',
+				'hsva(120, 40, 94, 0.5)',
+				'hsl(181, 100%, 37%)',
+				'hsla(209, 100%, 56%, 0.73)',
+				'#c7158577',
+			],
 			textCenterOptions: [
 				{
 					value: 'start',
-					label: '左对齐',
+					label: '左',
 				},
 				{
 					value: 'center',
-					label: '居中对齐',
+					label: '中',
 				},
 				{
 					value: 'right',
-					label: '右对齐',
+					label: '右',
 				},
 			],
 			writingModeOptions: [
 				{
 					value: 'horizontal-tb',
-					label: '横向对齐',
+					label: '横向',
 				},
 				{
 					value: 'vertical-lr',
@@ -148,14 +178,14 @@ export default {
 		for (let i = 0; i < 23; i++) {
 			let obj = {
 				value: `G-font-${i}`,
-				label: `常用样式${i}`,
+				label: `${i}`,
 			};
 			this.options.push(obj);
 		}
 		for (let i = 0; i < this.fontFamily.length; i++) {
 			let obj = {
 				value: `Family-${this.fontFamily[i]}`,
-				label: `Family-${this.fontFamily[i]}`,
+				label: `${this.fontFamily[i]}`,
 			};
 			this.fontFamilyArr.push(obj);
 		}

@@ -87,9 +87,11 @@
 							:src="c_element.val"
 							v-if="c_element.type == 'image'"
 							@load="urlInfo($event, c_element.rand)"
-							style="width: 40px; height: 40px; white-space: nowrap; display: block"
+							style="white-space: nowrap; display: block"
 							:style="{
-								transform: c_element['transformScale'],
+								transform: c_element['transformScale'] || '',
+								width: c_element['w'] ? `${c_element['w']}px` : '40px',
+								height: c_element['h'] ? `${c_element['h']}px` : '40px',
 							}"
 							alt=""
 						/>
@@ -220,7 +222,12 @@ export default {
 	},
 	created() {
 		this.getData();
-		this.getCurrentSwiper();
+		let id = '';
+		if (id === '') {
+			this.getCurrentSwiper();
+		} else {
+			this.getCurrentTemplate();
+		}
 	},
 	mounted() {
 		new Swiper('.swiper-container', {
@@ -248,23 +255,24 @@ export default {
 		changeIndex(val) {
 			this.$refs.carousel.setActiveItem(val);
 		},
-		getCurrentTemplate() {
-			let that = this;
-
-			this.$api.templateAll.get({ id: 29 }, (rs) => {
-				this.newSwiperBanner = JSON.parse(rs.data.newSwiperBanner);
-				this.swiperBanner = JSON.parse(rs.data.swiperBanner);
-				this.currentSwiper = JSON.parse(rs.data.currentSwiper);
-				this.$nextTick(function () {
-					JSON.parse(rs.data.imgToData).map((item, index) => {
-						that.$set(this.imgToData, index, {
-							...item,
-							rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+		getCurrentTemplate(type = 'nomral') {
+			if (type === 'normal') {
+				let that = this;
+				this.$api.templateAll.get({ id: type }, (rs) => {
+					this.newSwiperBanner = JSON.parse(rs.data.newSwiperBanner);
+					this.swiperBanner = JSON.parse(rs.data.swiperBanner);
+					this.currentSwiper = JSON.parse(rs.data.currentSwiper);
+					this.$nextTick(function () {
+						JSON.parse(rs.data.imgToData).map((item, index) => {
+							that.$set(this.imgToData, index, {
+								...item,
+								rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
+							});
 						});
+						this.imgStyleToData = JSON.parse(rs.data.imgToData);
 					});
-					this.imgStyleToData = JSON.parse(rs.data.imgToData);
 				});
-			});
+			}
 		},
 		defineStyle() {
 			let arr = [
@@ -309,12 +317,8 @@ export default {
 			this.swiperBanner = newData;
 		},
 		saveTemplate() {
-			let newData = [];
-			newData = this.imgToData.filter((item, index) => {
-				return item.type !== 'tool';
-			});
 			let obj = {
-				imgToData: JSON.stringify(newData),
+				imgToData: JSON.stringify(this.imgToData),
 				swiperBanner: JSON.stringify(this.swiperBanner),
 				currentSwiper: JSON.stringify(this.currentSwiper),
 				newSwiperBanner: JSON.stringify(this.newSwiperBanner),
@@ -461,7 +465,6 @@ export default {
 				this.swiperBanner = newData;
 				this.newSwiperBanner = newData;
 				this.currentFolder = rs.data.parent_data;
-				this.getCurrentTemplate();
 			});
 		},
 		changeSwiper(index) {
@@ -678,6 +681,8 @@ export default {
 		onResize(data, x, y, width, height, index) {
 			let dom_height = this.$refs[data.rand][data.index].offsetHeight;
 			let dom_width = this.$refs[data.rand][data.index].offsetWidth;
+			this.$set(this.imgToData[index], 'w', width);
+			this.$set(this.imgToData[index], 'h', height);
 			this.$set(this.imgToData[index], 'transformScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][data.index].style.transform = `scale(${width / dom_width},${height / dom_height})`;
 		},
@@ -812,6 +817,7 @@ export default {
 ::v-deep .handle-ml {
 	position: absolute;
 	z-index: 999;
+	padding: 3px;
 }
 ::v-deep .swiper-pagination-bullet-active {
 	width: 15px;

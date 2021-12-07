@@ -72,7 +72,9 @@ export default {
 			imageData: [
 				{ name: '实拍', icon: 'sf-icon-hdd', data: 'all' },
 				{ name: '测评', icon: 'sf-icon-hdd', data: 'lattice' },
-			], //网盘分类参数
+			],
+			templateData: [{ name: '所有', icon: 'sf-icon-hdd', data: 'all' }],
+			//网盘分类参数
 			categoryMenuData: [],
 			towerSrc: require('../assets/img/tower/Spring-bottom-0.png'),
 			timer: false,
@@ -136,6 +138,8 @@ export default {
 				this.categoryMenuData = this.ectdData;
 			} else if (type === 'image') {
 				this.categoryMenuData = this.imageData;
+			} else if (type === 'template') {
+				this.categoryMenuData = this.templateData;
 			}
 			this.change(0, type);
 		},
