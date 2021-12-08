@@ -205,7 +205,7 @@ export default {
 			imgStyleToData: [],
 			fontArr: [],
 			r: 1,
-			currentSwiper: '11-25/1',
+			currentSwiper: '11-25/6',
 			diskData: [],
 			maxFileSize: 4294967296, //4GB
 			maxFileSizeText: '0B',
@@ -228,6 +228,7 @@ export default {
 		} else {
 			this.getCurrentTemplate();
 		}
+		this.defineStyle();
 	},
 	mounted() {
 		new Swiper('.swiper-container', {
@@ -275,6 +276,29 @@ export default {
 			}
 		},
 		defineStyle() {
+			let data = this.newSwiperBanner;
+			let newData = [];
+			let newDataArr = [];
+			let val = [];
+			data.map((item, index) => {
+				let obj = {};
+				obj[item.sort] = item;
+				newData.push(obj);
+			});
+			let a = [];
+			for (let i in newData) {
+				if (Object.keys(newData[i])[0] === '1' || Object.keys(newData[i])[0] === 1) {
+					newDataArr.push(Object.values(newData[i])[0]);
+				} else {
+					if (!a.includes(Object.keys(newData[i])[0])) {
+						newDataArr.push({ children: this.getNew(Object.keys(newData[i])[0]) });
+					}
+				}
+				a.push(Object.keys(newData[i])[0]);
+			}
+			this.swiperBanner = newDataArr;
+		},
+		getNew(val) {
 			let arr = [
 				['G-width-100 G-height-100'],
 				['G-width-100 G-height-50', 'G-width-100 G-height-50'],
@@ -285,36 +309,31 @@ export default {
 				['G-width-100 G-height-66', 'G-width-50 G-height-33', 'G-width-50 G-height-33'],
 				['G-width-100 G-height-60', 'G-width-50 G-height-40', 'G-width-50 G-height-40'],
 			];
-			let data = this.newSwiperBanner;
+			let split = val.split('/');
 			let newData = [];
-			let val = [];
-			data.map((item, index) => {
-				let split = String(item.sort).split('/');
-				if (split[0] === 1 || item.sort === '1') {
+			let news = [];
+			this.newSwiperBanner.map((item, index) => {
+				if (item.sort === val) {
 					let obj = {
 						...item,
-						style: arr[0],
+						style: arr[1],
 					};
-					newData.push(item);
-				} else {
-					val.push(item.sort);
+					news.push(obj);
 				}
 			});
-			let newVal = Array.from(new Set(val));
-			newVal.map((item, index) => {
-				let cont = this.funS(item);
-				let a = String(item).split('/');
-				let newCont = cont.map((c_item, index) => {
-					return {
-						...c_item,
-						style: arr[a[0] - 1][index],
-					};
-				});
-				newData[newData.length] = {
-					children: newCont,
-				};
-			});
-			this.swiperBanner = newData;
+			return news;
+		},
+		unique(arr) {
+			let arr1 = [];
+			for (var i = 0, len = arr.length; i < len; i++) {
+				if (arr[i] === 1) {
+					arr1.push(arr[i]);
+				} else if (!arr1.includes(arr[i])) {
+					// 检索arr1中是否含有arr中的值
+					arr1.push(arr[i]);
+				}
+			}
+			return arr1;
 		},
 		saveTemplate() {
 			let obj = {
@@ -335,7 +354,7 @@ export default {
 			let newArray = [];
 			let j = 0;
 			for (let i in this.newSwiperBanner) {
-				if (this.newSwiperBanner[i].sort === val) {
+				if (this.newSwiperBanner[i].sort === val.sort) {
 					newArray[j++] = this.newSwiperBanner[i];
 				}
 			}

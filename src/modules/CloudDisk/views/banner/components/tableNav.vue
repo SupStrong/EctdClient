@@ -21,7 +21,7 @@
 				</el-table-column>
 				<el-table-column prop="" label="样式1" width="100">
 					<template slot-scope="scope">
-						<el-select v-model="newV" placeholder="请选择" @change="handleEdit($event, scope.row, 'ku')">
+						<el-select v-model="scope.row.classone" placeholder="请选择" @change="handleEdit($event, scope.row, 'ku')">
 							<el-option
 								v-for="(item, index) in saveStyleData"
 								:key="index"
@@ -199,9 +199,7 @@ export default {
 	},
 	methods: {
 		tableRowClassName({ row, rowIndex }) {
-			console.log(row, 'xxx');
 			if (row.rand === this.data.currentIndex) {
-				console.log(row.currentIndex, 'xxx');
 				return 'G-skyblue';
 			}
 			return '';
@@ -213,7 +211,7 @@ export default {
 					rs.data.rows.map((item, index) => {
 						newData.push({
 							value: JSON.parse(item.styleLevel),
-							lable: `样式${index}`,
+							lable: index,
 						});
 					});
 					this.saveStyleData = newData;
@@ -233,7 +231,6 @@ export default {
 		},
 		changeRow(row) {
 			this.$emit('changeIndex', row.index);
-			// row.index
 		},
 		editTextColor(val, item, type) {
 			if (type === 'color') {
@@ -249,23 +246,22 @@ export default {
 			this.$emit('select', item);
 		},
 		handleEdit(value, row, type) {
-			// row = this.newV;
 			if (type === 'ku') {
 				row = {
 					...row,
-					class: this.newV['class'],
-					color: this.newV['color'],
-					'font-size': this.newV['font-size'],
-					'font-style': this.newV['font-style'],
-					fontFamily: this.newV['fontFamily'],
-					'text-shadow': this.newV['text-shadow'],
-					textAlign: this.newV['textAlign'],
-					textColor: this.newV['textColor'],
-					transformScale: this.newV['transformScale'],
-					writingMode: this.newV['writingMode'],
+					class: value['class'],
+					color: value['color'],
+					'font-size': value['font-size'],
+					'font-style': value['font-style'],
+					fontFamily: value['fontFamily'],
+					'text-shadow': value['text-shadow'],
+					textAlign: value['textAlign'],
+					textColor: value['textColor'],
+					transformScale: value['transformScale'],
+					writingMode: value['writingMode'],
+					classone: this.saveStyleData.findIndex((v) => v.value.rand === row.rand),
 				};
 			}
-
 			if (type === 'text') {
 				row.color = '';
 				row['text-shadow'] = '';
@@ -280,6 +276,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 ::v-deep .G-skyblue {
-	background: skyblue !important;
+	background: rgba(233, 236, 238, 1) !important;
 }
 </style>

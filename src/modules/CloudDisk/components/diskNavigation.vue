@@ -114,7 +114,6 @@
 					<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
 					<el-button class="btn" type="info" plain @click="changeData('text')">文案</el-button>
 					<el-button class="btn" type="warning" plain @click="changeData('image')">插画</el-button>
-					<el-button class="btn" type="danger" plain @click="changeData('icon')">表情</el-button>
 					<el-button class="btn" type="primary" plain @click="changeData('filter')">滤镜</el-button>
 					<el-button class="btn" type="primary" plain @click="changeData('tool')">组件</el-button>
 				</template>
