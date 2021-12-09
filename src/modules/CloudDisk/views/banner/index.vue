@@ -85,6 +85,7 @@
 							@keyup="imgDelete($event, c_element)"
 							:ref="c_element.rand"
 							:src="c_element.val"
+							class="lazy_load"
 							v-if="c_element.type == 'image'"
 							@load="urlInfo($event, c_element.rand)"
 							style="white-space: nowrap; display: block"
@@ -140,6 +141,7 @@
 				<bannerIcon v-else-if="popupData.type == 'icon'" :data="popupData" @change="addToData"></bannerIcon>
 				<bannerclassify v-else-if="popupData.type == 'classify'" :data="popupData" @change="addToData"></bannerclassify>
 				<bannerFilter v-else-if="popupData.type == 'filter'" :data="popupData" @change="addToData"></bannerFilter>
+				<bannerTemplate v-else-if="popupData.type == 'template'" :data="popupData" @handleTemplate="handleTemplate" @change="addToData"></bannerTemplate>
 				<bannerTableNav
 					v-else-if="popupData.type == 'table'"
 					:data="popupData"
@@ -169,6 +171,7 @@ import bannerFilter from './components/filterNav.vue';
 import bannerTableNav from './components/tableNav.vue';
 import domStyle from './components/domStyle.vue';
 import toolNav from './components/toolNav.vue';
+import bannerTemplate from './components/templateNav.vue';
 import uploadHandle from '../../tools/uploadHandle';
 
 export default {
@@ -180,6 +183,7 @@ export default {
 		bannerclassify,
 		bannerFilter,
 		bannerTableNav,
+		bannerTemplate,
 		toolNav,
 		draggable,
 		domStyle,
@@ -222,12 +226,7 @@ export default {
 	},
 	created() {
 		this.getData();
-		let id = '';
-		if (id === '') {
-			this.getCurrentSwiper();
-		} else {
-			this.getCurrentTemplate();
-		}
+		this.getCurrentSwiper();
 		this.defineStyle();
 	},
 	mounted() {
@@ -249,6 +248,10 @@ export default {
 			// let scale = ele.transformScale !== undefined ? ele.transformScale.match(/\d+(.\d+)?/g)[0] : 1;
 			return ele.x * 1;
 		},
+		handleTemplate(id) {
+			console.log(id, 'xxx');
+			this.getCurrentTemplate(id);
+		},
 		//点击方法
 		getData() {
 			this.$api.brand.list({}, (rs) => {});
@@ -256,24 +259,22 @@ export default {
 		changeIndex(val) {
 			this.$refs.carousel.setActiveItem(val);
 		},
-		getCurrentTemplate(type = 'nomral') {
-			if (type === 'normal') {
-				let that = this;
-				this.$api.templateAll.get({ id: type }, (rs) => {
-					this.newSwiperBanner = JSON.parse(rs.data.newSwiperBanner);
-					this.swiperBanner = JSON.parse(rs.data.swiperBanner);
-					this.currentSwiper = JSON.parse(rs.data.currentSwiper);
-					this.$nextTick(function () {
-						JSON.parse(rs.data.imgToData).map((item, index) => {
-							that.$set(this.imgToData, index, {
-								...item,
-								rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
-							});
+		getCurrentTemplate(id) {
+			let that = this;
+			this.$api.templateAll.get({ id }, (rs) => {
+				this.newSwiperBanner = JSON.parse(rs.data.newSwiperBanner);
+				this.swiperBanner = JSON.parse(rs.data.swiperBanner);
+				this.currentSwiper = JSON.parse(rs.data.currentSwiper);
+				this.$nextTick(function () {
+					JSON.parse(rs.data.imgToData).map((item, index) => {
+						that.$set(this.imgToData, index, {
+							...item,
+							rand: (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5),
 						});
-						this.imgStyleToData = JSON.parse(rs.data.imgToData);
 					});
+					this.imgStyleToData = JSON.parse(rs.data.imgToData);
 				});
-			}
+			});
 		},
 		defineStyle() {
 			let data = this.newSwiperBanner;
@@ -406,7 +407,6 @@ export default {
 					}
 				});
 				this.imgToData = newImgToData;
-				this.imgStyleToData = newImgToData;
 			} else if (e.keyCode === 67) {
 				let obj = {
 					...val,
@@ -417,6 +417,8 @@ export default {
 		},
 		// 删除文案
 		textDelete(e, val) {
+			// 48到57  0到9   49 50 51 52 53 54
+			console.log(e.keyCode, 'e.keyCodee.keyCodee.keyCode');
 			if (e.keyCode === 8) {
 				let newImgToData = [];
 				this.imgToData.map((item, index) => {
@@ -425,7 +427,6 @@ export default {
 					}
 				});
 				this.imgToData = newImgToData;
-				this.imgStyleToData = newImgToData;
 			} else if (e.keyCode === 67) {
 				let obj = {
 					...val,
@@ -433,6 +434,9 @@ export default {
 				};
 				this.imgToData.push(obj);
 			}
+			// else if (e.keyCode === 49 || e.keyCode === 50 || e.keyCode === 51 || e.keyCode === 52 || e.keyCode === 53 || e.keyCode === 54) {
+			// let arr = ['data', 'classify', 'text', 'image', 'filter', 'tool'];
+			// }
 		},
 		urlInfo(e, rand) {
 			// this.$refs[rand][this.swiperIndex].style.height = e.target.height / 4 + 'px';

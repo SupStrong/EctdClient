@@ -55,7 +55,6 @@ export default {
 				// { name: '传输', flag: 'trans', icon: 'sf-icon-exchange-alt', rotate: '90deg' },
 				{ name: '基础数据', flag: 'ectd', icon: 'sf-icon-share-alt' },
 				{ name: '生成图片', flag: 'image', icon: 'sf-icon-share-alt' },
-				{ name: '模板', flag: 'template', icon: 'sf-icon-share-alt' },
 			],
 			platform: process.platform,
 		};

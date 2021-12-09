@@ -6,11 +6,10 @@
 				<el-button type="danger" @click="onSubmit">新增文案</el-button>
 			</el-form-item>
 		</el-form>
-		<p class="text" v-for="(item, index) in oftenArr" :key="index" style="float: left" @dblclick="clickFun(item)">{{ item }}</p>
+		<p class="text" v-for="(item, index) of oftenArr" :key="index" style="float: left" @dblclick="clickFun(item)">{{ item }}</p>
 		<hr />
 		<p class="text" v-for="(item, index) in textArr" :key="index" @dblclick="clickFun(item.name)">
 			{{ item.name }}
-			<!-- <el-divider></el-divider> -->
 		</p>
 	</el-drawer>
 </template>
@@ -92,7 +91,14 @@ export default {
 			},
 		};
 	},
-	props: { data: { type: Boolean, default: true } },
+	props: {
+		data: {
+			type: Object,
+			default: function () {
+				return {};
+			},
+		},
+	},
 	created() {
 		this.getData();
 	},

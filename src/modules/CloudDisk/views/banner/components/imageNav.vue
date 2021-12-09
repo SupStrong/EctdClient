@@ -17,7 +17,14 @@ export default {
 			imgData: [],
 		};
 	},
-	props: { data: { type: Boolean, default: true } },
+	props: {
+		data: {
+			type: Object,
+			default: function () {
+				return {};
+			},
+		},
+	},
 	created() {
 		this.getData();
 	},

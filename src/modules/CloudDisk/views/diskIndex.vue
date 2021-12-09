@@ -104,7 +104,6 @@
 				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
 				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
 				<!-- 模板 -->
-				<templateIndex v-if="navType === 'template' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></templateIndex>
 			</div>
 		</section>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -130,7 +129,6 @@ import ectdIndex from './ectd/ectdIndex.vue';
 import bannerImage from './banner/index.vue';
 import latticeIndex from './banner/lattice.vue';
 // 模板
-import templateIndex from './template/index.vue';
 
 let shareWin = null;
 export default {
@@ -147,7 +145,6 @@ export default {
 		ectdIndex,
 		bannerImage,
 		latticeIndex,
-		templateIndex,
 	},
 	data() {
 		return {
