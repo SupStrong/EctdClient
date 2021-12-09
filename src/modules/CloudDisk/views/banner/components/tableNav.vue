@@ -246,6 +246,9 @@ export default {
 			this.$emit('select', item);
 		},
 		handleEdit(value, row, type) {
+			let index = this.listData.findIndex(function (item) {
+				return item.rand === row.rand;
+			});
 			if (type === 'ku') {
 				row = {
 					...row,
@@ -262,11 +265,13 @@ export default {
 					classone: this.saveStyleData.findIndex((v) => v.value.rand === row.rand),
 				};
 			}
+
 			if (type === 'text') {
 				row.color = '';
 				row['text-shadow'] = '';
 			}
 			this.$emit('select', row);
+			this.$set(this.listData, index, row);
 		},
 		handleDelete(value, row) {
 			this.$emit('delete', row);
