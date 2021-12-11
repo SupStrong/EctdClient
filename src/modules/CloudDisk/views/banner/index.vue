@@ -17,6 +17,7 @@
 						class="swiper-img"
 						:src="element.content ? 'http://118.31.70.36:3000/uploads/disk/' + element.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
 						alt=""
+						draggable="false"
 						οndragstart="return false"
 					/>
 					<div v-if="element.children" style="width: 100%; height: 100%; position: absolute">
@@ -26,6 +27,7 @@
 									<img
 										:src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : '69284f94b79bf8b867bf513be25b9c74.webp'"
 										style="width: 100%; height: 100%"
+										draggable="false"
 										alt=""
 									/>
 								</div>
@@ -39,7 +41,7 @@
 						class-name-active="my-active-class"
 						style="border: 0; display: flex; align-items: center; justify-content: center"
 						v-for="(c_element, index) in imgToData"
-						:key="index"
+						:key="c_element.rand"
 						:lock-aspect-ratio="true"
 						w="auto"
 						h="auto"
@@ -56,6 +58,7 @@
 							:tabindex="c_element.rand"
 							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
+							:key="c_element.rand"
 							class="img_text"
 							:class="c_element.class || 'G-font-6'"
 							style="
@@ -66,7 +69,9 @@
 								font-weight: 500;
 								line-height: 1;
 								text-align: center;
-								letter-spacing: -3px;
+								cursor: pointer;
+								letter-spacing: -2px;
+								border-radius: 3px;
 							"
 							:style="{
 								'text-align': c_element.textAlign,
@@ -74,8 +79,10 @@
 								color: c_element['color'],
 								'text-shadow': c_element['text-shadow'],
 								'font-family': c_element['fontFamily'],
-								'font-style': c_element['fontStyle'],
 								transform: c_element['transformScale'] || '',
+								background: c_element['backgroundColor'] || '',
+								'font-style': c_element['fontStyle'] || '',
+								padding: c_element['paddingStyle'] || '',
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
@@ -84,11 +91,12 @@
 							:tabindex="c_element.rand"
 							@keyup="imgDelete($event, c_element)"
 							:ref="c_element.rand"
+							:key="c_element.rand"
 							:src="c_element.val"
 							class="lazy_load"
 							v-if="c_element.type == 'image'"
 							@load="urlInfo($event, c_element.rand)"
-							style="white-space: nowrap; display: block"
+							style="white-space: nowrap; display: block; cursor: pointer"
 							:style="{
 								transform: c_element['transformScale'] || '',
 								width: c_element['w'] ? `${c_element['w']}px` : '40px',
@@ -434,16 +442,8 @@ export default {
 				};
 				this.imgToData.push(obj);
 			}
-			// else if (e.keyCode === 49 || e.keyCode === 50 || e.keyCode === 51 || e.keyCode === 52 || e.keyCode === 53 || e.keyCode === 54) {
-			// let arr = ['data', 'classify', 'text', 'image', 'filter', 'tool'];
-			// }
 		},
-		urlInfo(e, rand) {
-			// this.$refs[rand][this.swiperIndex].style.height = e.target.height / 4 + 'px';
-			// this.$refs[rand][this.swiperIndex].style.width = e.target.width / 4 + 'px';
-			// this.$refs[rand][this.swiperIndex].parentNode.style.height = e.target.height / 4 + 'px';
-			// this.$refs[rand][this.swiperIndex].parentNode.style.width = e.target.width / 4 + 'px';
-		},
+		urlInfo(e, rand) {},
 		verifyUploadSize(files) {
 			let result = [];
 			let totalSize = 0;
@@ -585,6 +585,7 @@ export default {
 			}
 		},
 		resetData(data) {
+			console.log(data, 'Dddd');
 			let obj = JSON.parse(JSON.stringify(this.imgToData));
 			this.imgToData = obj;
 			this.swiperIndex = data.index;
@@ -601,7 +602,9 @@ export default {
 						'text-shadow': data['text-shadow'],
 						fontFamily: data['fontFamily'],
 						textColor: data['textColor'],
-						imgHref: data['imgHref'],
+						backgroundColor: data['backgroundColor'],
+						fontStyle: data['fontStyle'],
+						paddingStyle: data['paddingStyle'],
 					});
 				}
 			});
@@ -731,13 +734,16 @@ export default {
 						color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
 						fontFamily: this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
 						'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
-						'font-style': this.getStyle(this.$refs[item.rand][item.index], 'fontStyle'),
+						fontStyle: this.getStyle(this.$refs[item.rand][item.index], 'fontStyle'),
 						transformScale: this.getStyle(this.$refs[item.rand][item.index], 'transform'),
 						textColor: splitArrr.split(' 1px 0px 0px, ')[0],
 						textAlign: this.getStyle(this.$refs[item.rand][item.index], 'textAlign'),
 						writingMode: this.getStyle(this.$refs[item.rand][item.index], 'writingMode'),
 						class: this.$refs[item.rand][item.index].getAttribute('class'),
+						backgroundColor: this.getStyle(this.$refs[item.rand][item.index], 'backgroundColor'),
+						paddingStyle: this.getStyle(this.$refs[item.rand][item.index], 'paddingStyle'),
 					};
+					console.log(obj, 'objobj');
 					this.imgStyleToData.push(obj);
 				}
 			});

@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="50" direction="rtl">
+		<el-drawer title="选中文字" :wrapperClosable="false" :visible.sync="data.isDrawer" :size="100" direction="rtl">
 			<el-table :data="listData" border style="width: 100%" @row-click="changeRow" :row-class-name="tableRowClassName">
-				<el-table-column fixed="left" label="页" width="40">
+				<el-table-column fixed="left" label="页" width="60">
 					<template slot-scope="scope">
 						{{ scope.row.index + 1 }}
 					</template>
 				</el-table-column>
-				<el-table-column label="文字" width="150">
+				<el-table-column label="文字" width="200">
 					<template slot-scope="scope">
 						<el-input v-model="scope.row.val" :value="scope.row.val" @change="handleEdit($event, scope.row)"></el-input>
 					</template>
@@ -56,6 +56,14 @@
 						</el-select>
 					</template>
 				</el-table-column>
+				<el-table-column prop="" label="字体" width="100">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.fontStyle" placeholder="请选择" @change="handleEdit($event, scope.row)">
+							<el-option v-for="(item, index) in fontStyleArr" :key="index" :label="item.label" :value="item.value" :style="{ 'font-style': item.value }">
+							</el-option>
+						</el-select>
+					</template>
+				</el-table-column>
 				<el-table-column prop="" label="颜色" width="50">
 					<template slot-scope="scope">
 						<el-color-picker
@@ -80,7 +88,21 @@
 						></el-color-picker>
 					</template>
 				</el-table-column>
-				<el-table-column prop="" label="居中" width="80">
+				<!-- 新增 -->
+				<el-table-column prop="" label="背景" width="50">
+					<template slot-scope="scope">
+						<el-color-picker
+							size="mini"
+							v-model="scope.row['backgroundColor']"
+							show-alpha
+							@active-change="editTextColor($event, scope.row, 'backgroundColor')"
+							@change="editTextColor($event, scope.row, 'backgroundColor')"
+							:predefine="predefineColors"
+						></el-color-picker>
+					</template>
+				</el-table-column>
+
+				<el-table-column prop="" label="居中" width="100">
 					<template slot-scope="scope">
 						<el-select v-model="scope.row.textAlign" placeholder="请选择" @change="handleEdit($event, scope.row)">
 							<el-option v-for="(item, index) in textCenterOptions" :key="index" :label="item.label" :value="item.value"> </el-option>
@@ -138,6 +160,16 @@ export default {
 				{
 					value: 'right',
 					label: '右',
+				},
+			],
+			fontStyleArr: [
+				{
+					value: 'italic',
+					label: '倾斜',
+				},
+				{
+					value: 'inherit',
+					label: '正常',
 				},
 			],
 			writingModeOptions: [
@@ -219,6 +251,7 @@ export default {
 			});
 		},
 		saveStyle(e, row) {
+			console.log(row, 'rrr');
 			let obj = {
 				styleLevel: JSON.stringify(row),
 			};
@@ -242,6 +275,9 @@ export default {
 			} else if (type === 'textShadow' && val == null) {
 				item['text-shadow'] = '';
 				item['textColor'] = '';
+			} else if (type === 'backgroundColor' && val != null) {
+				item['backgroundColor'] = val;
+				item['paddingStyle'] = '0px 3px 0px 0px';
 			}
 			this.$emit('select', item);
 		},
@@ -262,6 +298,9 @@ export default {
 					textColor: value['textColor'],
 					transformScale: value['transformScale'],
 					writingMode: value['writingMode'],
+					backgroundColor: value['backgroundColor'],
+					fontStyle: value['fontStyle'],
+					paddingStyle: value['paddingStyle'],
 					classone: this.saveStyleData.findIndex((v) => v.value.rand === row.rand),
 				};
 			}
@@ -282,5 +321,11 @@ export default {
 <style lang="scss" scoped>
 ::v-deep .G-skyblue {
 	background: rgba(233, 236, 238, 1) !important;
+}
+.el-drawer__wrapper {
+	width: 50% !important;
+	right: 0 !important;
+	float: right;
+	left: auto !important;
 }
 </style>

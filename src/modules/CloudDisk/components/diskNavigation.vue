@@ -1,5 +1,5 @@
 <template>
-	<div class="cloud-disk-navigation">
+	<div class="cloud-disk-navigation" tabindex="1" @keyup="allKeyup($event)">
 		<!-- 上方工具栏 新建 导入 浏览 编辑-->
 		<div class="disk-func">
 			<div class="left">
@@ -250,6 +250,20 @@ export default {
 		navControl(commend) {
 			//回调函数
 			this.$emit('callback', commend);
+		},
+		allKeyup(e) {
+			let obj = {
+				49: 'data',
+				50: 'classify',
+				51: 'text',
+				52: 'image',
+				53: 'filter',
+				54: 'tool',
+				55: 'template',
+			};
+			if (e.keyCode === 49 || e.keyCode === 50 || e.keyCode === 51 || e.keyCode === 52 || e.keyCode === 53 || e.keyCode === 54 || e.keyCode === 55) {
+				this.changeData(obj[e.keyCode]);
+			}
 		},
 		inputShowType(data) {
 			// this.
