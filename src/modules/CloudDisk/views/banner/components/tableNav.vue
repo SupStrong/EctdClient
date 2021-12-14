@@ -251,7 +251,6 @@ export default {
 			});
 		},
 		saveStyle(e, row) {
-			console.log(row, 'rrr');
 			let obj = {
 				styleLevel: JSON.stringify(row),
 			};
@@ -277,7 +276,8 @@ export default {
 				item['textColor'] = '';
 			} else if (type === 'backgroundColor' && val != null) {
 				item['backgroundColor'] = val;
-				item['paddingStyle'] = '0px 3px 0px 0px';
+				item['paddingStyle'] = '3px 10px 3px 10px';
+				item['text-align'] = 'center';
 			}
 			this.$emit('select', item);
 		},

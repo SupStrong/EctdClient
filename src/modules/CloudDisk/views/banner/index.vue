@@ -11,7 +11,7 @@
 				:autoplay="false"
 				@change="changeSwiper"
 			>
-				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :ref="'swiper1' + index" :key="index" οndragstart="return false">
+				<el-carousel-item class="test" v-for="(element, index) in swiperBanner" :key="index" :ref="'swiper1' + index" οndragstart="return false">
 					<img
 						v-if="!element.children"
 						class="swiper-img"
@@ -39,12 +39,11 @@
 					</div>
 					<vue-draggable-resizable
 						class-name-active="my-active-class"
-						style="border: 0; display: flex; align-items: center; justify-content: center"
+						style="display: flex; align-items: center; justify-content: center"
 						v-for="(c_element, index) in imgToData"
 						:key="c_element.rand"
-						:lock-aspect-ratio="true"
-						w="auto"
-						h="auto"
+						:w="c_element.p_width || 'auto'"
+						:h="c_element.p_height || 'auto'"
 						:x="c_element.x"
 						:y="c_element.y"
 						:style="{
@@ -58,7 +57,6 @@
 							:tabindex="c_element.rand"
 							@keyup="textDelete($event, c_element)"
 							:ref="c_element.rand"
-							:key="c_element.rand"
 							class="img_text"
 							:class="c_element.class || 'G-font-6'"
 							style="
@@ -72,6 +70,8 @@
 								cursor: pointer;
 								letter-spacing: -2px;
 								border-radius: 3px;
+								box-sizing: content-box;
+								line-height: 1;
 							"
 							:style="{
 								'text-align': c_element.textAlign,
@@ -99,8 +99,8 @@
 							style="white-space: nowrap; display: block; cursor: pointer"
 							:style="{
 								transform: c_element['transformScale'] || '',
-								width: c_element['w'] ? `${c_element['w']}px` : '40px',
-								height: c_element['h'] ? `${c_element['h']}px` : '40px',
+								width: c_element['w'] ? `${c_element['w']}px` : '30px',
+								height: c_element['h'] ? `${c_element['h']}px` : '30px',
 							}"
 							alt=""
 						/>
@@ -257,7 +257,6 @@ export default {
 			return ele.x * 1;
 		},
 		handleTemplate(id) {
-			console.log(id, 'xxx');
 			this.getCurrentTemplate(id);
 		},
 		//点击方法
@@ -325,7 +324,7 @@ export default {
 				if (item.sort === val) {
 					let obj = {
 						...item,
-						style: arr[1],
+						style: arr[split[0] - 1][index],
 					};
 					news.push(obj);
 				}
@@ -425,8 +424,6 @@ export default {
 		},
 		// 删除文案
 		textDelete(e, val) {
-			// 48到57  0到9   49 50 51 52 53 54
-			console.log(e.keyCode, 'e.keyCodee.keyCodee.keyCode');
 			if (e.keyCode === 8) {
 				let newImgToData = [];
 				this.imgToData.map((item, index) => {
@@ -585,7 +582,6 @@ export default {
 			}
 		},
 		resetData(data) {
-			console.log(data, 'Dddd');
 			let obj = JSON.parse(JSON.stringify(this.imgToData));
 			this.imgToData = obj;
 			this.swiperIndex = data.index;
@@ -705,25 +701,35 @@ export default {
 			);
 		},
 		onResize(data, x, y, width, height, index) {
-			let dom_height = this.$refs[data.rand][data.index].offsetHeight;
-			let dom_width = this.$refs[data.rand][data.index].offsetWidth;
-			this.$set(this.imgToData[index], 'w', width);
-			this.$set(this.imgToData[index], 'h', height);
+			let dom_height = this.$refs[data.rand][data.index].clientHeight;
+			let dom_width = this.$refs[data.rand][data.index].clientWidth;
 			this.$set(this.imgToData[index], 'transformScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][data.index].style.transform = `scale(${width / dom_width},${height / dom_height})`;
+			data.p_width = width;
+			data.p_height = height;
 		},
 		dragstop(data, x, y, width, height) {
 			data.x = x;
 			data.y = y;
 		},
 		onActivated(ele, index) {
-			let width = this.$refs[ele.rand][this.swiperIndex].offsetWidth;
-			let height = this.$refs[ele.rand][this.swiperIndex].offsetHeight;
-			this.$refs[ele.rand][this.swiperIndex].style.width = width + 'px';
-			this.$refs[ele.rand][this.swiperIndex].style.height = height + 'px';
-			this.$refs[ele.rand][this.swiperIndex].parentNode.style.width = width + 'px';
-			this.$refs[ele.rand][this.swiperIndex].parentNode.style.height = height + 'px';
-			this.$emit('change', { type: 'table', isDrawer: true, currentIndex: ele.rand });
+			let width = this.$refs[ele.rand][this.swiperIndex].clientWidth;
+			let height = this.$refs[ele.rand][this.swiperIndex].clientHeight;
+			let scaleW = 1;
+			let scaleH = 1;
+			if (ele.transformScale !== '' && ele.transformScale !== undefined) {
+				(scaleW = parseFloat(ele.transformScale.split(',')[0].split('scale(')[1])), (scaleH = parseFloat(ele.transformScale.split(',')[1]));
+			}
+			if (ele.paddingStyle === undefined || ele.paddingStyle === '0px') {
+				ele.p_width = width * scaleW;
+				ele.p_height = height * scaleH;
+			} else {
+				ele.p_width = width * scaleW;
+				ele.p_height = height * scaleH;
+			}
+			if (ele.type === 'text') {
+				this.$emit('change', { type: 'table', isDrawer: true, currentIndex: ele.rand });
+			}
 			this.imgStyleToData = [];
 			this.imgToData.map((item, index) => {
 				if (item.type === 'text') {
@@ -741,9 +747,8 @@ export default {
 						writingMode: this.getStyle(this.$refs[item.rand][item.index], 'writingMode'),
 						class: this.$refs[item.rand][item.index].getAttribute('class'),
 						backgroundColor: this.getStyle(this.$refs[item.rand][item.index], 'backgroundColor'),
-						paddingStyle: this.getStyle(this.$refs[item.rand][item.index], 'paddingStyle'),
+						paddingStyle: this.getStyle(this.$refs[item.rand][item.index], 'padding'),
 					};
-					console.log(obj, 'objobj');
 					this.imgStyleToData.push(obj);
 				}
 			});
@@ -803,7 +808,7 @@ export default {
 }
 .my-active-class {
 	box-sizing: content-box;
-	border: 1px solid red;
+	border: 1px dashed #000 !important;
 }
 // .my-class {
 // 	border: 0;
@@ -818,6 +823,7 @@ export default {
 .handle,
 .vdr {
 	padding: 0;
+	border: 0;
 }
 ::v-deep .el-carousel__indicators--outside {
 	display: none;
@@ -890,5 +896,8 @@ img:not([src]) {
 *::-webkit-scrollbar {
 	width: 0 !important;
 	height: 0 !important;
+}
+.var {
+	border: 0 !important;
 }
 </style>

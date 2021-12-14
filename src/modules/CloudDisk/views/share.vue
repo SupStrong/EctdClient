@@ -4,18 +4,18 @@
 		<div class="share-contain main" v-if="showShare">
 			<div class="left">
 				<div class="one-file animated zoomIn" v-if="shareInfo.type === 'file'">
-					<img :src="fileIcon(shareInfo)" draggable="false" :alt="shareInfo.name" />
+					<img :src="fileIcon(shareInfo)" :alt="shareInfo.name" />
 					<p class="name">{{ shareInfo.name }}</p>
 					<div class="download">
 						<span>{{ downloading ? progressText : shareInfo.$size }}</span>
 						<div class="progress" :style="{ width: progress }"></div>
 						<button class="sf-icon-download" v-if="!downloading" @click="download"></button>
 					</div>
-					<button v-if="isSameUser" class="save" @click="cancelShare">取消分享</button>
-					<button v-else class="save" @click="save">保存到网盘</button>
+					<!-- <button v-if="isSameUser" class="save" @click="cancelShare">取消分享</button> -->
+					<!-- <button v-else class="save" @click="save">保存到网盘</button> -->
 				</div>
 				<div class="file-list list-file" v-else>
-					<div class="header">
+					<!-- <div class="header">
 						<Checkbox v-model="select" @on-change="selectAll">&nbsp;&nbsp;全选</Checkbox>
 						<div class="container">
 							<button @click="cancelShare" v-if="isSameUser">取消分享</button>
@@ -24,7 +24,7 @@
 								保存到网盘
 							</button>
 						</div>
-					</div>
+					</div> -->
 					<div class="nav">
 						<span class="block" @click="rootDir">根目录/</span>
 						<span class="block" v-for="(item, index) in navData" :key="index" @click="openFolder(item, index)">{{ item.name }}/</span>
@@ -34,14 +34,14 @@
 					</div>
 				</div>
 			</div>
-			<div class="right animated slideInRight">
+			<!-- <div class="right animated slideInRight">
 				<div class="background" :style="{ background: 'url(' + shareInfo.user.avatar + ')' }"></div>
 				<div class="content">
 					<img :src="shareInfo.user.avatar" draggable="false" alt="" />
 					<p>{{ shareInfo.user.name }}</p>
 					<div class="sign">{{ shareInfo.user.sign || '暂无签名' }}</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 		<div class="share-contain disabled" v-else>
 			<template v-if="showPassCode">
@@ -155,6 +155,9 @@ export default {
 							}
 						} else {
 							this.fileList = [this.shareInfo];
+							if (this.fileList.length === 1) {
+								this.openFolder(this.fileList[0]);
+							}
 						}
 					}
 				},

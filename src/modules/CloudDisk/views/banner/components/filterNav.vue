@@ -1,5 +1,5 @@
 <template>
-	<el-drawer title="样品数据" :wrapperClosable="false" :visible.sync="data.isDrawer" direction="rtl">
+	<el-drawer title="滤镜" :wrapperClosable="false" :visible.sync="data.isDrawer" direction="rtl">
 		<ul class="demo__list">
 			<li class="demo__item" v-for="(item, index) in mapList" :key="index" @click="clickFun(item)">
 				<figure :class="item">
@@ -16,7 +16,7 @@ export default {
 			mapList: ['aden', 'reyes', 'perpetua', 'inkwell', 'earlybird', 'toaster', 'walden', 'hudson', 'gingham', 'mayfair', 'lofi', 'xpro2', '_1977', 'brooklyn'],
 		};
 	},
-	props: { data: { type: Boolean, default: true } },
+	props: { data: { type: Object, default: () => {} } },
 	methods: {
 		clickFun(val) {
 			this.$emit('change', { val: val, type: 'filter' });

@@ -44,7 +44,7 @@ export default {
 			tableData: [],
 		};
 	},
-	props: { data: { type: Boolean, default: true } },
+	props: { data: { type: Object, default: () => {} } },
 	created() {
 		this.$api.sample.list({}, (rs) => {
 			this.tableData = rs.data.rows;

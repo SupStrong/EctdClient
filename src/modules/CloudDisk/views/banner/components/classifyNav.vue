@@ -66,7 +66,7 @@ export default {
 			activeNames: ['1'],
 		};
 	},
-	props: { data: { type: Boolean, default: true } },
+	props: { data: { type: Object, default: () => {} } },
 	methods: {
 		clickFun(val) {
 			this.$emit('change', { val: val, type: 'text' });

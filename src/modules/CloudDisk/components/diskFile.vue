@@ -7,15 +7,15 @@
 		@mouseover="item.hover = true"
 		@mouseleave="item.hover = false"
 	>
-		<div class="select" @mousedown.stop.prevent="prevent">
+		<!-- <div class="select" @mousedown.stop.prevent="prevent">
 			<Checkbox v-model="item.active"></Checkbox>
-		</div>
+		</div> -->
 		<span class="icon">
-			<img :src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : itemIcon(item)" draggable="false" alt="" />
+			<img :src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : itemIcon(item)" alt="" />
 		</span>
 		<p>{{ item.name }}</p>
-		<div class="time">{{ item.updatedAt }}</div>
-		<div class="size">{{ item.$size }}</div>
+		<!--<div class="time">{{ item.updatedAt }}</div>
+		<div class="size">{{ item.$size }}</div> -->
 	</div>
 </template>
 
@@ -90,7 +90,6 @@ export default {
 .list-file {
 	.file {
 		width: 100%;
-		height: 35px;
 		padding-left: 5px;
 		cursor: pointer;
 		margin: 3px 0;
@@ -100,8 +99,8 @@ export default {
 		font-size: 12px;
 		text-align: left;
 		img {
-			width: 20px;
-			height: 20px;
+			width: 100px;
+			height: 100px;
 		}
 		.icon {
 			padding-top: 9px;

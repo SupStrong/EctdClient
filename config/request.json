@@ -1,12 +1,12 @@
 {
   "development": {
     "url": "http://118.31.70.36:3000",
-    "updateUrl": "https://update.zjinh.cn",
-    "diskWebUrl": "https://disk.zjinh.cn"
+    "updateUrl": "http://localhost:8080/",
+    "diskWebUrl": "http://localhost:8080"
   },
   "production": {
     "url": "http://118.31.70.36:3000",
-    "updateUrl": "https://update.zjinh.cn",
-    "diskWebUrl": "https://disk.zjinh.cn"
+    "updateUrl": "http://localhost:8080/",
+    "diskWebUrl": "http://localhost:8080"
   }
 }
