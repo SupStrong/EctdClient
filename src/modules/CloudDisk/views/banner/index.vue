@@ -217,7 +217,7 @@ export default {
 			imgStyleToData: [],
 			fontArr: [],
 			r: 1,
-			currentSwiper: '11-25/6',
+			currentSwiper: '11-25/8',
 			diskData: [],
 			maxFileSize: 4294967296, //4GB
 			maxFileSizeText: '0B',
@@ -320,11 +320,18 @@ export default {
 			let split = val.split('/');
 			let newData = [];
 			let news = [];
+			var o = {};
 			this.newSwiperBanner.map((item, index) => {
 				if (item.sort === val) {
+					var items = item.sort;
+					if (o[items]) {
+						o[items]++;
+					} else {
+						o[items] = 1;
+					}
 					let obj = {
 						...item,
-						style: arr[split[0] - 1][index],
+						style: arr[split[0] - 1][o[items] - 1],
 					};
 					news.push(obj);
 				}
