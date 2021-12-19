@@ -78,6 +78,7 @@
 								</ul>
 							</Poptip>
 							<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
+							<button class="btn default" @click="actionControl('newAllFolder')">新建子文件夹</button>
 						</template>
 						<template v-else-if="data.categoryType === 'trash'">
 							<button class="btn remove" :disabled="cleanDisabled" @click="cleanTrash">清空</button>

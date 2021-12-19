@@ -49,6 +49,7 @@
 						:style="{
 							visibility: c_element['index'] != swiperIndex ? 'hidden' : 'inherit',
 						}"
+						:lock-aspect-ratio="c_element.type != 'text'"
 						@dragstop="(left, top, width, height) => dragstop(c_element, left, top, width, height)"
 						@activated="(left, top, width, height) => onActivated(c_element, index)"
 						@resizing="(left, top, width, height) => onResize(c_element, left, top, width, height, index)"
@@ -318,6 +319,9 @@ export default {
 				['G-width-100 G-height-60', 'G-width-50 G-height-40', 'G-width-50 G-height-40'],
 			];
 			let split = val.split('/');
+			if (split == 0 || split == '') {
+				return;
+			}
 			let newData = [];
 			let news = [];
 			var o = {};

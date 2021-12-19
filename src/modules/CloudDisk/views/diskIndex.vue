@@ -1042,6 +1042,52 @@ export default {
 						},
 					});
 					break;
+				case 'newAllFolder':
+					this.popupWindow({
+						title: '新建文件夹',
+						tips: '请输入生成的个数',
+						callback: (value) => {
+							if (value.length === 0) {
+								return this.$Message.error('文件夹名称不能为空');
+							}
+							if (this.validateFileName(value)) {
+								return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
+							}
+							let arr = [];
+							if (this.diskInfo.navData.length) {
+								this.diskInfo.navData.map((item, index) => {
+									arr.push(item.name);
+								});
+								arr.push(value);
+							} else {
+								arr.push(value);
+							}
+							for (let i = 1; i <= value; i++) {
+								this.$api.disk.newFolder(
+									{
+										parentId: this.diskInfo.id,
+										name: Number(i),
+										parentName: this.diskInfo.navData[this.diskInfo.navData.length - 1].name + '/' + i,
+									},
+									(rs) => {
+										this.$Message.success(i + '已创建');
+										this.diskData.push(this.$api.disk.diskData(rs.data));
+										this.$api.disk.newFolder(
+											{
+												parentId: rs.data.id,
+												name: 'SP',
+												parentName: rs.data.parentName + '/SP',
+											},
+											(rs) => {
+												// this.$Message.success(value + '已创建');
+											}
+										);
+									}
+								);
+							}
+						},
+					});
+					break;
 				case 'rename':
 					this.popupWindow({
 						title: '重命名',
