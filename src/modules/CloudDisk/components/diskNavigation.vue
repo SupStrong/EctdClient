@@ -156,6 +156,7 @@
 				<div v-for="(item, index) in data.navData" :key="index" @mouseover="handleDragEnter" class="item" @click="navControl(item)">
 					{{ item.name }}
 				</div>
+				<el-button class="btn primary" v-if="type == 'disk'" style="margin-left: 10px; line-height: 1" @click="copyValue">复制</el-button>
 			</div>
 		</div>
 		<ul class="sort-container" v-if="fileStateIcon !== 'sf-icon-th-large' && type !== 'trans'">
@@ -251,6 +252,20 @@ export default {
 		navControl(commend) {
 			//回调函数
 			this.$emit('callback', commend);
+		},
+		copyValue() {
+			let newData = this.data.navData.map((item, index) => {
+				return item.name;
+			});
+			let value = newData.join('/');
+			var oInput = document.createElement('input');
+			oInput.value = value;
+			document.body.appendChild(oInput);
+			oInput.select(); // 选择对象
+			document.execCommand('Copy'); // 执行浏览器复制命令
+			oInput.className = 'oInput';
+			oInput.style.display = 'none';
+			this.$Message.success('复制成功');
 		},
 		allKeyup(e) {
 			let obj = {

@@ -231,10 +231,11 @@ export default {
 			}
 		},
 		openFolder(item, index) {
-			if (!this.isLogin) {
-				this.typeChange('login');
-				return;
-			}
+			console.log('1222');
+			// if (!this.isLogin) {
+			// 	this.typeChange('login');
+			// 	return;
+			// }
 			if (item.type && item.type !== 'folder') {
 				return;
 			}

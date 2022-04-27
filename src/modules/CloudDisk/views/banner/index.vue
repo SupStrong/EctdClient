@@ -61,7 +61,7 @@
 							class="img_text"
 							:class="c_element.class || 'G-font-6'"
 							style="
-								font-size: 26px;
+								font-size: 32px;
 								white-space: nowrap;
 								display: inline-box;
 								white-space: pre;
@@ -70,9 +70,9 @@
 								text-align: center;
 								cursor: pointer;
 								letter-spacing: -2px;
-								border-radius: 3px;
 								box-sizing: content-box;
 								line-height: 1;
+								border: 1px solid transparent;
 							"
 							:style="{
 								'text-align': c_element.textAlign,
@@ -84,6 +84,7 @@
 								background: c_element['backgroundColor'] || '',
 								'font-style': c_element['fontStyle'] || '',
 								padding: c_element['paddingStyle'] || '',
+								'border-radius': c_element['borderRadius'] || '',
 							}"
 							v-if="c_element.type == 'text'"
 							v-html="c_element.val"
@@ -100,8 +101,8 @@
 							style="white-space: nowrap; display: block; cursor: pointer"
 							:style="{
 								transform: c_element['transformScale'] || '',
-								width: c_element['w'] ? `${c_element['w']}px` : '30px',
-								height: c_element['h'] ? `${c_element['h']}px` : '30px',
+								width: c_element['w'] ? `${c_element['w']}px` : '50px',
+								height: c_element['h'] ? `${c_element['h']}px` : '50px',
 							}"
 							alt=""
 						/>
@@ -122,12 +123,21 @@
 			</el-carousel>
 			<div class="imgDom"></div>
 			<p>当前文件夹有{{ swiperBanner.length }}张图片，当前是第{{ this.swiperIndex + 1 }}张图片</p>
-
 			<div class="current-swiper">
-				<div v-for="(item, index) in newSwiperBanner" :key="index" style="margin-right: 10px">
-					<img :src="'http://118.31.70.36:3000/uploads/disk/' + item.content" style="width: 60px; height: 60px; margin: 0; margin-bottom: 10px" alt="" />
-					<el-input type="text" v-model="item.sort" min="1" placeholder="当前" />
-				</div>
+				<draggable
+					style="width: 100%"
+					v-model="newSwiperBanner"
+					chosen-class="chosen"
+					force-fallback="true"
+					group="people"
+					animation="1000"
+					@end="onEndNewSwiper"
+				>
+					<div v-for="(item, index) in newSwiperBanner" :key="index" style="margin-right: 10px; float: left">
+						<img :src="'http://118.31.70.36:3000/uploads/disk/' + item.content" style="width: 60px; height: 60px; margin: 0; margin-bottom: 10px" alt="" />
+						<el-input type="text" v-model="item.sort" min="1" style="width: 60px" placeholder="当前" />
+					</div>
+				</draggable>
 				<el-button class="btn" type="danger" style="width: 100px; height: 40px; display: flex; align-self: end; margin-left: 10px" @click="defineStyle()"
 					>确定</el-button
 				>
@@ -254,8 +264,10 @@ export default {
 	// computed: {},
 	methods: {
 		setLeftScale(ele) {
-			// let scale = ele.transformScale !== undefined ? ele.transformScale.match(/\d+(.\d+)?/g)[0] : 1;
 			return ele.x * 1;
+		},
+		onEndNewSwiper() {
+			this.swiperBanner = this.newSwiperBanner;
 		},
 		handleTemplate(id) {
 			this.getCurrentTemplate(id);
@@ -487,10 +499,11 @@ export default {
 				return;
 			}
 			this.$api.disk.search({ parentName: this.currentSwiper }, (rs) => {
-				let newData = rs.data.allImg.map((item) => {
+				let newData = rs.data.allImg.map((item, index) => {
 					return {
 						...item,
 						sort: 1,
+						// index: ++index,
 					};
 				});
 				this.swiperBanner = newData;
@@ -612,6 +625,7 @@ export default {
 						backgroundColor: data['backgroundColor'],
 						fontStyle: data['fontStyle'],
 						paddingStyle: data['paddingStyle'],
+						borderRadius: data['borderRadius'],
 					});
 				}
 			});
@@ -759,6 +773,7 @@ export default {
 						class: this.$refs[item.rand][item.index].getAttribute('class'),
 						backgroundColor: this.getStyle(this.$refs[item.rand][item.index], 'backgroundColor'),
 						paddingStyle: this.getStyle(this.$refs[item.rand][item.index], 'padding'),
+						borderRadius: this.getStyle(this.$refs[item.rand][item.index], 'borderRadius'),
 					};
 					this.imgStyleToData.push(obj);
 				}

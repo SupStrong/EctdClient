@@ -109,6 +109,13 @@
 						</el-select>
 					</template>
 				</el-table-column>
+				<el-table-column prop="" label="圆角" width="100">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.borderRadius" placeholder="请选择" @change="handleEdit($event, scope.row)">
+							<el-option v-for="(item, index) in radiusArr" :key="index" :label="item.label" :value="item.value"> </el-option>
+						</el-select>
+					</template>
+				</el-table-column>
 				<el-table-column fixed="right" label="操作" width="110">
 					<template slot-scope="scope">
 						<el-button @click="handleDelete($event, scope.row)" type="text" size="small">删除</el-button>
@@ -186,6 +193,28 @@ export default {
 				{
 					value: '',
 					balel: '',
+				},
+			],
+			radiusArr: [
+				{
+					value: '5px',
+					balel: '5',
+				},
+				{
+					value: '8px',
+					balel: '8',
+				},
+				{
+					value: '10px',
+					balel: '10',
+				},
+				{
+					value: '12px',
+					balel: '12',
+				},
+				{
+					value: '15px',
+					balel: '15',
 				},
 			],
 		};
@@ -269,14 +298,14 @@ export default {
 				item['color'] = val;
 			}
 			if (type === 'textShadow' && val != null) {
-				item['text-shadow'] = `${val} 1px 0px, ${val} 0px 1px, ${val} -1px 0px, ${val} 0px -1px`;
+				item['text-shadow'] = `${val} 1px 0px, ${val} 0px 1px, ${val} -2px 0px, ${val} 0px -2px`;
 				item['textColor'] = `${val}`;
 			} else if (type === 'textShadow' && val == null) {
 				item['text-shadow'] = '';
 				item['textColor'] = '';
 			} else if (type === 'backgroundColor' && val != null) {
 				item['backgroundColor'] = val;
-				item['paddingStyle'] = '3px 10px 3px 10px';
+				item['paddingStyle'] = '3px 5px 3px 5px';
 				item['text-align'] = 'center';
 			}
 			this.$emit('select', item);
@@ -301,6 +330,7 @@ export default {
 					backgroundColor: value['backgroundColor'],
 					fontStyle: value['fontStyle'],
 					paddingStyle: value['paddingStyle'],
+					borderRadius: value['borderRadius'],
 					classone: this.saveStyleData.findIndex((v) => v.value.rand === row.rand),
 				};
 			}

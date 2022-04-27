@@ -1,19 +1,12 @@
 <template>
-	<div
-		class="file"
-		:class="{ active: item.active }"
-		@mousedown.stop="mousedown"
-		@dblclick.stop="open(item)"
-		@mouseover="item.hover = true"
-		@mouseleave="item.hover = false"
-	>
+	<div class="file" :class="{ active: item.active }" @mousedown.stop="mousedown" @dblclick.stop="open(item)">
 		<!-- <div class="select" @mousedown.stop.prevent="prevent">
 			<Checkbox v-model="item.active"></Checkbox>
 		</div> -->
 		<span class="icon">
 			<img :src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : itemIcon(item)" alt="" />
 		</span>
-		<p>{{ item.name }}</p>
+		<p>{{ item.parentName }}</p>
 		<!--<div class="time">{{ item.updatedAt }}</div>
 		<div class="size">{{ item.$size }}</div> -->
 	</div>
@@ -38,6 +31,7 @@ export default {
 			this.$emit('mousedown', e);
 		},
 		open(item) {
+			console.log('000');
 			this.$emit('open', 'open', item);
 		},
 		prevent() {},
@@ -89,7 +83,6 @@ export default {
 /*文件列表视图*/
 .list-file {
 	.file {
-		width: 100%;
 		padding-left: 5px;
 		cursor: pointer;
 		margin: 3px 0;
@@ -98,6 +91,7 @@ export default {
 		line-height: 35px;
 		font-size: 12px;
 		text-align: left;
+		float: left;
 		img {
 			width: 100px;
 			height: 100px;
