@@ -118,9 +118,9 @@ import diskFile from '../components/diskFile';
 import uploadHandle from '../tools/uploadHandle';
 import uploadFolder from '../tools/uploadFolder';
 import dropHandle from '../tools/dropHandle';
+import treeViewer from '../tools/treeViewer';
 import downloadHandle from '../tools/downloadHandle';
 import transferList from '../components/transferList';
-import treeViewer from '../tools/treeViewer';
 import '../components/contextmenu/styles/index.css';
 import { directive, Contextmenu, ContextmenuItem } from '../components/contextmenu';
 import loading from '../components/loading';
@@ -684,12 +684,6 @@ export default {
 			} else {
 				files = e.target.files;
 			}
-			// if (files.length === 0) {
-			// 	if (type === 'normal') {
-			// 		e.target.value = '';
-			// 	}
-			// 	return;
-			// }
 			files = this.verifyUploadSize(files);
 			if (files.length > 500) {
 				if (type === 'normal') {
@@ -1019,20 +1013,10 @@ export default {
 							if (this.validateFileName(value)) {
 								return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
 							}
-							let arr = [];
-							if (this.diskInfo.navData.length) {
-								this.diskInfo.navData.map((item, index) => {
-									arr.push(item.name);
-								});
-								arr.push(value);
-							} else {
-								arr.push(value);
-							}
 							this.$api.disk.newFolder(
 								{
 									parentId: this.diskInfo.id,
 									name: value,
-									parentName: arr.join('/'),
 								},
 								(rs) => {
 									this.diskData.push(this.$api.disk.diskData(rs.data));
@@ -1067,21 +1051,10 @@ export default {
 									{
 										parentId: this.diskInfo.id,
 										name: Number(i),
-										parentName: this.diskInfo.navData[this.diskInfo.navData.length - 1].name + '/' + i,
 									},
 									(rs) => {
 										this.$Message.success(i + '已创建');
 										this.diskData.push(this.$api.disk.diskData(rs.data));
-										this.$api.disk.newFolder(
-											{
-												parentId: rs.data.id,
-												name: 'SP',
-												parentName: rs.data.parentName + '/SP',
-											},
-											(rs) => {
-												// this.$Message.success(value + '已创建');
-											}
-										);
 									}
 								);
 							}
@@ -1100,14 +1073,10 @@ export default {
 							if (this.validateFileName(value)) {
 								return this.$Message.error('文件名称不能包含【\\\\\\\\/:*?\\"<>|】');
 							}
-							console.log(this.diskInfo.selectFiles, 'this.diskInfo.selectFiles[0].id');
-							let parentArr = this.diskInfo.selectFiles[0].parentName.split('/');
-							parentArr[parentArr.length - 1] = value;
 							this.$api.disk.rename(
 								{
 									id: this.diskInfo.selectFiles[0].id,
 									name: value,
-									parentName: parentArr.join('/'),
 								},
 								() => {
 									this.diskInfo.select.name = value;
@@ -1238,6 +1207,7 @@ export default {
 		},
 		openFileHandle(item) {
 			let openType = item.openType;
+			console.log(item, 'iiii');
 			let mediaFileType = ['image', 'video', 'audio'];
 			if (openType === 'zip') {
 				this.openFile(openType, item);
@@ -1506,10 +1476,10 @@ export default {
 			if (this.isWebCloudDisk) {
 				this.$router.replace({
 					query: {
-						id: this.diskInfo.id,
-						type: this.navType,
+						// id: this.diskInfo.id,
+						// type: this.navType,
 						category: this.diskInfo.categoryType,
-						category_name: this.diskInfo.category,
+						// category_name: this.diskInfo.category,
 					},
 				});
 			}

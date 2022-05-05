@@ -14,18 +14,18 @@
 								<span class="icon sf-icon-download"></span>
 								<span>下载</span>
 							</button>
-							<!-- <button class="btn text" @click="actionControl('move')">
+							<button class="btn text" @click="actionControl('move')">
 								<span class="icon sf-icon-arrows"></span>
-								<span>移动到12</span>
-							</button> -->
-							<!-- <button class="btn text" @click="actionControl('copy')">
+								<span>移动到</span>
+							</button>
+							<button class="btn text" @click="actionControl('copy')">
 								<span class="icon sf-icon-copy"></span>
 								<span>复制</span>
 							</button>
 							<button class="btn text" @click="actionControl('cut')">
 								<span class="icon sf-icon-cut"></span>
 								<span>剪切</span>
-							</button> -->
+							</button>
 							<button class="btn text" @click="actionControl('trash')">
 								<span class="icon sf-icon-trash-alt"></span>
 								<span>删除</span>
@@ -102,6 +102,22 @@
 								视频
 							</button>
 						</template>
+						<template v-else-if="data.categoryType === 'template'">
+							<el-button class="btn" type="primary" plain @click="changeData('data')">样品数据</el-button>
+							<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
+							<el-button class="btn" type="info" plain @click="changeData('text')">文案</el-button>
+							<el-button class="btn" type="warning" plain @click="changeData('image')">插画</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('filter')">滤镜</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('tool')">组件</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('template')">模板</el-button>
+						</template>
+						<template v-else-if="type === 'ectd'">
+							<el-button class="btn" type="info" @click="showSample = true">样品</el-button>
+							<el-button class="btn" type="primary" @click="showBrand = true">品牌</el-button>
+							<el-button class="btn" type="danger" @click="showClassify = true">分类</el-button>
+							<el-button class="btn" type="info" @click="showCompany = true">单位</el-button>
+							<el-button class="btn" type="info" @click="showImgText = true">文案</el-button>
+						</template>
 					</template>
 				</template>
 				<template v-else-if="type === 'share'">
@@ -110,28 +126,12 @@
 						取消分享
 					</button>
 				</template>
-				<template v-else-if="type === 'image'">
-					<el-button class="btn" type="primary" plain @click="changeData('data')">样品数据</el-button>
-					<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
-					<el-button class="btn" type="info" plain @click="changeData('text')">文案</el-button>
-					<el-button class="btn" type="warning" plain @click="changeData('image')">插画</el-button>
-					<el-button class="btn" type="primary" plain @click="changeData('filter')">滤镜</el-button>
-					<el-button class="btn" type="primary" plain @click="changeData('tool')">组件</el-button>
-					<el-button class="btn" type="primary" plain @click="changeData('template')">模板</el-button>
-				</template>
-				<template v-else-if="type === 'ectd'">
-					<el-button class="btn" type="info" @click="showSample = true">样品</el-button>
-					<el-button class="btn" type="primary" @click="showBrand = true">品牌</el-button>
-					<el-button class="btn" type="danger" @click="showClassify = true">分类</el-button>
-					<el-button class="btn" type="info" @click="showCompany = true">单位</el-button>
-					<el-button class="btn" type="info" @click="showImgText = true">文案</el-button>
-				</template>
 				<template v-else>
 					<!--<button class="btn default">全部开始</button>
 					<button class="btn default">全部暂停</button>-->
 				</template>
 			</div>
-			<div class="right" v-if="type !== 'trans'">
+			<!-- <div class="right" v-if="type !== 'trans'">
 				<input
 					type="text"
 					placeholder="搜索您的网盘"
@@ -142,7 +142,7 @@
 				<button class="action sf-icon-search" @click="switchSearch" v-show="type === 'disk'" />
 				<button :class="'action sf-icon-sort-amount-' + amountSort" @click="diskSort(sortData[0])" />
 				<button class="action" :class="fileStateIcon" @click="changeFileState" />
-			</div>
+			</div> -->
 		</div>
 		<div class="navigation-container">
 			<div class="left" v-if="type !== 'trans'">
@@ -156,7 +156,7 @@
 				<div v-for="(item, index) in data.navData" :key="index" @mouseover="handleDragEnter" class="item" @click="navControl(item)">
 					{{ item.name }}
 				</div>
-				<el-button class="btn primary" v-if="type == 'disk'" style="margin-left: 10px; line-height: 1" @click="copyValue">复制</el-button>
+				<!-- <el-button class="btn primary" v-if="type == 'disk'" style="margin-left: 10px; line-height: 1" @click="copyValue">复制</el-button> -->
 			</div>
 		</div>
 		<ul class="sort-container" v-if="fileStateIcon !== 'sf-icon-th-large' && type !== 'trans'">
@@ -289,6 +289,7 @@ export default {
 			this.$router.push('/create-data');
 		},
 		actionControl(commend) {
+			console.log(commend, 'commendcommend');
 			this.$emit('action', commend);
 		},
 		changeFileState() {
@@ -328,29 +329,25 @@ export default {
 			}
 		},
 		cleanTrash() {
-			this.$confirm({
-				title: '清空回收站',
-				tips: '该操作将清空回收站且不可恢复,是否继续',
-				callback: () => {
-					let clean = this.$Message.loading({
-						content: '正在清空回收站...',
-						duration: 0,
-					});
-					this.$api.disk.delete(
-						{
-							id: 'all',
-						},
-						() => {
-							clean();
-							this.$Message.success('回收站已清空');
-							this.$emit('callback', 'reload');
-						},
-						(rs) => {
-							clean();
-							this.$Message.error(rs.msg);
-						}
-					);
-				},
+			this.$confirm('清空回收站', '该操作将清空回收站且不可恢复,是否继续', {}).then(() => {
+				let clean = this.$Message.loading({
+					content: '正在清空回收站...',
+					duration: 0,
+				});
+				this.$api.disk.delete(
+					{
+						id: 'all',
+					},
+					() => {
+						clean();
+						this.$Message.success('回收站已清空');
+						this.$emit('callback', 'reload');
+					},
+					(rs) => {
+						clean();
+						this.$Message.error(rs.msg);
+					}
+				);
 			});
 		},
 		switchSearch() {

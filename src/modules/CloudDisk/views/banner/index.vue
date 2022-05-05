@@ -1,6 +1,7 @@
 <template>
 	<div class="main">
 		<!-- 轮播图sd -->
+		input
 		<div class="tool-swiper">
 			<el-carousel
 				indicator-position="outside"

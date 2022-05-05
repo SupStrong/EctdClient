@@ -5,7 +5,7 @@
 			<img
 				class="imageShower"
 				:class="{ imageAnim: !disableAnim }"
-				:src="nowImage.URL"
+				:src="'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com' + nowImage.content"
 				:style="{
 					webkitTransform: 'rotate(' + angle + 'deg)',
 					...imageOffset,
@@ -157,6 +157,7 @@ export default {
 			this.imageStyle.top = (container.height - imagSize.height) / 2;
 		},
 		showImage(item, index) {
+			console.log(item, index, 'Xxs');
 			this.nowImage = item;
 			this.nowImage.count = index;
 			this.nowImage.URL = this.$api.public.uploadUrl('disk', item.content);

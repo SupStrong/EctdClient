@@ -13,6 +13,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "ali-oss": "^6.17.1",
     "axios": "^0.21.1",
     "browser-md5-file": "^1.1.1",
     "chalk": "^4.1.0",

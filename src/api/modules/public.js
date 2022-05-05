@@ -62,12 +62,12 @@ export default {
 		return xhr;
 	},
 	verifyCode() {
-		return config.url + '/user/code' + '?' + Math.random();
+		return config.oss + '/user/code' + '?' + Math.random();
 	},
 	server(key) {
 		return config[key] + '/';
 	},
 	uploadUrl(folder, file) {
-		return config.url + '/uploads/' + folder + '/' + file;
+		return config.oss + file;
 	},
 };

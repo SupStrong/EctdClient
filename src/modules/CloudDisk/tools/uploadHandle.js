@@ -2,6 +2,7 @@ import BMF from 'browser-md5-file';
 let bmf = new BMF();
 import disk from '../../../api/modules/disk';
 import axios from 'axios';
+import { client } from '../../../../utils/oss';
 import randomKey from './randomKey';
 let defineKey = {
 	_md5: 0, //初始化md5
@@ -181,34 +182,52 @@ export default {
 		console.log('fd', fd);
 		let cancelToken = axios.CancelToken.source();
 		this.setData(index, 'cancelToken', cancelToken);
-		disk.uploadChunk(fd, cancelToken, (rs) => {
-			if (!fileData.last) {
-				//如果不是最后一个
-				chunk++;
-				this.startUpload(item, index, chunk);
-				this.setData(index, '_chunk', this.uploadList[index]._eachSize * chunk); //计算进度条
-				this.setData(index, '_progress', ((this.uploadList[index]._eachSize * chunk) / item.file.size) * 100); //计算进度条
-			} else {
-				this.mergeFile(item.file, index);
-			}
-		});
+		if (!fileData.last) {
+			//如果不是最后一个
+			chunk++;
+			this.startUpload(item, index, chunk);
+		} else {
+			this.mergeFile(item.file, index);
+		}
 	},
 	mergeFile(file, index) {
-		disk.uploadMerge(
-			{
-				...this.uploadList[index].data,
-				md5: this.uploadList[index]._md5,
-				name: file.name,
-				size: file.size,
-				chunkSize: this.uploadList[index]._eachSize,
-			},
-			(rs) => {
-				this.updateFinish(index, rs.data);
-			},
-			() => {
-				this.setData(index, '_state', 'error');
-			}
-		);
+		const date = new Date();
+		let that = this;
+		client()
+			.multipartUpload(`/image/${date.getFullYear()}/${date.getMonth()}-${date.getDate()}/${file.name}`, file, {})
+			.then(function (res) {
+				disk.uploadMerge(
+					{
+						...that.uploadList[index].data,
+						md5: that.uploadList[index]._md5,
+						name: file.name,
+						size: file.size,
+						extname: res.name,
+						chunkSize: that.uploadList[index]._eachSize,
+					},
+					(rs) => {
+						that.updateFinish(index, rs.data);
+					},
+					() => {
+						that.setData(index, '_state', 'error');
+					}
+				);
+			});
+		// disk.uploadMerge(
+		// 	{
+		// 		...this.uploadList[index].data,
+		// 		md5: this.uploadList[index]._md5,
+		// 		name: file.name,
+		// 		size: file.size,
+		// 		chunkSize: this.uploadList[index]._eachSize,
+		// 	},
+		// 	(rs) => {
+		// 		this.updateFinish(index, rs.data);
+		// 	},
+		// 	() => {
+		// 		this.setData(index, '_state', 'error');
+		// 	}
+		// );
 	},
 	pauseUpload(index) {
 		if (this.uploadList[index]._state === 'paused') {

@@ -4,9 +4,9 @@
 			<Checkbox v-model="item.active"></Checkbox>
 		</div> -->
 		<span class="icon">
-			<img :src="item.content ? 'http://118.31.70.36:3000/uploads/disk/' + item.content : itemIcon(item)" alt="" />
+			<img :src="item.content ? 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/' + item.content : itemIcon(item)" alt="" />
 		</span>
-		<p>{{ item.parentName }}</p>
+		<p>{{ item.name }}</p>
 		<!--<div class="time">{{ item.updatedAt }}</div>
 		<div class="size">{{ item.$size }}</div> -->
 	</div>

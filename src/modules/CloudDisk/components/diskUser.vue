@@ -5,7 +5,7 @@
 				<img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" draggable="false" />
 				<span class="name">{{ userInfo.name || '未登录' }}</span>
 			</div>
-			<Icon :class="['arrow', { rotate: hoverUser }]" type="ios-arrow-up" />
+			<!-- <Icon :class="['arrow', { rotate: hoverUser }]" type="ios-arrow-up" /> -->
 		</div>
 		<div class="action-head" slot="title">
 			<div class="user">
@@ -31,26 +31,6 @@ export default {
 			hoverUser: false,
 			quitFlag: false,
 			actionMenu: [
-				{
-					name: '个人设置',
-					action: 'account',
-				},
-				{
-					name: '系统设置',
-					action: 'setting',
-				},
-				{
-					name: '问题反馈',
-					action: 'feedBack',
-				},
-				{
-					name: '关于',
-					action: 'about',
-				},
-				{
-					name: '切换账户',
-					action: 'switch',
-				},
 				{
 					name: '退出',
 					action: 'exit',

@@ -1,35 +1,19 @@
 <template>
-	<div class="cloud-disk-category">
-		<div class="category-container">
-			<ul>
-				<li v-for="(item, index) in categoryMenuData" :key="index" ripple :class="{ active: data.categoryType === item.data }" @click="change(index)">
-					<i :class="item.icon" />{{ item.name }}
-					<div class="count" v-show="item.count > 0">{{ item.count }}</div>
-				</li>
-			</ul>
-			<div class="bottom">
-				<div class="tower" :style="{ background: 'url(' + towerSrc + ')' }"></div>
-				<p>{{ data.selectTips }}</p>
-			</div>
-		</div>
-		<ul class="wave-progress">
-			<li class="wave-blue">
-				<div class="wave" style="bottom: 95%"></div>
-				<p class="text" data-text="95%">95%</p>
-			</li>
-			<li class="wave-orange">
-				<div class="wave" style="bottom: 70%"></div>
-				<p class="text" data-text="70%">70%</p>
-			</li>
-			<li class="wave-purple">
-				<div class="wave" style="bottom: 45%"></div>
-				<p class="text" data-text="45%">45%</p>
-			</li>
-			<li class="wave-cyan">
-				<div class="wave" style="bottom: 20%"></div>
-				<p class="text" data-text="20%">20%</p>
-			</li>
-		</ul>
+	<div class="category-container" style="height: 100%; background: #2f2f2f">
+		<el-menu class="el-menu-vertical-demo" style="background: #2f2f2f">
+			<template v-for="(item, index) in categoryMenuData">
+				<el-submenu :index="index" :key="index">
+					<template slot="title">
+						<i :class="item.icon" />
+						<span>{{ item.name }}</span>
+					</template>
+					<el-menu-item v-for="(subItem, subIndex) in item.child" :index="index + '-' + subIndex" :key="subIndex">
+						<i :class="subItem.icon" />
+						<span slot="title" style="margin-left: 10px" @click="change(subItem)">{{ subItem.name }}</span>
+					</el-menu-item>
+				</el-submenu>
+			</template>
+		</el-menu>
 	</div>
 </template>
 
@@ -50,30 +34,57 @@ export default {
 	data() {
 		return {
 			typeData: [
-				{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
-				{ name: '图片', icon: 'sf-icon-image', data: 'picture' },
-				{ name: '视频', icon: 'sf-icon-video', data: 'video' },
-				{ name: '文档', icon: 'sf-icon-file-alt', data: 'document' },
-				{ name: '音乐', icon: 'sf-icon-music', data: 'music' },
-				{ name: '种子', icon: 'sf-icon-magnet', data: 'torrent' },
-				{ name: '其他', icon: 'sf-icon-puzzle-piece', data: 'other' },
-				{ name: '回收站', icon: 'sf-icon-trash', data: 'trash' },
-			], //网盘分类参数
-			shareData: [
-				{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
-				{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
-			], //分享分类参数
-			transData: [
-				{ name: '正在下载', icon: 'sf-icon-download', count: 0, data: 'download' },
-				{ name: '正在上传', icon: 'sf-icon-upload', count: 0, data: 'upload' },
-				{ name: '传输完成', icon: 'sf-icon-check-circle', count: 0, data: 'finish' },
-			], //传输分类参数,
-			ectdData: [],
-			imageData: [
-				{ name: '实拍', icon: 'sf-icon-hdd', data: 'all' },
-				{ name: '测评', icon: 'sf-icon-hdd', data: 'lattice' },
+				{
+					name: '素材管理',
+					icon: '',
+					child: [
+						{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
+						{ name: '图片', icon: 'sf-icon-image', data: 'picture' },
+						{ name: '视频', icon: 'sf-icon-video', data: 'video' },
+						{ name: '文档', icon: 'sf-icon-file-alt', data: 'document' },
+						{ name: '音乐', icon: 'sf-icon-music', data: 'music' },
+						{ name: '其他', icon: 'sf-icon-puzzle-piece', data: 'other' },
+						{ name: '回收站', icon: 'sf-icon-trash', data: 'trash' },
+					],
+				},
+				{
+					name: '分享管理',
+					icon: '',
+					child: [
+						{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
+						{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
+					],
+				},
 			],
-			templateData: [{ name: '所有', icon: 'sf-icon-hdd', data: 'all' }],
+			// typeData: [
+			// 	{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
+			// 	{ name: '图片', icon: 'sf-icon-image', data: 'picture' },
+			// 	{ name: '视频', icon: 'sf-icon-video', data: 'video' },
+			// 	{ name: '文档', icon: 'sf-icon-file-alt', data: 'document' },
+			// 	{ name: '音乐', icon: 'sf-icon-music', data: 'music' },
+			// 	// { name: '种子', icon: 'sf-icon-magnet', data: 'torrent' },
+			// 	{ name: '其他', icon: 'sf-icon-puzzle-piece', data: 'other' },
+			// 	{ name: '回收站', icon: 'sf-icon-trash', data: 'trash' },
+			// 	{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
+			// 	{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
+			// 	{ name: '工具台', icon: 'sf-icon-hdd', data: 'template' },
+			// 	// { name: '测评', icon: 'sf-icon-hdd', data: 'lattice' },
+			// ], //网盘分类参数
+			// shareData: [
+			// 	{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
+			// 	{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
+			// ], //分享分类参数
+			// transData: [
+			// 	{ name: '正在下载', icon: 'sf-icon-download', count: 0, data: 'download' },
+			// 	{ name: '正在上传', icon: 'sf-icon-upload', count: 0, data: 'upload' },
+			// 	{ name: '传输完成', icon: 'sf-icon-check-circle', count: 0, data: 'finish' },
+			// ], //传输分类参数,
+			ectdData: [],
+			// imageData: [
+			// 	{ name: '实拍', icon: 'sf-icon-hdd', data: 'all' },
+			// 	{ name: '测评', icon: 'sf-icon-hdd', data: 'lattice' },
+			// ],
+			// templateData: [{ name: '所有', icon: 'sf-icon-hdd', data: 'all' }],
 			//网盘分类参数
 			categoryMenuData: [],
 			towerSrc: require('../assets/img/tower/Spring-bottom-0.png'),
@@ -127,29 +138,16 @@ export default {
 		},
 		updateData(type) {
 			console.log(type);
-			if (type === 'disk') {
-				this.categoryMenuData = this.typeData;
-			} else if (type === 'share') {
-				this.categoryMenuData = this.shareData;
-			} else if (type === 'trans') {
-				this.categoryMenuData = this.transData;
-			} else if (type === 'ectd') {
-				this.getEctdDocumentList();
-				this.categoryMenuData = this.ectdData;
-			} else if (type === 'image') {
-				this.categoryMenuData = this.imageData;
-			} else if (type === 'template') {
-				this.categoryMenuData = this.templateData;
-			}
-			this.change(0, type);
+			this.categoryMenuData = this.typeData;
+			this.change(this.typeData[0].child[0], type);
 		},
 		updateMenuCount(data) {
 			this.categoryMenuData[0].count = data.downloading;
 			this.categoryMenuData[1].count = data.uploading;
 			this.categoryMenuData[2].count = data.finish;
 		},
-		change(index, type = this.type) {
-			this.$emit('change', this.categoryMenuData[index], type);
+		change(data, type = this.type) {
+			this.$emit('change', data, type);
 		},
 		/** 获取ectd文档列表 */
 		getEctdDocumentList() {
@@ -172,12 +170,19 @@ export default {
 	height: 100%;
 	overflow: auto;
 	display: flex;
+	a,
+	span {
+		color: white;
+	}
 	.category-container {
 		width: 100%;
-		flex: 1;
-		position: relative;
+		height: 100%;
+		// flex: 1;
+		// position: relative;
+		background: #2f2f2f;
 		ul {
 			margin-top: 5px;
+			background: #2f2f2f;
 			li {
 				width: 100%;
 				height: 40px;
@@ -189,6 +194,7 @@ export default {
 				align-items: center;
 				padding-left: 20px;
 				position: relative;
+				color: white;
 				i {
 					width: 35px;
 					height: 35px;
@@ -203,11 +209,11 @@ export default {
 					padding: 0 6px;
 				}
 				&:hover {
-					background: #f8f8f8;
+					// background: #f8f8f8;
 				}
 			}
 			.active {
-				color: $diskMainColor;
+				color: #ff4e60;
 				background: #3388ff2e !important;
 			}
 		}
@@ -351,6 +357,51 @@ export default {
 			.text::before {
 				-webkit-text-stroke: 1px $value;
 			}
+		}
+	}
+}
+::v-deep .el-menu-item {
+	background: rgb(47, 47, 47);
+	span {
+		color: white;
+	}
+}
+::v-deep .el-submenu__title {
+	width: 100%;
+	color: white;
+}
+::v-deep .el-submenu:hover {
+	background-color: rgb(47, 47, 47);
+}
+::v-deep .el-menu {
+	background-color: #2f2f2f;
+}
+::v-deep .el-submenu__title:hover {
+	background-color: #2f2f2f;
+}
+::v-deep .el-menu-item.is-active {
+	color: #ff4e60;
+}
+::v-deep .el-menu-item.is-active span {
+	color: #ff4e60;
+}
+.category-container {
+	ul {
+		li {
+			i {
+			}
+			.count {
+			}
+			&:hover {
+				background: #2f2f2f;
+				span {
+					// color: white;
+				}
+			}
+		}
+		.active {
+			color: #ff4e60;
+			background: #3388ff2e !important;
 		}
 	}
 }

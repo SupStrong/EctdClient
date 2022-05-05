@@ -254,12 +254,12 @@ export default {
 	matchIcon(item, extName, fullPath = false) {
 		for (let i in FileType) {
 			if (FileType[i].ext.includes(extName)) {
-				item.$icon = fullPath ? require('../../modules/CloudDisk/assets/img/disk/' + FileType[i].icon) : FileType[i].icon;
+				item.$icon = fullPath ? '' : FileType[i].icon;
 				break;
 			}
 		}
 		if (!item.$icon) {
-			item.$icon = fullPath ? require('../../modules/CloudDisk/assets/img/disk/OtherType.png') : 'OtherType.png';
+			item.$icon = fullPath ? '' : 'OtherType.png';
 		}
 	},
 	diskData(item) {

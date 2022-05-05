@@ -1,32 +1,45 @@
 <template>
 	<section class="cloud-disk-header">
 		<windowHeader ref="windowHeader" :config="headerConfig" width="32px" mode="hide"></windowHeader>
-		<div class="header-container" :class="platform">
-			<div class="logo-area">
+		<header class="header fl-row-justy">
+			<div style="width: 100%; display: flex">
 				<div class="logo">
-					<img src="../../../assets/common/img/app/CloudDisk.png" alt="" draggable="false" />
-					<p class="name">C-DISK</p>
-					<p class="capacity">{{ sizeTips }}</p>
+					<img src="https://img1.baidu.com/it/u=2847626372,3815971220&fm=253&fmt=auto&app=138&f=JPEG?w=708&h=500" alt="" />
+				</div>
+				<div class="nav">
+					<div class="nav-list">
+						<div>热门模板</div>
+						<div></div>
+					</div>
+					<div class="nav-list">
+						<div>素材中心</div>
+						<div></div>
+					</div>
+					<div class="nav-list">
+						<div>红薯基地</div>
+						<div></div>
+					</div>
+					<div class="nav-list">
+						<div>美妆</div>
+						<div></div>
+					</div>
+					<div class="nav-list">
+						<div>美妆方向</div>
+						<div></div>
+					</div>
+					<div class="nav-list">
+						<div>
+							<router-link style="color: white" to="/toolMain/search">YOYO查词</router-link>
+						</div>
+						<div></div>
+					</div>
 				</div>
 			</div>
-			<div class="right">
-				<div class="menu-list">
-					<ul>
-						<li v-for="(item, index) in navTypes" :key="index" @click="navTypeChange(item.flag)" :class="{ active: type === item.flag }">
-							<span :class="[item.icon, { rotate: item.rotate }]"></span>
-							<p>{{ item.name }}</p>
-						</li>
-					</ul>
-				</div>
-				<div class="container" v-if="isDisk">
-					<diskUser @show="showWin" @exit="exitDisk"></diskUser>
-					<Poptip v-if="isWeb" trigger="hover" placement="bottom-end" padding="0">
-						<div class="action download-client">客户端下载</div>
-						<clientDownload type="components" slot="content"></clientDownload>
-					</Poptip>
-				</div>
+			<div class="login">
+				<div class="btns">登录</div>
+				<div class="btns">注册</div>
 			</div>
-		</div>
+		</header>
 	</section>
 </template>
 
@@ -50,11 +63,11 @@ export default {
 				},
 			},
 			navTypes: [
-				{ name: '网盘', flag: 'disk', icon: 'sf-icon-hdd' },
-				{ name: '分享', flag: 'share', icon: 'sf-icon-share-alt' },
+				// { name: '网盘', flag: 'disk', icon: 'sf-icon-hdd' },
+				// { name: '分享', flag: 'share', icon: 'sf-icon-share-alt' },
 				// { name: '传输', flag: 'trans', icon: 'sf-icon-exchange-alt', rotate: '90deg' },
-				{ name: '基础数据', flag: 'ectd', icon: 'sf-icon-share-alt' },
-				{ name: '生成图片', flag: 'image', icon: 'sf-icon-share-alt' },
+				// { name: '基础数据', flag: 'ectd', icon: 'sf-icon-share-alt' },
+				// { name: '模板', flag: 'image', icon: 'sf-icon-share-alt' },
 			],
 			platform: process.platform,
 		};
@@ -102,137 +115,56 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.cloud-disk-header {
+.header {
+	height: 65px;
+	padding: 0 32px;
+	background-color: #2f2f2f;
+}
+.logo {
+	width: 130px;
+	height: 45px;
+	img {
+		width: 100%;
+		height: 100%;
+	}
+}
+.nav {
 	width: 100%;
 	display: flex;
-	flex-direction: column;
-	-webkit-app-region: drag;
-	background: #fff;
-	box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.1);
-	z-index: 1;
-	.header {
-		width: 100%;
-		height: 30px;
+	align-items: center;
+	margin-left: 10px;
+	.nav-list {
+		padding: 0 12px;
+		font-size: 15px;
+		color: white;
+		cursor: pointer;
 	}
-	.header-container {
-		width: 100%;
-		height: 60px;
+}
+.login {
+	display: flex;
+	align-items: center;
+	.btns {
+		width: 75px;
+		height: 35px;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		.logo-area {
-			width: 260px;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			.logo {
-				display: flex;
-				align-items: flex-start;
-				padding: 0 20px 0;
-				position: relative;
-				z-index: 1;
-				img {
-					width: 45px;
-					height: 45px;
-					border-radius: 100%;
-					background: #edf1f8;
-					margin-right: 5px;
-				}
-				.name {
-					font-family: zk-font;
-					font-size: 20px;
-					margin-left: 5px;
-					margin-top: -2px;
-					color: #636363;
-				}
-				.capacity {
-					font-size: 12px;
-					color: #4f4f4f;
-					font-weight: normal;
-					position: absolute;
-					top: 25px;
-					left: 75px;
-				}
-			}
-		}
-		.right {
-			width: 100%;
-			height: 60px;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			.container {
-				display: flex;
-				align-items: center;
-				height: 60px;
-				.ivu-poptip {
-					display: flex;
-					align-items: center;
-				}
-			}
-			.menu-list {
-				-webkit-app-region: no-drag;
-				ul {
-					width: 100%;
-					padding: 14px 0;
-					overflow: hidden;
-					display: flex;
-					align-items: center;
-					li {
-						display: flex;
-						align-items: center;
-						cursor: pointer;
-						overflow: hidden;
-						margin-right: 30px;
-						.rotate {
-							transform: rotate(90deg) !important;
-							font-size: 16px;
-						}
-						span {
-							width: 35px;
-							height: 35px;
-							text-align: center;
-							line-height: 35px;
-							font-size: 16px;
-							border-radius: 100%;
-						}
-						p {
-							margin: 5px 0;
-						}
-					}
-					.active {
-						color: $diskMainColor;
-					}
-				}
-			}
-			.action {
-				margin-right: 20px;
-				&:hover {
-					color: $diskMainColor;
-					cursor: pointer;
-				}
-			}
-			.download-client {
-				margin-left: 10px;
-				height: 25px;
-				line-height: 25px;
-				border-left: 1px solid #d2d2d2;
-				padding-left: 10px;
-			}
-		}
-		.ivu-dropdown {
-			display: unset !important;
-		}
+		justify-content: center;
+		color: white;
+		border-radius: 5px;
+		font-weight: bold;
+		cursor: pointer;
 	}
-	.win32 {
-		.right {
-			padding-right: 100px;
-		}
+	.btns:nth-child(1) {
+		background-color: #2f2f2f;
+		border: 1px solid white;
+		margin-right: 15px;
+		font-size: 14px;
 	}
-	.darwin {
-		.logo-area {
-			padding-left: 30px;
-		}
+	.btns:nth-child(2) {
+		background-color: #2f2f2f;
+		color: #ff4e60;
+		border: 1px solid #ff4e60;
+		font-size: 14px;
 	}
 }
 </style>
