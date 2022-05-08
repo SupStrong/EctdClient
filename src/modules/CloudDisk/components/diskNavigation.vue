@@ -2,7 +2,23 @@
 	<div class="cloud-disk-navigation" tabindex="1" @keyup="allKeyup($event)">
 		<!-- 上方工具栏 新建 导入 浏览 编辑-->
 		<div class="disk-func">
-			<div class="left">
+			<div class="left font">
+				<el-tooltip class="item" effect="dark" content="文字管理" placement="bottom">
+					<div @click="handleChange('fontline')"><i class="iconfont icon-ziti"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片管理" placement="bottom">
+					<div @click="handleChange('fontStroke')"><i class="iconfont icon-tupian_o"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="模板管理" placement="bottom">
+					<div @click="handleChange('fontVertically')"><i class="iconfont icon-mobankuangjia-xianxing"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-tongguanshuju"></i></div>
+				</el-tooltip>
+			</div>
+		</div>
+		<div class="disk-func">
+			<div class="left" style="display: none">
 				<template v-if="type === 'disk'">
 					<button class="btn primary" v-if="data.clipboard.length !== 0 && data.categoryType === 'all'" @click="actionControl('paste')">
 						<span class="icon sf-icon-paste"></span>
@@ -102,6 +118,7 @@
 								视频
 							</button>
 						</template>
+						<template v-else-if="data.categoryType === 'toolTable'"> </template>
 						<template v-else-if="data.categoryType === 'template'">
 							<el-button class="btn" type="primary" plain @click="changeData('data')">样品数据</el-button>
 							<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
@@ -111,7 +128,7 @@
 							<el-button class="btn" type="primary" plain @click="changeData('tool')">组件</el-button>
 							<el-button class="btn" type="primary" plain @click="changeData('template')">模板</el-button>
 						</template>
-						<template v-else-if="type === 'ectd'">
+						<template v-else-if="data.categoryType === 'beauty'">
 							<el-button class="btn" type="info" @click="showSample = true">样品</el-button>
 							<el-button class="btn" type="primary" @click="showBrand = true">品牌</el-button>
 							<el-button class="btn" type="danger" @click="showClassify = true">分类</el-button>
@@ -131,20 +148,57 @@
 					<button class="btn default">全部暂停</button>-->
 				</template>
 			</div>
-			<!-- <div class="right" v-if="type !== 'trans'">
-				<input
-					type="text"
-					placeholder="搜索您的网盘"
-					v-model="searchKey"
-					@keyup.enter="switchSearch"
-					:style="showSearch ? { width: '200px', border: '1px solid #eee' } : ''"
-				/>
-				<button class="action sf-icon-search" @click="switchSearch" v-show="type === 'disk'" />
-				<button :class="'action sf-icon-sort-amount-' + amountSort" @click="diskSort(sortData[0])" />
-				<button class="action" :class="fileStateIcon" @click="changeFileState" />
+			<!-- <div class="left font">
+				<div class="font-family" @click="handleChange('fontFamily')">
+					<span>黑色字体</span>
+					<i class="iconfont icon-xiala"></i>
+				</div>
+				<div class="font-size" @click="handleChange('fontSize')">
+					<i class="iconfont icon-jiahao_o" @click="handleChange('fontSize', 'add')"></i>
+					<el-input value="122"></el-input>
+					<i class="iconfont icon-jian" @click="handleChange('fontSize', 'reduce')"></i>
+				</div>
+				<el-tooltip class="item" effect="dark" content="颜色" placement="bottom">
+					<div @click="handleChange('fontColor')">
+						<i class="iconfont icon-yanse"></i>
+						<div></div>
+					</div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="加粗" placement="bottom">
+					<div @click="handleChange('fontBold')"><i class="iconfont icon-zitijiacu"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="倾斜" placement="bottom">
+					<div @click="handleChange('fontItalic')"><i class="iconfont icon-zitixiahuaxian"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="文字间距" placement="bottom">
+					<div @click="handleChange('fontText')"><i class="iconfont icon-zijianju"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="行间距" placement="bottom">
+					<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="居中方式" placement="bottom">
+					<div @click="handleChange('fontStroke')"><i class="iconfont icon-youduiqi"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="文字横竖" placement="bottom">
+					<div @click="handleChange('fontVertically')"><i class="iconfont icon-hengshuqiehuanshu"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="透明度" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-suodingtouming_huaban1"></i></div>
+				</el-tooltip>
 			</div> -->
+			<div class="left font">
+				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
+					<div @click="handleChange('fontVertically')"><i class="iconfont icon-lvjing"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片样式" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-yuanjiao"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片裁剪" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-jianqie"></i></div>
+				</el-tooltip>
+			</div>
 		</div>
-		<div class="navigation-container">
+		<!-- <div class="navigation-container">
 			<div class="left" v-if="type !== 'trans'">
 				<button class="sf-icon-chevron-left" @click="navControl('back')" :disabled="data.navData.length === 0" />
 				<button class="sf-icon-home" @click="navControl('home')" style="font-size: 15px" />
@@ -156,9 +210,8 @@
 				<div v-for="(item, index) in data.navData" :key="index" @mouseover="handleDragEnter" class="item" @click="navControl(item)">
 					{{ item.name }}
 				</div>
-				<!-- <el-button class="btn primary" v-if="type == 'disk'" style="margin-left: 10px; line-height: 1" @click="copyValue">复制</el-button> -->
 			</div>
-		</div>
+		</div> -->
 		<ul class="sort-container" v-if="fileStateIcon !== 'sf-icon-th-large' && type !== 'trans'">
 			<li class="select-all">
 				<!-- <Checkbox v-model="data.selectAll" @on-change="selectChange"></Checkbox> -->
@@ -178,11 +231,11 @@
 			<p><i class="sf-icon-info-circle" /> 回收站仍然占用网盘空间，文件保存10天后将被自动清除</p>
 		</div>
 		<ectd-import v-model="showEctdImport"></ectd-import>
-		<sampleData v-model="showSample" status="news" @input="showSample = false"></sampleData>
+		<!-- <sampleData v-model="showSample" status="news" @input="showSample = false"></sampleData>
 		<brandData v-model="showBrand" status="news" @input="showBrand = false"></brandData>
 		<classifyData v-model="showClassify" status="news" @input="showClassify = false"></classifyData>
 		<companyData v-model="showCompany" status="news" @input="showCompany = false"></companyData>
-		<imgTextData v-model="showImgText" status="news" @input="showImgText = false"></imgTextData>
+		<imgTextData v-model="showImgText" status="news" @input="showImgText = false"></imgTextData> -->
 	</div>
 </template>
 
@@ -266,6 +319,32 @@ export default {
 			oInput.className = 'oInput';
 			oInput.style.display = 'none';
 			this.$Message.success('复制成功');
+		},
+		handleChange(type = 'normal') {
+			switch (type) {
+				case 'normal': //无
+					break;
+				case 'fontFamily': // 字体
+					break;
+				case 'fontSize': // 字号
+					break;
+				case 'fontColor': // 颜色
+					break;
+				case 'fontBold': // 粗细
+					break;
+				case 'fontItalic': // 倾斜
+					break;
+				case 'fontText': // 文字间距
+					break;
+				case 'fontline': // 行间距
+					break;
+				case 'fontStroke': //  居中方式
+					break;
+				case 'fontVertically': // 排列方式/横竖
+					break;
+				case 'fontOpacity': // 透明度
+					break;
+			}
 		},
 		allKeyup(e) {
 			let obj = {
@@ -582,6 +661,55 @@ export default {
 			color: #848484;
 			i {
 				font-size: 14px;
+			}
+		}
+	}
+	.iconfont {
+		font-size: 22px;
+		margin: 0 15px;
+		cursor: pointer;
+	}
+	.font {
+		&-family {
+			border: 1px solid rgba(255, 78, 96, 0.5);
+			border-radius: 4px;
+			padding: 0 0px 0 15px;
+			height: 35px;
+			display: flex;
+			font-weight: bold;
+			align-items: center;
+			margin-right: 15px;
+			cursor: pointer;
+			.iconfont {
+				font-size: 12px;
+			}
+		}
+		&-size {
+			height: 35px;
+			display: flex;
+			align-items: center;
+			border: 1px solid rgba(255, 78, 96, 0.5);
+			border-radius: 4px;
+			margin-right: 15px;
+			cursor: pointer;
+			.iconfont {
+				font-size: 12px;
+				margin: 0 5px;
+				font-weight: bold;
+			}
+			::v-deep .el-input {
+				width: 70px;
+				height: 33px;
+				line-height: 33px;
+				border: 0;
+				outline: none;
+				.el-input__inner {
+					height: 33px;
+					line-height: 33px;
+					border: 0;
+					text-align: center;
+					font-weight: bold;
+				}
 			}
 		}
 	}

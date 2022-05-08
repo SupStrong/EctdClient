@@ -61,6 +61,9 @@
 .G-Fsize-32 {
   font-size: 32px !important;
 }
+.G-Fsize-34 {
+  font-size: 32px !important;
+}
 // 常用样式
 // 常用颜色
 .G-color-333 {
@@ -72,7 +75,9 @@
 .G-color-444 {
   color: #444;
 }
-
+.G-color-b4 {
+  color: #b4b4b4;
+}
 .G-color-555 {
   color: #555;
 }
@@ -141,6 +146,9 @@
 .G-color-ffa609 {
   color: #FFA609;
 }
+.G-color-1D2383 {
+  color: #1D2383;
+}
 .G-color-888 {
   color: #888;
 }
@@ -160,22 +168,35 @@
 .G-color-be {
   color: #bebebe;
 }
+.G-color-2172F6{
+  color: #2172F6;
+}
 // 行高
 .G-lht-20{
   line-height: 20px;
 }
 
 // 常用间距
+.G-Mt-2 {
+  margin-top: 2px;
+}
+.G-Mb-0 {
+  margin-bottom: 0px!important;
+}
 .G-Mt-5 {
   margin-top: 5px;
 }
 
 .G-Mt-8 {
-  margin-top: 8px;
+  margin-top: 8px!important;
 }
 
 .G-Mt-10 {
-  margin-top: 10px!important;
+  margin-top: 10px;
+}
+
+.G-Mt-12 {
+  margin-top: 12px!important;
 }
 
 .G-Mt-15 {
@@ -192,13 +213,20 @@
 .G-Mr-5 {
   margin-right: 5px;
 }
-
+.G-Mr-8 {
+  margin-right: 8px;
+}
 .G-Mr-10 {
   margin-right: 10px;
 }
-
+.G-Mr-13 {
+  margin-right: 13px;
+}
 .G-Mr-15 {
   margin-right: 15px;
+}
+.G-Mr-20 {
+  margin-right: 20px;
 }
 .G-Mr-25 {
   margin-right: 25px;
@@ -206,7 +234,9 @@
 .G-Mb-5 {
   margin-bottom: 5px;
 }
-
+.G-Mb-8 {
+  margin-bottom: 8px;
+}
 .G-Mb-10 {
   margin-bottom: 10px;
 }
@@ -283,6 +313,12 @@
   background-color: #f7f8fa;
 }
 
+.G-d-b{
+  display: block;
+}
+.G-text-center{
+  text-align: center;
+}
 // 通用样式
 .G-bold{
   font-weight: bold;
@@ -294,8 +330,17 @@
 }
 
 .G-col-2 {
-	-webkit-line-clamp: 2;
-	word-break: break-all;
+  overflow:hidden; 
+  text-overflow:ellipsis;
+  display:-webkit-box; 
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2; 
+}
+.G-col-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 .G-col-4 {
 	-webkit-line-clamp: 4;
@@ -304,32 +349,10 @@
 .G-cursor{
   cursor: pointer;
 }
-// 
-.handle{
-  width: 8px;
-  height: 8px;
+.van-nav-bar{
+  width: 10rem;
+  margin: 0 auto;
 }
-.handle, .vdr{
-  padding: 5px;
-}
-//
-.el-drawer {
-	border-left: 1px solid #999;
-	box-shadow: 0 0;
-}
-.el-drawer__wrapper{
-  width: 800px!important;
-  right: 0!important;
-  float: right;
-  left: auto!important;
-}
-.el-drawer__container{
-  width: 100%;
-  float: right;
-}
-.el-drawer.rtl{
-  width: 100%!important;
-}
-.v-modal{
-  z-index: 0!important;
+.van-nav-bar .van-icon{
+  color: #666!important;
 }

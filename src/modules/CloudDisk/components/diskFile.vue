@@ -4,7 +4,8 @@
 			<Checkbox v-model="item.active"></Checkbox>
 		</div> -->
 		<span class="icon">
-			<img :src="item.content ? 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/' + item.content : itemIcon(item)" alt="" />
+			<!-- {{ item.$icon }} -->
+			<img :src="item.$icon == 'ImageType.png' ? 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/' + item.content : itemIcon(item)" alt="" />
 		</span>
 		<p>{{ item.name }}</p>
 		<!--<div class="time">{{ item.updatedAt }}</div>

@@ -1,15 +1,15 @@
 <template>
 	<div class="category-container" style="height: 100%; background: #2f2f2f">
-		<el-menu class="el-menu-vertical-demo" style="background: #2f2f2f">
+		<el-menu class="el-menu-vertical-demo" style="background: #2f2f2f" :collapse="false">
 			<template v-for="(item, index) in categoryMenuData">
 				<el-submenu :index="index" :key="index">
 					<template slot="title">
 						<i :class="item.icon" />
 						<span>{{ item.name }}</span>
 					</template>
-					<el-menu-item v-for="(subItem, subIndex) in item.child" :index="index + '-' + subIndex" :key="subIndex">
+					<el-menu-item v-for="(subItem, subIndex) in item.child" :index="index + '-' + subIndex" :key="subIndex" @click="change(subItem)">
 						<i :class="subItem.icon" />
-						<span slot="title" style="margin-left: 10px" @click="change(subItem)">{{ subItem.name }}</span>
+						<span slot="title" style="margin-left: 10px">{{ subItem.name }}</span>
 					</el-menu-item>
 				</el-submenu>
 			</template>
@@ -35,7 +35,16 @@ export default {
 		return {
 			typeData: [
 				{
-					name: '素材管理',
+					name: '我的工具',
+					icon: '',
+					child: [
+						{ name: '工作台', icon: 'sf-icon-unlink', data: 'toolTable' },
+						{ name: '我的模板', icon: 'sf-icon-link', data: 'template' },
+						{ name: '收藏模板', icon: 'sf-icon-unlink', data: 'collect' },
+					],
+				},
+				{
+					name: '资源管理',
 					icon: '',
 					child: [
 						{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
@@ -54,6 +63,11 @@ export default {
 						{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
 						{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
 					],
+				},
+				{
+					name: '数据管理',
+					icon: '',
+					child: [{ name: '美妆数据', icon: 'sf-icon-link', data: 'beauty' }],
 				},
 			],
 			// typeData: [

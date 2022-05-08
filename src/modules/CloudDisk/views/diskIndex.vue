@@ -14,8 +14,17 @@
 					@action="diskFeatureControl"
 					@change="changeGenerate"
 				></diskNavigation>
+				<!-- <div v-if="diskInfo.categoryType == 'toolTable'" class="toolBox">
+					<div class="toolBox-menu">21</div>
+					<div class="toolBox-box">d</div>
+				</div> -->
+				<!-- <el-drawer title="我是标题" :visible.sync="isTure" :with-header="false">
+					<span>我来啦!</span>
+				</el-drawer> -->
+
+				<!-- v-show="navType != 'trans' && navType != 'ectd' && navType != 'image' && navType != 'template'" -->
 				<div
-					v-show="navType != 'trans' && navType != 'ectd' && navType != 'image' && navType != 'template'"
+					style="display: none"
 					ref="diskFileArea"
 					class="cloud-disk-content"
 					:class="diskFileShowType"
@@ -60,17 +69,17 @@
 							<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
 							<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
 								<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
-								<contextmenu-item divider></contextmenu-item>
+								<!-- <contextmenu-item divider></contextmenu-item> -->
 								<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
 								<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
 								<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
-								<contextmenu-item divider></contextmenu-item>
+								<!-- <contextmenu-item divider></contextmenu-item> -->
 								<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
 							</template>
-							<contextmenu-item divider v-else></contextmenu-item>
-							<template v-if="diskInfo.categoryType === 'trash'">
-								<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
-							</template>
+							<!-- <contextmenu-item divider v-else></contextmenu-item> -->
+							<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
+							<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
+							<!-- </template> -->
 							<template v-if="navType !== 'share'">
 								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
 								<contextmenu-item divider></contextmenu-item>
@@ -150,6 +159,7 @@ export default {
 		return {
 			navType: 'disk',
 			diskData: [],
+			isTure: true,
 			diskInfo: {
 				id: 1, //顶级目录id
 				keyFlag: null, //按住的按键
