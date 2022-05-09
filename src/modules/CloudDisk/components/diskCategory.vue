@@ -305,6 +305,7 @@ export default {
 			z-index: 10;
 			// 设置大小合适的圆形容器(足够覆盖整个进度圆)
 			width: 800px;
+
 			height: 800px;
 			border-radius: 45%;
 
