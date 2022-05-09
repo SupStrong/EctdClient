@@ -5,6 +5,7 @@
 			<div class="left">
 				<diskCategory ref="diskCategory" :data="diskInfo" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
+
 			<div class="right">
 				<diskNavigation
 					:data="diskInfo"
@@ -18,7 +19,7 @@
 					<div class="toolBox-menu">21</div>
 					<div class="toolBox-box">d</div>
 				</div> -->
-				<!-- <el-drawer title="我是标题" :visible.sync="isTure" :with-header="false">
+				<!-- <el-drawer title="我是标题" :visible.sync="isTure">
 					<span>我来啦!</span>
 				</el-drawer> -->
 
@@ -102,6 +103,31 @@
 								{{ diskInfo.selectFiles.length }}
 							</span>
 						</div>
+					</div>
+				</div>
+				<div class="tool-box">
+					<div class="tool">
+						<i class="iconfont icon-zhedie down" @click="handleChange('down')"></i>
+					</div>
+					<div class="template">
+						<div class="template-main" v-for="item in 3">
+							<div class="fl-row-justy">
+								<div class="G-t-r G-bold G-color-333 G-Fsize-18">第一页</div>
+								<div class="icon G-t-r">
+									<el-tooltip class="item" effect="dark" content="删除模板" placement="top-start">
+										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete')"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="添加一个新模板" placement="top-start">
+										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add')"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="复制一个新模板" placement="top-start">
+										<i class="iconfont icon-fuzhi G-Fsize-20 G-Mr-10" @click="handleChange('clone')"></i>
+									</el-tooltip>
+								</div>
+							</div>
+							<div class="box"></div>
+						</div>
+						<!-- <div class="template-foot">Bottom</div> -->
 					</div>
 				</div>
 				<div class="cloud-disk-content" v-if="navType === 'trans'">
@@ -315,6 +341,22 @@ export default {
 					callback && callback();
 				}
 			});
+		},
+		handleChange(type = 'normal') {
+			switch (commend) {
+				case 'delete': //后退
+					//
+					break;
+				case 'add':
+					//
+					break;
+				case 'clone':
+					//
+					break;
+				case 'down':
+					//
+					break;
+			}
 		},
 		childChange(data) {
 			this.generateData = {
@@ -1529,6 +1571,9 @@ export default {
 	flex-direction: column;
 	background: #f8f8f8;
 }
+::v-deep .disk-func {
+	background-color: #fff;
+}
 .cloud-disk-main {
 	width: 100%;
 	height: calc(100% - 60px);
@@ -1542,10 +1587,10 @@ export default {
 	.right {
 		width: 100%;
 		height: 100%;
-		background: #fff;
 		display: flex;
 		flex-direction: column;
 		flex: 1px;
+		background-color: rgba(236, 236, 236, 1);
 		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
 		.cloud-disk-content {
 			width: 100%;
@@ -1578,6 +1623,65 @@ export default {
 			animation-name: slideInDown;
 			color: #fff;
 		}
+	}
+}
+.tool-box {
+	display: flex;
+	position: relative;
+}
+.template {
+	height: calc(100vh - 155px);
+	background-color: rgba(236, 236, 236, 1);
+	overflow-y: scroll;
+	margin: 0 auto;
+	&-main {
+		width: 428.49px;
+		margin-top: 10px;
+		margin-bottom: 20px;
+		.iconfont {
+			cursor: pointer;
+		}
+		.box {
+			background-color: #fff;
+			width: 428.49px;
+			height: 606.15px;
+		}
+	}
+	&-foot {
+		width: 100%;
+		height: 50px;
+		position: absolute;
+		bottom: 0;
+		border: 1px solid blue;
+	}
+}
+.template::-webkit-scrollbar {
+	width: 0px;
+}
+.tool {
+	width: 350px;
+	height: 100%;
+	background-color: rgb(47, 47, 47);
+	border-left: 1px solid white;
+	position: relative;
+	.down {
+		position: absolute;
+		display: inline-block;
+		bottom: 50%;
+		top: 50%;
+		right: -25px;
+		z-index: 10;
+		// 设置大小合适的圆形容器(足够覆盖整个进度圆)
+		width: 25px;
+		height: 80px;
+		border-bottom-right-radius: 25px;
+		border-top-right-radius: 25px;
+		background: #2f2f2f;
+		display: flex;
+		align-items: center;
+		color: white;
+		font-size: 20px;
+		cursor: pointer;
 	}
 }
 </style>

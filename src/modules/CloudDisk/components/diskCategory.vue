@@ -374,6 +374,9 @@ export default {
 		}
 	}
 }
+::v-depp .el-menu {
+	border: 0;
+}
 ::v-deep .el-menu-item {
 	background: rgb(47, 47, 47);
 	span {
