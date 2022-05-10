@@ -12,9 +12,9 @@
 				<el-tooltip class="item" effect="dark" content="模板管理" placement="bottom">
 					<div @click="handleChange('fontVertically')"><i class="iconfont icon-mobankuangjia-xianxing"></i></div>
 				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
+				<!-- <el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-tongguanshuju"></i></div>
-				</el-tooltip>
+				</el-tooltip> -->
 			</div>
 		</div>
 		<div class="disk-func">
@@ -148,10 +148,11 @@
 					<button class="btn default">全部暂停</button>-->
 				</template>
 			</div>
-			<!-- <div class="left font">
+			<!-- v-if="type == 'text'" -->
+			<div class="left font">
 				<div class="font-family" @click="handleChange('fontFamily')">
 					<span>黑色字体</span>
-					<i class="iconfont icon-xiala"></i>
+					<i class="iconfont icon-xiala G-Ml-15"></i>
 				</div>
 				<div class="font-size" @click="handleChange('fontSize')">
 					<i class="iconfont icon-jiahao_o" @click="handleChange('fontSize', 'add')"></i>
@@ -174,8 +175,18 @@
 					<div @click="handleChange('fontText')"><i class="iconfont icon-zijianju"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="行间距" placement="bottom">
-					<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
+					<el-dropdown>
+						<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item>黄金糕</el-dropdown-item>
+							<el-dropdown-item>狮子头</el-dropdown-item>
+							<el-dropdown-item>螺蛳粉</el-dropdown-item>
+							<el-dropdown-item disabled>双皮奶</el-dropdown-item>
+							<el-dropdown-item divided>蚵仔煎</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
 				</el-tooltip>
+
 				<el-tooltip class="item" effect="dark" content="居中方式" placement="bottom">
 					<div @click="handleChange('fontStroke')"><i class="iconfont icon-youduiqi"></i></div>
 				</el-tooltip>
@@ -185,8 +196,8 @@
 				<el-tooltip class="item" effect="dark" content="透明度" placement="bottom">
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-suodingtouming_huaban1"></i></div>
 				</el-tooltip>
-			</div> -->
-			<div class="left font">
+			</div>
+			<div class="left font" v-if="type == 'image'">
 				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
 					<div @click="handleChange('fontVertically')"><i class="iconfont icon-lvjing"></i></div>
 				</el-tooltip>
@@ -195,6 +206,22 @@
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="图片裁剪" placement="bottom">
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-jianqie"></i></div>
+				</el-tooltip>
+			</div>
+			<div class="left font" v-else-if="type == 'template'">
+				<el-tooltip class="item" effect="dark" content="我的模板" placement="bottom">
+					<div @click="handleChange('fontVertically')"><i class="iconfont icon-wode"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="所有模板" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-24gl-borderAll"></i></div>
+				</el-tooltip>
+			</div>
+			<div>
+				<el-tooltip class="item" effect="dark" content="保存模板" placement="bottom">
+					<el-button type="primary" size="small" @click="handleChange('save')">保存模板</el-button>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="导出图片" placement="bottom">
+					<el-button type="success" size="small" @click="handleChange('export')">导出图片</el-button>
 				</el-tooltip>
 			</div>
 		</div>
@@ -344,6 +371,10 @@ export default {
 					break;
 				case 'fontOpacity': // 透明度
 					break;
+				case 'save': // 保存模板
+					break;
+				case 'export': // 导出图片
+					break;
 			}
 		},
 		allKeyup(e) {
@@ -463,6 +494,7 @@ export default {
 		height: 45px;
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		padding: 0 10px;
 		border-bottom: 1px solid #eee;
 		justify-content: space-between;
@@ -480,6 +512,12 @@ export default {
 				padding-right: 35px;
 				border-radius: 20px !important;
 				margin-right: -35px;
+			}
+			.item {
+				margin-right: 10px;
+			}
+			.item:hover {
+				background: #ececec;
 			}
 			input:focus {
 				border-color: $diskMainColor !important;
@@ -666,12 +704,12 @@ export default {
 	}
 	.iconfont {
 		font-size: 22px;
-		margin: 0 15px;
+		margin: 0 5px;
 		cursor: pointer;
 	}
 	.font {
 		&-family {
-			border: 1px solid rgba(255, 78, 96, 0.5);
+			border: 1px solid #ececec;
 			border-radius: 4px;
 			padding: 0 0px 0 15px;
 			height: 35px;
@@ -688,7 +726,7 @@ export default {
 			height: 35px;
 			display: flex;
 			align-items: center;
-			border: 1px solid rgba(255, 78, 96, 0.5);
+			border: 1px solid #ececec;
 			border-radius: 4px;
 			margin-right: 15px;
 			cursor: pointer;

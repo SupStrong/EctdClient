@@ -107,12 +107,43 @@
 				</div>
 				<div class="tool-box">
 					<div class="tool">
-						<i class="iconfont icon-zhedie down" @click="handleChange('down')"></i>
+						<!-- <div class="tool-font">
+							<div class="list" v-for="item in 30">
+								<span class="G-Fsize-14 G-color-333">微软雅黑</span>
+								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou"></i>
+							</div>
+						</div> -->
+						<!-- <div class="tool-color">
+							<div class="demonstration G-bold">自设样式</div>
+							<div class="block G-Mt-10">
+								<el-color-picker v-model="color1"></el-color-picker>
+							</div>
+							<div class="G-bold">默认颜色</div>
+							<div>
+								<div class="list G-Mt-10" v-for="(item, index) in colorArr" :key="index" :style="{ 'background-color': 'rgb(' + item + ')' }"></div>
+							</div>
+						</div> -->
+						<div class="tool-image">
+							<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
+							<el-button type="success" size="small" plain @click="handleChange('my')">我的素材</el-button>
+							<el-breadcrumb class="G-Mt-15" separator-class="el-icon-arrow-right">
+								<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+								<el-breadcrumb-item>活动管理</el-breadcrumb-item>
+								<el-breadcrumb-item>活动列表</el-breadcrumb-item>
+								<el-breadcrumb-item>活动详情</el-breadcrumb-item>
+							</el-breadcrumb>
+							<div class="G-Mt-15">
+								<div class="list" v-for="item in 20">
+									<img src="https://img1.baidu.com/it/u=3078839842,1528260431&fm=253&fmt=auto&app=138&f=JPEG?w=658&h=368" alt="" />
+									<div class="G-t-c">文件夹</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="template">
 						<div class="template-main" v-for="item in 3">
 							<div class="fl-row-justy">
-								<div class="G-t-r G-bold G-color-333 G-Fsize-18">第一页</div>
+								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第一页</div>
 								<div class="icon G-t-r">
 									<el-tooltip class="item" effect="dark" content="删除模板" placement="top-start">
 										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete')"></i>
@@ -141,6 +172,9 @@
 				<!-- 模板 -->
 			</div>
 		</section>
+		<div class="silder-icon">
+			<el-slider v-model="value" vertical height="200px"> </el-slider>
+		</div>
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
 	</main>
 </template>
@@ -206,6 +240,32 @@ export default {
 				},
 				selectAll: false,
 			},
+			colorArr: [
+				'0, 0, 0',
+				'84, 84, 84',
+				'115, 115, 115',
+				'166, 166, 166',
+				'217, 217, 217',
+				'255, 255, 255',
+				'255, 22, 22',
+				'255, 87, 87',
+				'255, 102, 196',
+				'203, 108, 230',
+				'140, 82, 255',
+				'94, 23, 235',
+				'3, 152, 158',
+				'0, 194, 203',
+				'92, 225, 230',
+				'56, 182, 255',
+				'82, 113, 255',
+				'0, 74, 173',
+				'0, 128, 55',
+				'126, 217, 87',
+				'201, 226, 101',
+				'255, 222, 89',
+				'255, 189, 89',
+				'255, 145, 77',
+			],
 			loading: true,
 			/*拖拽选择参数*/
 			mouseSelectData: {
@@ -1660,28 +1720,99 @@ export default {
 }
 .tool {
 	width: 350px;
-	height: 100%;
-	background-color: rgb(47, 47, 47);
+	height: calc(100vh - 155px);
+	background-color: white;
 	border-left: 1px solid white;
 	position: relative;
-	.down {
-		position: absolute;
-		display: inline-block;
-		bottom: 50%;
-		top: 50%;
-		right: -25px;
-		z-index: 10;
-		// 设置大小合适的圆形容器(足够覆盖整个进度圆)
-		width: 25px;
-		height: 80px;
-		border-bottom-right-radius: 25px;
-		border-top-right-radius: 25px;
-		background: #2f2f2f;
-		display: flex;
-		align-items: center;
-		color: white;
-		font-size: 20px;
-		cursor: pointer;
+	overflow-y: scroll;
+	&-font {
+		.list {
+			height: 38px;
+			color: white;
+			background: white;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 15px;
+			cursor: pointer;
+			border: 1px solid #fff;
+		}
+		.list:hover {
+			background-color: #ececec;
+		}
 	}
+	&-color {
+		margin: 20px;
+		.list {
+			width: 38px;
+			height: 38px;
+			border-radius: 4px;
+			border: 1px solid #999;
+			display: inline-block;
+			cursor: pointer;
+			margin-right: 15px;
+		}
+		.list:nth-child(6n) {
+			margin-right: 0;
+		}
+		.list:hover {
+			background-color: #ececec;
+		}
+	}
+	&-image {
+		margin: 15px;
+		.list {
+			width: 50px;
+			margin-right: 17px;
+			float: left;
+			cursor: pointer;
+			margin-bottom: 10px;
+			img {
+				width: 50px;
+				height: 50px;
+				margin: initial;
+				text-align: center;
+			}
+			span {
+				text-align: center;
+			}
+		}
+		.list:nth-child(5n) {
+			margin-right: 0;
+		}
+	}
+	// .down {
+	// 	position: absolute;
+	// 	display: inline-block;
+	// 	bottom: 50%;
+	// 	top: 50%;
+	// 	right: -25px;
+	// 	z-index: 10;
+	// 	// 设置大小合适的圆形容器(足够覆盖整个进度圆)
+	// 	width: 25px;
+	// 	height: 80px;
+	// 	border-bottom-right-radius: 25px;
+	// 	border-top-right-radius: 25px;
+	// 	background: #2f2f2f;
+	// 	display: flex;
+	// 	align-items: center;
+	// 	color: white;
+	// 	font-size: 20px;
+	// 	cursor: pointer;
+	// }
+}
+.tool::-webkit-scrollbar {
+	width: 0;
+}
+.silder-icon {
+	position: fixed;
+	right: 10px;
+	bottom: 20px;
+}
+::v-deep .el-slider__button{
+	border: 2px solid #333;
+}
+::v-deep .el-slider__bar{
+	background: #333;
 }
 </style>

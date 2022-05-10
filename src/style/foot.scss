@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3385429 */
-  src: url('//at.alicdn.com/t/font_3385429_odn1pfoa6ck.woff2?t=1652105492152') format('woff2'),
-       url('//at.alicdn.com/t/font_3385429_odn1pfoa6ck.woff?t=1652105492152') format('woff'),
-       url('//at.alicdn.com/t/font_3385429_odn1pfoa6ck.ttf?t=1652105492152') format('truetype');
+  src: url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.woff2?t=1652186897057') format('woff2'),
+       url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.woff?t=1652186897057') format('woff'),
+       url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.ttf?t=1652186897057') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-duigou:before {
+  content: "\e65d";
+}
+
+.icon-24gl-borderAll:before {
+  content: "\eafe";
+}
+
+.icon-wode:before {
+  content: "\e8a0";
+}
+
+.icon-suoyourenyuan:before {
+  content: "\e647";
+}
+
+.icon-shengchengtupian:before {
+  content: "\e636";
 }
 
 .icon-zhedie:before {
