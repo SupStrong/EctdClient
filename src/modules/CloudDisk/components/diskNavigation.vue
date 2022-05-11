@@ -4,13 +4,13 @@
 		<div class="disk-func">
 			<div class="left font">
 				<el-tooltip class="item" effect="dark" content="文字管理" placement="bottom">
-					<div @click="handleChange('fontline')"><i class="iconfont icon-ziti"></i></div>
+					<div @click="handleChange('textBox')"><i class="iconfont icon-ziti"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="图片管理" placement="bottom">
-					<div @click="handleChange('fontStroke')"><i class="iconfont icon-tupian_o"></i></div>
+					<div @click="handleChange('imageBox')"><i class="iconfont icon-tupian_o"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="模板管理" placement="bottom">
-					<div @click="handleChange('fontVertically')"><i class="iconfont icon-mobankuangjia-xianxing"></i></div>
+					<div @click="handleChange('templateBox')"><i class="iconfont icon-mobankuangjia-xianxing"></i></div>
 				</el-tooltip>
 				<!-- <el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-tongguanshuju"></i></div>
@@ -149,7 +149,10 @@
 				</template>
 			</div>
 			<!-- v-if="type == 'text'" -->
-			<div class="left font">
+			<div class="left font" v-if="isCurrent == 'textBox'">
+				<el-tooltip class="item" effect="dark" content="常用字体样式" placement="bottom">
+					<div @click="handleChange('fontBold')"><i class="iconfont icon-AApay"></i></div>
+				</el-tooltip>
 				<div class="font-family" @click="handleChange('fontFamily')">
 					<span>黑色字体</span>
 					<i class="iconfont icon-xiala G-Ml-15"></i>
@@ -197,18 +200,18 @@
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-suodingtouming_huaban1"></i></div>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-if="type == 'image'">
+			<div class="left font" v-if="isCurrent == 'imageBox'">
 				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
-					<div @click="handleChange('fontVertically')"><i class="iconfont icon-lvjing"></i></div>
+					<div @click="handleChange('imageFilter')"><i class="iconfont icon-lvjing"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="图片样式" placement="bottom">
-					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-yuanjiao"></i></div>
+					<div @click="handleChange('imageStyle')"><i class="iconfont icon-yuanjiao"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="图片裁剪" placement="bottom">
-					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-jianqie"></i></div>
+					<div @click="handleChange('imageCut')"><i class="iconfont icon-jianqie"></i></div>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-else-if="type == 'template'">
+			<div class="left font" v-if="isCurrent == 'templateBox'">
 				<el-tooltip class="item" effect="dark" content="我的模板" placement="bottom">
 					<div @click="handleChange('fontVertically')"><i class="iconfont icon-wode"></i></div>
 				</el-tooltip>
@@ -315,6 +318,7 @@ export default {
 			showClassify: false,
 			showCompany: false,
 			showImgText: false,
+			isCurrent: 'textBox',
 		};
 	},
 	computed: {
@@ -349,8 +353,17 @@ export default {
 		},
 		handleChange(type = 'normal') {
 			switch (type) {
-				case 'normal': //无
+				// 第一级
+				case 'textBox': //无
+					this.isCurrent = 'textBox';
 					break;
+				case 'imageBox': //无
+					this.isCurrent = 'imageBox';
+					break;
+				case 'templateBox': //无
+					this.isCurrent = 'templateBox';
+					break;
+				// 字体的
 				case 'fontFamily': // 字体
 					break;
 				case 'fontSize': // 字号
@@ -374,6 +387,13 @@ export default {
 				case 'save': // 保存模板
 					break;
 				case 'export': // 导出图片
+					break;
+				// 图片的
+				case 'imageFilter': // 图片滤镜
+					break;
+				case 'imageStyle': // 图片样式
+					break;
+				case 'imageCut': // 剪裁图片
 					break;
 			}
 		},

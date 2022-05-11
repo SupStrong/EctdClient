@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3385429 */
-  src: url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.woff2?t=1652186897057') format('woff2'),
-       url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.woff?t=1652186897057') format('woff'),
-       url('//at.alicdn.com/t/font_3385429_hj2wv6rbm8.ttf?t=1652186897057') format('truetype');
+  src: url('//at.alicdn.com/t/font_3385429_un4hssiwk7.woff2?t=1652278763326') format('woff2'),
+       url('//at.alicdn.com/t/font_3385429_un4hssiwk7.woff?t=1652278763326') format('woff'),
+       url('//at.alicdn.com/t/font_3385429_un4hssiwk7.ttf?t=1652278763326') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bianda:before {
+  content: "\e878";
+}
+
+.icon-suoxiao:before {
+  content: "\e87b";
+}
+
+.icon-fangda:before {
+  content: "\e60d";
+}
+
+.icon-AApay:before {
+  content: "\e674";
 }
 
 .icon-duigou:before {
