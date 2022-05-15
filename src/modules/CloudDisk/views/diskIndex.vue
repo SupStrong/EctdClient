@@ -12,9 +12,11 @@
 					:data="diskInfo"
 					:type="navType"
 					:loading="loading"
+          :curData='curData'
 					@callback="diskNavigationControl"
 					@action="diskFeatureControl"
 					@change="changeGenerate"
+          @handleSelectFamily="handleSelectFamily"
 				></diskNavigation>
 
 				<!-- <div v-if="diskInfo.categoryType == 'toolTable'" class="toolBox">
@@ -39,22 +41,9 @@
 					@drop.prevent.stop="dropUpload"
 					v-contextmenu:contextmenuWrap
 				>
-					<input
-						type="file"
-						@change="uploadFolder"
-						webkitdirectory
-						style="display: none"
-						ref="inputFolderFile"
-						multiple="multiple"
-					/>
+					<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
 
-					<input
-						type="file"
-						@change="prepareUpload"
-						style="display: none"
-						ref="inputFile"
-						multiple="multiple"
-					/>
+					<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
 
 					<diskFile
 						v-for="(item, index) in diskData"
@@ -70,32 +59,21 @@
 
 					<contextmenu ref="contextmenuWrap">
 						<template v-if="mouseDownWhere === 'area'">
-							<contextmenu-item
-								@click="diskFeatureControl('upload')"
-								:disabled="diskInfo.categoryType !== 'all'"
-							>上传文件</contextmenu-item>
+							<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
 
-							<contextmenu-item
-								@click="diskFeatureControl('uploadFolder')"
-								:disabled="diskInfo.categoryType !== 'all'"
-							>上传文件夹</contextmenu-item>
+							<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
 
-							<contextmenu-item
-								@click="diskFeatureControl('newFolder')"
-								:disabled="diskInfo.categoryType !== 'all'"
-							>新建文件夹</contextmenu-item>
+							<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
 
 							<contextmenu-item divider></contextmenu-item>
 
-							<contextmenu-item
-								@click="diskFeatureControl('clear')"
-								:disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
-							>清空剪贴板</contextmenu-item>
+							<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+								>清空剪贴板</contextmenu-item
+							>
 
-							<contextmenu-item
-								@click="diskFeatureControl('paste')"
-								:disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
-							>粘贴</contextmenu-item>
+							<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+								>粘贴</contextmenu-item
+							>
 
 							<contextmenu-item divider></contextmenu-item>
 
@@ -103,13 +81,8 @@
 						</template>
 
 						<template v-else>
-							<template
-								v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'"
-							>
-								<contextmenu-item
-									@click="diskFeatureControl('go-where')"
-									:disabled="moreThanOneSelect"
-								>打开文件所在位置</contextmenu-item>
+							<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
+								<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
 
 								<contextmenu-item divider></contextmenu-item>
 							</template>
@@ -141,9 +114,7 @@
 							<!-- </template> -->
 
 							<template v-if="navType !== 'share'">
-								<contextmenu-item
-									@click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')"
-								>删除</contextmenu-item>
+								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
 
 								<contextmenu-item divider></contextmenu-item>
 							</template>
@@ -153,10 +124,9 @@
 							</template>
 
 							<template v-else-if="diskInfo.categoryType !== 'trash'">
-								<contextmenu-item
-									@click="diskFeatureControl('share')"
-									:disabled="moreThanOneSelect"
-								>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item>
+								<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect"
+									>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item
+								>
 							</template>
 
 							<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
@@ -173,22 +143,22 @@
 				</div>
 				<div class="tool-box">
 					<div class="tool">
-						<!-- <div class="tool-font">
-							<div class="list" v-for="item in 30">
-								<span class="G-Fsize-14 G-color-333">微软雅黑</span>
-								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou"></i>
+						<div class="tool-font" v-if="handleOpenDrawer == 'fontFamily'">
+							<div class="list" v-for="(item,index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily',item)">
+								<span class="G-Fsize-14 G-color-333">{{item.name}}</span>
+								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou" v-if="curData.fFamily == item.path"></i>
 							</div>
-						</div>-->
-						<!-- <div class="tool-color">
+						</div>
+						<div class="tool-color"  v-else-if="handleOpenDrawer == 'fontColor'">
 							<div class="demonstration G-bold">自设样式</div>
 							<div class="block G-Mt-10">
-								<el-color-picker v-model="color1"></el-color-picker>
+								<el-color-picker v-model="curData.fColor" @active-change="handleColor" :show-alpha="false" :predefine="predefineColors" color-format="hsv"></el-color-picker>
 							</div>
 							<div class="G-bold">默认颜色</div>
 							<div>
-								<div class="list G-Mt-10" v-for="(item, index) in colorArr" :key="index" :style="{ 'background-color': 'rgb(' + item + ')' }"></div>
+								<div class="list G-Mt-10" v-for="(item, index) in colorArr" :key="index" :style="{ 'background-color': 'rgb(' + item + ')' }" :class="{'active': item == curData.fColor}" @click="handleSelectStyle('fontColor',item)"></div>
 							</div>
-						</div>-->
+						</div>
 
 						<div class="tool-image" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
@@ -207,60 +177,222 @@
 
 							<div class="G-Mt-15">
 								<div class="list" v-for="item in 20">
-									<img
-										src="https://img1.baidu.com/it/u=3078839842,1528260431&fm=253&fmt=auto&app=138&f=JPEG?w=658&h=368"
-										alt
-									/>
-
+									<img src="https://img1.baidu.com/it/u=3078839842,1528260431&fm=253&fmt=auto&app=138&f=JPEG?w=658&h=368" alt />
 									<div class="G-t-c">文件夹</div>
 								</div>
 							</div>
 						</div>
 						<div class="tool-filter" hidden>
-
 							<div class="list" v-for="item in 10">
 								<img
 									src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F99882184926c415a3b33b5e90456e9e74b23df514f004-6Huk10_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654869395&t=e0d57cbcb6b9e584134f438fd43e74cf"
 									alt
 								/>
-
 								<span>默认</span>
 							</div>
 						</div>
-						<div class="tool-allFont">
+						<div class="tool-allFont" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">我的字体</el-button>
 							<el-button type="success" size="small" plain @click="handleChange('my')">官方字体</el-button>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
-							<div style="width:50%;float:left;text-align:center;cursor:pointer;margin-top:10px;font-weight: 400;font-style: normal;color: rgb(136, 255, 227);text-decoration: none;font-size:30px;text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;">美好人生</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
 						</div>
 					</div>
 
 					<div class="template">
-						<div class="template-main" v-for="item in 3">
+						<div class="template-main" v-for="(item, index) in templateList" ref="mainBox" :key="index">
 							<div class="fl-row-justy">
-								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第一页</div>
+								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第{{ toChinesNum(index + 1) }}页</div>
 
 								<div class="icon G-t-r">
-									<el-tooltip class="item" effect="dark" content="删除模板" placement="top-start">
-										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete')"></i>
-									</el-tooltip>
+									<!-- <el-tooltip class="item" effect="dark" content="删除模板" v-if="templateList.length != 1" placement="top-start">
+										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete', index)"></i>
+									</el-tooltip> -->
 
 									<el-tooltip class="item" effect="dark" content="添加一个新模板" placement="top-start">
-										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add')"></i>
+										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add', index)"></i>
 									</el-tooltip>
 
 									<el-tooltip class="item" effect="dark" content="复制一个新模板" placement="top-start">
-										<i class="iconfont icon-fuzhi G-Fsize-20 G-Mr-10" @click="handleChange('clone')"></i>
+										<i class="iconfont icon-fuzhi G-Fsize-20 G-Mr-10" @click="handleChange('clone', index)"></i>
 									</el-tooltip>
 								</div>
 							</div>
-
-							<div class="box"></div>
+							<div class="box" ref="mainChildBox">
+								<div v-for="(citem, cindex) in item" :key="citem.rand">
+									<vue-draggable-resizable 
+                  style="display: flex; align-items: center; justify-content: center"
+                  class-name-active="my-active-class" 
+                  v-if="citem.type == 'text'"
+                  :w="citem.w || 'auto'"
+					      	:h="citem.h || 'auto'"
+                  :x="citem.x"
+                  :y="citem.y"
+                  :lock-aspect-ratio="true"
+                  @dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+                  @activated="(left, top, width, height) => onActivated(citem, index,cindex)"
+                  @resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index,cindex)"
+                >
+										<p
+                      :ref="citem.rand"
+							        :tabindex="citem.rand"
+							        @keyup="handleQuick($event, index,cindex)"
+											:style="{
+												color: `rgb(${citem.fColor})`,
+												fontSize: citem.fSize + 'px',
+												fontFamily: citem.fFamily,
+												fontStyle: citem.fStyle,
+												textAlign: citem.fAlign,
+												opacity: citem.fOpcity,
+                        fontWeight:citem.fWeight,
+                       transform: citem['fScale'] || ''
+											}"
+											>{{ citem.name }}</p
+										>
+									</vue-draggable-resizable>
+									<vue-draggable-resizable 
+                   :w="citem.w || 'auto'"
+					      	:h="citem.h || 'auto'"
+                  :x="citem.x"
+                  :y="citem.y"
+                  class-name-active="my-active-class" 
+                  v-if="citem.type == 'image'"
+                  :lock-aspect-ratio="true"
+                  @dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+                  @activated="(left, top, width, height) => onActivated(citem, index)"
+                  @resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index,cindex)"
+                  >
+                  	<img
+                      :src="citem.url" 
+							        :tabindex="citem.rand"
+                      :ref="citem.rand" 
+							        @keyup="handleQuick($event, index,cindex)"
+                      :style="{
+                      transform: citem['fScale'] || '',
+                      width: citem.w ? citem.w + 'px' : '100px',
+                      height: citem.h ? citem.h + 'px' : '100px',
+                    }" 
+                    />
+									</vue-draggable-resizable>
+								</div>
+							</div>
 						</div>
 
 						<!-- <div class="template-foot">Bottom</div> -->
@@ -268,45 +400,25 @@
 				</div>
 
 				<div class="cloud-disk-content" v-if="navType === 'trans'">
-					<transferList
-						type="upload"
-						:data="uploadList"
-						:category="diskInfo.categoryType"
-						@remove="removeTrans"
-						@update="updateCount"
-					></transferList>
+					<transferList type="upload" :data="uploadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 
-					<transferList
-						type="download"
-						:data="downloadList"
-						:category="diskInfo.categoryType"
-						@remove="removeTrans"
-						@update="updateCount"
-					></transferList>
+					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 
 				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
 
 				<!-- 生成图片 -->
 
-				<bannerImage
-					v-if="navType === 'image' && diskInfo.categoryType == 'all'"
-					@change="childChange"
-					:popupData.sync="generateData"
-				></bannerImage>
+				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
 
-				<latticeIndex
-					v-if="navType === 'image' && diskInfo.categoryType == 'lattice'"
-					@change="childChange"
-					:popupData.sync="generateData"
-				></latticeIndex>
+				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
 
 				<!-- 模板 -->
 			</div>
 		</section>
 
 		<div class="silder-icon">
-			<el-slider v-model="value" vertical height="200px"></el-slider>
+			<el-slider v-model="mainScale" vertical @input="handleMainScale($event)" height="200px"></el-slider>
 		</div>
 
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
@@ -314,6 +426,9 @@
 </template>
 
 <script>
+// JS
+
+import { toChinesNum } from '../../../../utils/index.js';
 import diskHeader from '../components/diskHeader';
 
 import diskCategory from '../components/diskCategory';
@@ -347,2061 +462,2200 @@ import ectdIndex from './ectd/ectdIndex.vue';
 import bannerImage from './banner/index.vue';
 
 import latticeIndex from './banner/lattice.vue';
-
 // 模板
-
 let shareWin = null;
 
 export default {
-  name: 'diskIndex',
+	name: 'diskIndex',
 
-  components: {
-    diskHeader,
+	components: {
+		diskHeader,
 
-    diskCategory,
+		diskCategory,
 
-    diskNavigation,
+		diskNavigation,
 
-    diskFile,
+		diskFile,
 
-    transferList,
+		transferList,
 
-    Contextmenu,
+		Contextmenu,
 
-    ContextmenuItem,
+		ContextmenuItem,
 
-    loading,
+		loading,
 
-    ectdIndex,
+		ectdIndex,
 
-    bannerImage,
+		bannerImage,
 
-    latticeIndex,
-  },
+		latticeIndex,
+	},
 
-  data () {
-    return {
-      navType: 'disk',
+	data() {
+		return {
+			navType: 'disk',
 
-      diskData: [],
+			diskData: [],
 
-      isTure: true,
+			isTure: true,
 
-      diskInfo: {
-        id: 1, //顶级目录id
+			diskInfo: {
+				id: 1, //顶级目录id
 
-        keyFlag: null, //按住的按键
+				keyFlag: null, //按住的按键
 
-        select: {}, //当前选择的（单个）
+				select: {}, //当前选择的（单个）
 
-        selectFiles: [], //多选
+				selectFiles: [], //多选
 
-        selectTips: '', //选择提示
+				selectTips: '', //选择提示
 
-        clipboard: [], //剪贴板
+				clipboard: [], //剪贴板
 
-        clipboardType: '', //剪切板类型
+				clipboardType: '', //剪切板类型
 
-        category: '网盘',
+				category: '网盘',
 
-        categoryType: 'all',
+				categoryType: 'all',
 
-        navData: [],
+				navData: [],
 
-        count: 0,
+				count: 0,
 
-        page: 1,
+				page: 1,
 
-        size: {
-          used: 0,
+				size: {
+					used: 0,
 
-          total: 0,
+					total: 0,
 
-          left: 0,
-        },
+					left: 0,
+				},
 
-        selectAll: false,
-      },
-
-      colorArr: [
-        '0, 0, 0',
-
-        '84, 84, 84',
-
-        '115, 115, 115',
-
-        '166, 166, 166',
-
-        '217, 217, 217',
-
-        '255, 255, 255',
-
-        '255, 22, 22',
-
-        '255, 87, 87',
-
-        '255, 102, 196',
-
-        '203, 108, 230',
-
-        '140, 82, 255',
-
-        '94, 23, 235',
-
-        '3, 152, 158',
-
-        '0, 194, 203',
-
-        '92, 225, 230',
-
-        '56, 182, 255',
-
-        '82, 113, 255',
-
-        '0, 74, 173',
-
-        '0, 128, 55',
-
-        '126, 217, 87',
-
-        '201, 226, 101',
-
-        '255, 222, 89',
-
-        '255, 189, 89',
-
-        '255, 145, 77',
+				selectAll: false,
+			},
+      predefineColors:[
+           '#ff4500',
+          '#ff8c00',
+          '#ffd700',
+          '#90ee90',
+          '#00ced1',
+          '#1e90ff',
+          '#c71585',
+          'rgba(255, 69, 0, 0.68)',
+          'rgb(255, 120, 0)',
+          'hsv(51, 100, 98)',
+          'hsva(120, 40, 94, 0.5)',
+          'hsl(181, 100%, 37%)',
+          'hsla(209, 100%, 56%, 0.73)',
+          '#c7158577'
       ],
+			colorArr: [
+				'0, 0, 0',
+				'84, 84, 84',
+				'115, 115, 115',
+				'166, 166, 166',
+				'217, 217, 217',
+				'255, 255, 255',
+				'255, 22, 22',
+				'255, 87, 87',
+				'255, 102, 196',
+				'203, 108, 230',
+				'140, 82, 255',
+				'94, 23, 235',
+				'3, 152, 158',
+				'0, 194, 203',
+				'92, 225, 230',
+				'56, 182, 255',
+				'82, 113, 255',
+				'0, 74, 173',
+				'0, 128, 55',
+				'126, 217, 87',
+				'201, 226, 101',
+				'255, 222, 89',
+				'255, 189, 89',
+				'255, 145, 77',
+			],
 
-      loading: true,
+			loading: true,
 
-      /*拖拽选择参数*/
+			/*拖拽选择参数*/
 
-      mouseSelectData: {
-        left: 0,
+			mouseSelectData: {
+				left: 0,
 
-        top: 0,
+				top: 0,
 
-        width: 0,
+				width: 0,
 
-        height: 0,
-      },
+				height: 0,
+			},
 
-      mouseDownWhere: 'area',
+			mouseDownWhere: 'area',
 
-      showUploadTips: false,
+			showUploadTips: false,
 
-      uploadList: [],
+			uploadList: [],
 
-      downloadList: [],
+			downloadList: [],
 
-      popupWindowOpen: false, //是否有弹窗
+			popupWindowOpen: false, //是否有弹窗
 
-      fileViewer: {},
+			fileViewer: {},
 
-      maxFileSize: 4294967296, //4GB
+			maxFileSize: 4294967296, //4GB
 
-      maxFileSizeText: '0B',
+			maxFileSizeText: '0B',
 
-      draggingFilesStyle: {
-        display: 'none',
+			draggingFilesStyle: {
+				display: 'none',
 
-        left: 0,
+				left: 0,
 
-        top: 0,
-      },
+				top: 0,
+			},
 
-      settingConfig: {
-        maxUpTrans: 3,
+			settingConfig: {
+				maxUpTrans: 3,
 
-        maxDownTrans: 3,
+				maxDownTrans: 3,
 
-        noticeBubble: true, //气泡提示
+				noticeBubble: true, //气泡提示
 
-        noticeFlag: true, //提醒声音
-      },
-
-      noticeSrc: false,
-
-      generateData: {
-        type: '',
-
-        isDrawer: false,
-
-        currentIndex: '',
-
-        // type: 'table',
-
-        // isDrawer: true,
-      },
-    };
-  },
-
-  directives: {
-    contextmenu: directive,
-  },
-
-  computed: {
-    diskFileShowType: function () {
-      return this.$store.state.fileStateIcon === 'sf-icon-th-large' ? 'block-file' : 'list-file';
-    },
-
-    haveSelect: function () {
-      return this.diskInfo.selectFiles.length !== 0;
-    },
-
-    isWebCloudDisk: function () {
-      return this.$projectInfo.projectName === 'CloudDisk' && !this.$isElectron;
-    },
-
-    moreThanOneSelect: function () {
-      return this.diskInfo.selectFiles.length > 1;
-    },
-  },
-
-  watch: {
-    diskData: {
-      handler () {
-        this.diskInfo.selectFiles = [];
-
-        this.diskData.forEach((item, index) => {
-          if (item.active) {
-            this.diskInfo.selectFiles.push(item);
-          }
-        });
-
-        if (this.diskInfo.selectFiles.length) {
-          this.diskInfo.selectTips = '选中' + this.diskInfo.selectFiles.length + '个项目';
-        } else {
-          this.diskInfo.selectTips = this.diskData.length + '个项目';
-        }
-
-        this.diskInfo.selectAll = this.diskInfo.selectFiles.length === this.diskData.length;
-      },
-
-      deep: true,
-    },
-  },
-
-  mounted () {
-    console.error('mounted', this.navType);
-
-    this.initKeyDown();
-
-    if (this.$isElectron) {
-      this.initDiskProfile(() => {
-        this.$getUserInfo();
-
-        this.getDiskData();
-
-        this.$api.localFile.read('setting', (setting) => {
-          this.settingConfig = Object.assign(this.settingConfig, setting);
-
-          uploadHandle.maxLimit = this.settingConfig.maxUpTrans;
-
-          downloadHandle.maxLimit = this.settingConfig.maxDownTrans;
-
-          this.noticeSrc = localStorage.noticeVoice;
-
-          this.$ipc.send('system', 'download-update', setting.transDownFolder);
-
-          this.initDiskInfo(this.initTransData);
-        });
-      });
-    } else {
-      this.noticeSrc = '/CloudDisk/voice/1.wav';
-
-      if (this.isWebCloudDisk) {
-        let query = this.$route.query;
-
-        this.navType = query.type || 'disk';
-
-        this.diskInfo.id = parseInt(query.id) || 1;
-
-        this.diskInfo.categoryType = query.category || 'all';
-
-        this.diskInfo.category = query.category_name || '全部文件';
-
-        if (this.diskInfo.id !== 1 && this.navType !== 'trans') {
-          this.$api.disk.fileInfo(
-            {
-              id: this.diskInfo.id,
-            },
-
-            (rs) => {
-              this.diskInfo.navData = rs.data.address;
-            }
-          );
-        }
-      }
-
-      this.$getUserInfo();
-
-      if (this.navType === 'disk') {
-        this.getDiskData();
-      }
-
-      this.initDiskInfo();
-    }
-  },
-
-  beforeDestroy () {
-    this.initKeyDown('stop');
-  },
-
-  methods: {
-    initDiskProfile (callback) {
-      this.$ipc.on('win-data', (e, data) => {
-        if (data) {
-          this.$api.user.login(
-            data,
-
-            () => {
-              callback && callback();
-            },
-
-            () => {
-              this.$ipc.send('system', 'logoff');
-            }
-          );
-        } else {
-          callback && callback();
-        }
-      });
-    },
-
-    handleChange (type = 'normal') {
-      switch (commend) {
-        case 'delete': //后退
-          //
-
-          break;
-
-        case 'add':
-          //
-
-          break;
-
-        case 'clone':
-          //
-
-          break;
-
-        case 'down':
-          //
-
-          break;
-
-        case 'official':
-          //
-
-          break;
-
-        case 'my':
-          //
-
-          break;
-      }
-    },
-
-    childChange (data) {
-      this.generateData = {
-        type: data.type,
-
-        isDrawer: true,
-
-        currentIndex: data.currentIndex,
-      };
-    },
-
-    changeGenerate (data) {
-      this.generateData = {
-        type: data.type,
-
-        isDrawer: true,
-
-        currentIndex: data.currentIndex,
-      };
-    },
-
-    initTransData () {
-      this.$nextTick(() => {
-        this.$ipc.on('read-file', (e, data) => {
-          let file = new File([data.result], data.name);
-
-          this.prepareUpload({ files: [file] }, 'drop', data.parentId, true);
-        });
-
-        this.$api.localFile.read('download', (data) => {
-          if (data && data.length) {
-            let needDownload = data.filter((item) => {
-              return item._state !== 'finish' && item._state !== 'cancelled';
-            });
-
-            this.prepareDownload(needDownload, true);
-          }
-        });
-
-        this.$api.localFile.read('upload', (data) => {
-          if (data && data.length) {
-            data.forEach((item) => {
-              if (item._state !== 'finish' && item._state !== 'cancelled' && item._state !== 'cancelling' && item.path) {
-                this.$ipc.send('system', 'read-file', [item.path, item.name, item.data.parentId]);
-              }
-            });
-          }
-        });
-      });
-    },
-
-    initDiskInfo (callback) {
-      this.maxFileSizeText = this.maxFileSize.fileSize();
-
-      this.$api.disk.info((rs) => {
-        this.diskInfo.size = rs.data;
-
-        callback && callback();
-      });
-    },
-
-    initKeyDown (flag) {
-      if (flag === 'stop') {
-        document.documentElement.removeEventListener('keydown', () => { }, true);
-
-        document.documentElement.removeEventListener('keyup', () => { }, true);
-
-        return;
-      }
-
-      document.addEventListener('keydown', (e) => {
-        if (this.popupWindowOpen || shareWin) {
-          return false;
-        }
-
-        if (!this.$isElectron) {
-          let count = 0;
-
-          for (let i in this.fileViewer) {
-            count++;
-          }
-
-          if (count) {
-            return false;
-          }
-        }
-
-        if (e.ctrlKey) {
-          if (e.key === 'c' && this.haveSelect) {
-            this.diskFeatureControl('copy');
-          } else if (e.key === 'x' && this.haveSelect) {
-            this.diskFeatureControl('cut');
-          } else if (e.key === 'v') {
-            this.diskFeatureControl('paste');
-          } else if (e.key === 'm' && this.diskInfo.selectFiles.length === 1) {
-            this.diskFeatureControl('rename');
-          } else if (e.key === 'o' && this.diskInfo.selectFiles.length === 1) {
-            this.diskFeatureControl('open');
-          } else if (e.key === 'd' && this.haveSelect) {
-            this.diskFeatureControl('download');
-          } else if (e.key === 'Delete' && this.haveSelect) {
-            this.diskFeatureControl('delete');
-          }
-        } else if (e.altKey) {
-          if (e.key === 'Enter' && this.diskInfo.selectFiles.length === 1) {
-            this.diskFeatureControl('info');
-          }
-        } else {
-          if (e.key === 'Delete' && this.haveSelect) {
-            this.diskFeatureControl(this.diskInfo.categoryType === 'trash' ? 'delete' : 'trash');
-          }
-        }
-
-        if (e.key === 'F2' && this.diskInfo.selectFiles.length === 1) {
-          this.diskFeatureControl('rename');
-        }
-
-        if (e.key === 'Control') {
-          this.diskInfo.keyFlag = 'Control';
-        }
-
-        if (e.key === 'Shift') {
-          this.diskInfo.keyFlag = 'Shift';
-        }
-      });
-
-      document.addEventListener('keyup', (e) => {
-        this.diskInfo.keyFlag = null;
-      });
-    },
-
-    categoryChange (category, type) {
-      this.diskInfo.categoryType = category.data;
-
-      this.diskInfo.category = category.name === '全部文件' ? '网盘' : category.name;
-
-      this.resetData();
-
-      this.diskNavigationControl('clear');
-
-      /** 切换到e-CTD */
-
-      if (type === 'ectd') {
-        /** 国家规范 */
-
-        this.diskInfo.country = category.country;
-      } else if (type !== 'trans') {
-        this.getDiskData();
-      } else {
-        this.saveInfoToRoute();
-
-        this.updateCount();
-      }
-    },
-
-    resetData (id) {
-      this.diskInfo.id = id || 1;
-
-      this.diskInfo.page = 1;
-
-      this.diskData = [];
-
-      this.loading = true;
-
-      this.clearSelect();
-    },
-
-    getDiskData (keyword) {
-      let obj = {
-        page: this.diskInfo.page,
-
-        parentId: this.diskInfo.id,
-
-        category: this.diskInfo.categoryType,
-      };
-
-      this.saveInfoToRoute();
-
-      keyword ? (obj.keyWord = keyword) : '';
-
-      this.$api.disk.list(obj, (rs) => {
-        this.loading = false;
-
-        this.diskInfo.count = rs.data.count;
-
-        this.diskData = [...this.diskData, ...rs.data.rows];
-      });
-    },
-
-    loadMoreDiskData (e) {
-      this.$scrollEnd(
-        e,
-
-        () => {
-          if (!this.loading && this.diskData.length < this.diskInfo.count) {
-            this.diskInfo.page++;
-
-            this.getDiskData();
-          }
-        },
-
-        0
-      );
-    },
-
-    mainMouseControl (e) {
-      if (e.button === 0) {
-        this.clearSelect();
-      } else {
-        this.mouseDownWhere = 'area';
-      }
-
-      this.mouseSelect();
-    },
-
-    selectFile (event, item, index) {
-      this.mouseDownWhere = 'file';
-
-      //左键//右键
-
-      if (event.button === 0 || event.button === 2) {
-        event.stopPropagation();
-
-        let area = this.$refs.diskFileArea;
-
-        if (this.diskInfo.categoryType !== 'trash' && this.navType !== 'share') {
-          if (!this.diskInfo.keyFlag) {
-            if (this.diskInfo.selectFiles.length === 0) {
-              item.active = true;
-
-              this.diskInfo.select = item;
-            } else {
-              let hasFlag = this.diskInfo.selectFiles.filter((select) => {
-                return select.id === item.id;
-              });
-
-              if (!hasFlag.length) {
-                this.clearSelect();
-
-                item.active = true;
-
-                this.diskInfo.select = item;
-              }
-            }
-          }
-
-          document.onmousemove = (e) => {
-            e.stopPropagation();
-
-            e.preventDefault();
-
-            this.draggingFilesStyle = {
-              display: 'flex',
-
-              left: e.clientX - area.getBoundingClientRect().left + 5 + 'px',
-
-              top: e.clientY - area.getBoundingClientRect().top + 5 + 'px',
-            };
-          };
-        }
-
-        document.onmouseup = () => {
-          document.onmousemove = null;
-
-          if (this.draggingFilesStyle.display === 'flex') {
-            let dropItem = this.diskData.filter((item) => {
-              return item.hover && item.type === 'folder';
-            });
-
-            //拖拽移动文件不会经过默认的条件判断，所以在这里做了
-
-            if (dropItem.length) {
-              dropItem = dropItem[0];
-
-              let flag = this.diskInfo.selectFiles.filter((item) => {
-                return item.id === dropItem.id;
-              });
-
-              /*判断拖拽的文件在放置的时候是否包含自身*/
-
-              if (!flag.length) {
-                this.diskFeatureControl('cut');
-
-                this.diskFeatureControl('paste');
-              }
-            }
-
-            this.draggingFilesStyle = {
-              display: 'none',
-
-              left: 0,
-
-              top: 0,
-            };
-
-            return;
-          }
-
-          if (this.diskInfo.keyFlag === 'Control') {
-            //Ctrl多选
-
-            item.active = !item.active; //反选
-          } else if (this.diskInfo.keyFlag === 'Shift') {
-            //Shift多选
-
-            let Start = index,
-              End;
-
-            item.active = true;
-
-            if (this.diskInfo.select.id) {
-              for (let i = 0; i < this.diskData.length; i++) {
-                if (this.diskData[i].id === this.diskInfo.select.id) {
-                  Start = i;
-                }
-
-                if (this.diskData[i].id === item.id) {
-                  End = i;
-                }
-              }
-            }
-
-            this.clearSelect(true);
-
-            for (let j = Math.min(End, Start); j < Math.max(End, Start) + 1; j++) {
-              this.diskData[j].active = true;
-            }
-          } else if (!this.diskInfo.keyFlag) {
-            if (event.button === 2) {
-              //如果是右键，判断当前是否在已选中的里面
-
-              let hasIndex = this.diskInfo.selectFiles.filter((file) => {
-                return file.id === item.id;
-              });
-
-              if (!hasIndex.length) {
-                //单选
-
-                this.clearSelect();
-
-                item.active = true;
-
-                this.diskInfo.select = item;
-              }
-            } else {
-              //左键直接取消原有的选中
-
-              this.clearSelect();
-
-              item.active = true;
-
-              this.diskInfo.select = item;
-            }
-          }
-        };
-      }
-    },
-
-    dropUploadTips (show) {
-      if (this.diskInfo.categoryType === 'all') {
-        this.showUploadTips = show;
-      }
-    },
-
-    dropUpload (e) {
-      if (this.diskInfo.categoryType === 'all') {
-        dropHandle.init(e, (data) => {
-          this.uploadFolder(data.folder, 'drop');
-
-          if (data.file.length) {
-            this.prepareUpload(data.file, 'drop');
-          }
-        });
-
-        this.showUploadTips = false;
-      }
-    },
-
-    mouseSelect () {
-      event.preventDefault();
-
-      event.stopPropagation();
-
-      let area = this.$refs.diskFileArea;
-
-      let start = {
-        x: event.clientX - area.getBoundingClientRect().left + area.scrollLeft,
-
-        y: event.clientY - area.getBoundingClientRect().top + area.scrollTop,
-
-        maxy: area.scrollHeight,
-      };
-
-      this.mouseSelectData.left = start.x;
-
-      this.mouseSelectData.top = start.y;
-
-      document.onmouseup = () => {
-        this.mouseSelectData = {
-          left: 0,
-
-          top: 0,
-
-          width: 0,
-
-          height: 0,
-        };
-
-        document.onmousemove = null;
-      };
-
-      document.onmousemove = (ev) => {
-        let end = {
-          x: ev.clientX - area.getBoundingClientRect().left + area.scrollLeft,
-
-          y: ev.clientY - area.getBoundingClientRect().top + area.scrollTop,
-
-          scrolldown: Math.min(ev.clientY - area.getBoundingClientRect().top, event.clientY - area.getBoundingClientRect().top) + 10 + area.offsetHeight,
-
-          scrollup: Math.min(ev.clientY - area.getBoundingClientRect().top, event.clientY - area.getBoundingClientRect().top),
-        };
-
-        this.mouseSelectData = {
-          left: Math.min(start.x, end.x) + 'px',
-
-          top: Math.min(start.y, end.y) + 'px',
-
-          width: Math.abs(end.x - start.x) + 'px',
-
-          height: Math.abs(end.y - start.y) + 'px',
-        };
-
-        let area_data = {
-          left: Math.min(start.x, end.x),
-
-          top: Math.min(start.y, end.y),
-
-          width: Math.abs(end.x - start.x),
-
-          height: Math.abs(end.y - start.y),
-        };
-
-        let selList = document.getElementsByClassName('file');
-
-        this.clearSelect();
-
-        for (let i = 0; i < selList.length; i++) {
-          let sl = selList[i].offsetWidth + selList[i].offsetLeft,
-            st = selList[i].offsetHeight + selList[i].offsetTop;
-
-          let area_l = area_data.left + area_data.width;
-
-          let area_t = area_data.top + area_data.height;
-
-          if (sl > area_data.left && st > area_data.top && selList[i].offsetLeft < area_l && selList[i].offsetTop < area_t) {
-            if (this.diskData[i].active !== true) {
-              this.diskData[i].active = true;
-            }
-          } else {
-            if (this.diskData[i].active) {
-              this.diskData[i].active = false;
-            }
-          }
-        }
-      };
-    },
-
-    clearSelect (flag) {
-      this.diskData.forEach((item, index) => {
-        item.active = false;
-
-        item.hover = false;
-      });
-
-      if (!flag) {
-        this.diskInfo.select = {};
-      }
-
-      //this.diskInfo.selectFiles = [];
-    },
-
-    verifyUploadSize (files) {
-      let result = [];
-
-      let totalSize = 0;
-
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].size < this.maxFileSize) {
-          result.push(files[i]);
-
-          totalSize = totalSize + files[i].size;
-        } else {
-          this.$Message.warning(files[i].name + '超过' + this.maxFileSizeText + '已过滤');
-        }
-      }
-
-      let uploadingSize = this.uploadList.reduce((a, b) => {
-        if (b._state !== 'finish') {
-          a = a + b.size;
-        }
-
-        return a;
-      }, 0);
-
-      if (totalSize && totalSize > this.diskInfo.size.left - uploadingSize) {
-        this.$Message.error('剩余空间不足');
-
-        return [];
-      }
-
-      return result;
-    },
-
-    uploadFolder (e, type = 'normal') {
-      let files = [];
-
-      if (type === 'drop') {
-        files = e;
-      } else {
-        files = e.target.files;
-      }
-
-      files = this.verifyUploadSize(files);
-
-      if (files.length > 500) {
-        if (type === 'normal') {
-          e.target.value = '';
-        }
-
-        this.$Message.warning('文件/目录过多');
-
-        return;
-      }
-
-      this.$Message.info('空文件夹将不会创建');
-
-      this.$api.disk.uploadFolder(
+				noticeFlag: true, //提醒声音
+			},
+      curData:{},
+			noticeSrc: false,
+			mainScale: 0,
+      fontFamilyArr:[
         {
-          folder: uploadFolder.init(files),
-
-          parentId: this.diskInfo.id,
+          name:'第一个',
+          path:'Family-1'
         },
-
-        (rs) => {
-          this.diskData.push(this.$api.disk.diskData(rs.data.main));
-
-          let data = uploadFolder.mateParent(files, rs.data.folders);
-
-          for (let parentId in data) {
-            if (data.hasOwnProperty(parentId)) {
-              this.prepareUpload(data[parentId], 'folder', parentId, true);
-            }
-          }
-
-          uploadHandle.canStart();
-
-          if (type === 'normal') {
-            e.target.value = '';
-          }
-        },
-
-        () => {
-          if (type === 'normal') {
-            e.target.value = '';
-          }
-        }
-      );
-    },
-
-    prepareUpload (e, type, parentId, paused) {
-      let files = [];
-
-      if (type === 'folder' || type === 'drop') {
-        files = e;
-      } else {
-        files = e.target.files;
-      }
-
-      if (type !== 'folder') {
-        if (files.length === 0) {
-          if (!type) {
-            e.target.value = '';
-          }
-
-          return;
-        }
-
-        files = this.verifyUploadSize(files);
-      }
-
-      uploadHandle.init(
-        files,
-
         {
-          parentId: parentId || this.diskInfo.id,
-        },
-
-        (data, fileData) => {
-          console.log(data, fileData, 'xxx');
-
-          this.uploadList = data;
-
-          if (fileData && type !== 'folder') {
-            this.diskData.push(this.$api.disk.diskData(fileData));
-
-            this.transFinish(fileData, 'upload');
-
-            this.initDiskInfo();
-          }
-        },
-
-        paused
-      );
-
-      if (!type) {
-        e.target.value = '';
-      }
-    },
-
-    prepareDownload (files, paused) {
-      downloadHandle.init(
-        files,
-
-        this.$isElectron,
-
-        (data, finish) => {
-          this.downloadList = data;
-
-          if (finish) {
-            this.transFinish(finish, 'download');
-          }
-        },
-
-        paused
-      );
-    },
-
-    transFinish (item, type) {
-      if (this.settingConfig.noticeBubble) {
-        this.$notify(item.name, type === 'upload' ? '上传完成' : '下载完成');
-      }
-
-      if (this.settingConfig.noticeFlag) {
-        if (this.noticeSrc) {
-          this.$refs.audio.play();
+          name:'第二个',
+          path:'Family-2'
         }
+      ],
+			templateList: [
+				[
+					{ rand:'1',fScale:'1',type: 'text', name: '你好', fColor: '0,0,0', fSize: 20, fFamily: 'cursive', fWeight: '400', fStyle: 'inherit', fAlign: 'center', fOpcity: '1',familyText:'第一个'},
+					{ rand:'2',fScale:'1',type: 'image', url: 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/8.png', iFilter: '' },
+				],
+				// [{type:'image',url:'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/12.png',iFilter:''}],
+			],
+      handleOpenDrawer:'',
+			generateData: {
+				type: '',
+
+				isDrawer: false,
+
+				currentIndex: '',
+
+				// type: 'table',
+
+				// isDrawer: true,
+			},
+		};
+	},
+
+	directives: {
+		contextmenu: directive,
+	},
+
+	computed: {
+		diskFileShowType: function () {
+			return this.$store.state.fileStateIcon === 'sf-icon-th-large' ? 'block-file' : 'list-file';
+		},
+
+		haveSelect: function () {
+			return this.diskInfo.selectFiles.length !== 0;
+		},
+
+		isWebCloudDisk: function () {
+			return this.$projectInfo.projectName === 'CloudDisk' && !this.$isElectron;
+		},
+
+		moreThanOneSelect: function () {
+			return this.diskInfo.selectFiles.length > 1;
+		},
+	},
+
+	watch: {
+		diskData: {
+			handler() {
+				this.diskInfo.selectFiles = [];
+
+				this.diskData.forEach((item, index) => {
+					if (item.active) {
+						this.diskInfo.selectFiles.push(item);
+					}
+				});
+
+				if (this.diskInfo.selectFiles.length) {
+					this.diskInfo.selectTips = '选中' + this.diskInfo.selectFiles.length + '个项目';
+				} else {
+					this.diskInfo.selectTips = this.diskData.length + '个项目';
+				}
+
+				this.diskInfo.selectAll = this.diskInfo.selectFiles.length === this.diskData.length;
+			},
+
+			deep: true,
+		},
+	},
+
+	mounted() {
+		console.error('mounted', this.navType);
+
+		this.initKeyDown();
+
+		if (this.$isElectron) {
+			this.initDiskProfile(() => {
+				this.$getUserInfo();
+
+				this.getDiskData();
+
+				this.$api.localFile.read('setting', (setting) => {
+					this.settingConfig = Object.assign(this.settingConfig, setting);
+
+					uploadHandle.maxLimit = this.settingConfig.maxUpTrans;
+
+					downloadHandle.maxLimit = this.settingConfig.maxDownTrans;
+
+					this.noticeSrc = localStorage.noticeVoice;
+
+					this.$ipc.send('system', 'download-update', setting.transDownFolder);
+
+					this.initDiskInfo(this.initTransData);
+				});
+			});
+		} else {
+			this.noticeSrc = '/CloudDisk/voice/1.wav';
+
+			if (this.isWebCloudDisk) {
+				let query = this.$route.query;
+
+				this.navType = query.type || 'disk';
+
+				this.diskInfo.id = parseInt(query.id) || 1;
+
+				this.diskInfo.categoryType = query.category || 'all';
+
+				this.diskInfo.category = query.category_name || '全部文件';
+
+				if (this.diskInfo.id !== 1 && this.navType !== 'trans') {
+					this.$api.disk.fileInfo(
+						{
+							id: this.diskInfo.id,
+						},
+
+						(rs) => {
+							this.diskInfo.navData = rs.data.address;
+						}
+					);
+				}
+			}
+
+			this.$getUserInfo();
+
+			if (this.navType === 'disk') {
+				this.getDiskData();
+			}
+
+			this.initDiskInfo();
+		}
+	},
+
+	beforeDestroy() {
+		this.initKeyDown('stop');
+	},
+
+	methods: {
+		handleMainScale(e) {
+			console.log(this.toChinesNum(1), '1212');
+			this.$refs.mainBox.map((item, index) => {
+				// this.$refs.mainBox[index].style.transform = 'scale(1.1)'
+				// this.$refs.mainChildBox[index].style.transform = 'scale(1.1)'
+			});
+		},
+    handleQuick(e,index,cindex){
+      if (e.keyCode === 17) {         // ctrl+c事件
+        let item = JSON.parse(JSON.stringify(this.templateList[index][cindex]));
+        item.rand = (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5)
+        this.templateList[index].push(item);
+			} else if (e.keyCode === 8) {  // 删除事件
+        this.templateList[index].splice(cindex, 1);
+			}
+    },
+    handleColor(e){
+      let str = e.match(/\d+(\.\d+)?/g);
+      this.curData.fColor = str.toString();
+    },
+    handleSelectStyle(type,item){
+      if(type == 'fontFamily'){
+        this.curData.fFamily = item.path;
+        this.curData.familyText = item.name;
+      }else if(type == 'fontColor'){
+        this.curData.fColor = item;
       }
     },
-
-    diskNavigationControl (commend, func) {
-      switch (commend) {
-        case 'back': //后退
-          if (this.diskInfo.navData.length > 1) {
-            this.diskNavigationControl(this.diskInfo.navData[this.diskInfo.navData.length - 2]);
-          } else {
-            this.diskNavigationControl('home');
-          }
-
-          break;
-
-        case 'home': //返回顶层
-          if (this.diskInfo.categoryType === 'share') {
-            this.SwitchType('share');
-
-            this.diskNavigationControl('clear');
-          } else if (this.diskInfo.category !== '搜索') {
-            this.resetData(1);
-
-            this.getDiskData();
-
-            this.diskNavigationControl('clear');
-          } else if (this.diskInfo.category === '搜索') {
-            this.SwitchType('disk');
-
-            this.diskNavigationControl('clear');
-          }
-
-          break;
-
-        case 'reload': //刷新
-          this.resetData(this.diskInfo.id);
-
-          this.initDiskInfo();
-
-          this.getDiskData();
-
-          break;
-
-        case 'clear':
-          this.diskInfo.navData = [];
-
-          break;
-
-        case 'sort':
-          this.diskData = func(this.diskData);
-
-          break;
-
-        case 'search':
-          this.resetData();
-
-          this.diskInfo.categoryType = 'all';
-
-          this.diskInfo.category = '网盘';
-
-          this.getDiskData(func);
-
-          break;
-
-        default:
-          //默认切换
-
-          for (let i = this.diskInfo.navData.length - 1; i > 0; i--) {
-            if (commend === this.diskInfo.navData[i]) {
-              break;
-            }
-
-            this.diskInfo.navData.splice(i, 1);
-          }
-
-          this.resetData(commend.id);
-
-          this.getDiskData();
-
-          break;
+    handleSelectFamily(e){
+        this.handleOpenDrawer = e.status;
+    },
+    dragstop(data, x, y, width, height) {
+			data.x = x;
+			data.y = y;
+		},
+    onResize(data, x, y, width, height, index,cindex) {
+			let dom_width = this.$refs[data.rand][0].clientWidth;
+			let dom_height = this.$refs[data.rand][0].clientHeight;
+			this.$set(this.templateList[index][cindex], 'fScale', `scale(${width / dom_width},${height / dom_height})`);
+			this.$refs[data.rand][0].style.transform = `scale(${width / dom_width},${height / dom_height})`;
+      console.log(width,this.$refs[data.rand][0].clientWidth,height / dom_height,"@1212")
+			data.w = width;
+			data.h = height;
+		},
+    onActivated(ele, index,cindex) {
+      if(ele.type === 'text'){
+        this.curData = ele;
+      }else if(ele.type === 'image'){
+        this.curData = ele;
       }
-    },
+			// let width = this.$refs[ele.rand][0].clientWidth;
+			// let height = this.$refs[ele.rand][0].clientHeight;
+			// let scaleW = 1;
+			// let scaleH = 1;
+			// if (ele.transformScale !== '' && ele.transformScale !== undefined) {
+			// 	(scaleW = parseFloat(ele.transformScale.split(',')[0].split('scale(')[1])), (scaleH = parseFloat(ele.transformScale.split(',')[1]));
+			// }
+			// if (ele.paddingStyle === undefined || ele.paddingStyle === '0px') {
+			// 	ele.w = width * scaleW;
+			// 	ele.h = height * scaleH;
+			// } else {
+			// 	ele.w = width * scaleW;
+			// 	ele.h = height * scaleH;
+			// }
+			// if (ele.type === 'text') {
+			// 	this.$emit('change', { type: 'table', isDrawer: true, currentIndex: ele.rand });
+			// }
+			// this.imgStyleToData = [];
+			// this.templateList.map((item, index) => {
+			// 	if (item.type === 'text') {
+			// 		let splitArrr = this.getStyle(this.$refs[item.rand][item.index], 'textShadow');
+			// 		let obj = {
+			// 			...item,
+			// 			'font-size': this.getStyle(this.$refs[item.rand][item.index], 'fontSize'),
+			// 			color: this.getStyle(this.$refs[item.rand][item.index], 'color'),
+			// 			fontFamily: this.getStyle(this.$refs[item.rand][item.index], 'fontFamily'),
+			// 			'text-shadow': this.getStyle(this.$refs[item.rand][item.index], 'textShadow'),
+			// 			fontStyle: this.getStyle(this.$refs[item.rand][item.index], 'fontStyle'),
+			// 			transformScale: this.getStyle(this.$refs[item.rand][item.index], 'transform'),
+			// 			textColor: splitArrr.split(' 1px 0px 0px, ')[0],
+			// 			textAlign: this.getStyle(this.$refs[item.rand][item.index], 'textAlign'),
+			// 			writingMode: this.getStyle(this.$refs[item.rand][item.index], 'writingMode'),
+			// 			class: this.$refs[item.rand][item.index].getAttribute('class'),
+			// 			backgroundColor: this.getStyle(this.$refs[item.rand][item.index], 'backgroundColor'),
+			// 			paddingStyle: this.getStyle(this.$refs[item.rand][item.index], 'padding'),
+			// 			borderRadius: this.getStyle(this.$refs[item.rand][item.index], 'borderRadius'),
+			// 		};
+			// 		this.imgStyleToData.push(obj);
+			// 	}
+			// });
+		},
+		toChinesNum(num) {
+			let changeNum = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+			let unit = ['', '十', '百', '千', '万'];
+			num = parseInt(num);
+			let getWan = (temp) => {
+				let strArr = temp.toString().split('').reverse();
+				let newNum = '';
+				let newArr = [];
+				strArr.forEach((item, index) => {
+					newArr.unshift(item === '0' ? changeNum[item] : changeNum[item] + unit[index]);
+				});
+				let numArr = [];
+				newArr.forEach((m, n) => {
+					if (m !== '零') numArr.push(n);
+				});
+				if (newArr.length > 1) {
+					newArr.forEach((m, n) => {
+						if (newArr[newArr.length - 1] === '零') {
+							if (n <= numArr[numArr.length - 1]) {
+								newNum += m;
+							}
+						} else {
+							newNum += m;
+						}
+					});
+				} else {
+					newNum = newArr[0];
+				}
+				return newNum;
+			};
+			let overWan = Math.floor(num / 10000);
+			let noWan = num % 10000;
+			if (noWan.toString().length < 4) {
+				noWan = '0' + noWan;
+			}
+			return overWan ? getWan(overWan) + '万' + getWan(noWan) : getWan(num);
+		},
+		initDiskProfile(callback) {
+			this.$ipc.on('win-data', (e, data) => {
+				if (data) {
+					this.$api.user.login(
+						data,
+
+						() => {
+							callback && callback();
+						},
+
+						() => {
+							this.$ipc.send('system', 'logoff');
+						}
+					);
+				} else {
+					callback && callback();
+				}
+			});
+		},
+
+		handleChange(commend = 'normal', index) {
+			switch (commend) {
+				case 'delete': //删除
+					this.templateList.splice(index, 1);
+					break;
+				case 'add':
+					this.templateList.push({ text: 'text' });
+					break;
+				case 'clone':
+					this.templateList.push(this.templateList[index]);
+					break;
+
+				case 'down':
+					//
+
+					break;
+
+				case 'official':
+					//
+
+					break;
+
+				case 'my':
+					//
+
+					break;
+			}
+		},
+
+		childChange(data) {
+			this.generateData = {
+				type: data.type,
+
+				isDrawer: true,
+
+				currentIndex: data.currentIndex,
+			};
+		},
+
+		changeGenerate(data) {
+			this.generateData = {
+				type: data.type,
+
+				isDrawer: true,
+
+				currentIndex: data.currentIndex,
+			};
+		},
+
+		initTransData() {
+			this.$nextTick(() => {
+				this.$ipc.on('read-file', (e, data) => {
+					let file = new File([data.result], data.name);
+
+					this.prepareUpload({ files: [file] }, 'drop', data.parentId, true);
+				});
+
+				this.$api.localFile.read('download', (data) => {
+					if (data && data.length) {
+						let needDownload = data.filter((item) => {
+							return item._state !== 'finish' && item._state !== 'cancelled';
+						});
+
+						this.prepareDownload(needDownload, true);
+					}
+				});
+
+				this.$api.localFile.read('upload', (data) => {
+					if (data && data.length) {
+						data.forEach((item) => {
+							if (item._state !== 'finish' && item._state !== 'cancelled' && item._state !== 'cancelling' && item.path) {
+								this.$ipc.send('system', 'read-file', [item.path, item.name, item.data.parentId]);
+							}
+						});
+					}
+				});
+			});
+		},
+
+		initDiskInfo(callback) {
+			this.maxFileSizeText = this.maxFileSize.fileSize();
+
+			this.$api.disk.info((rs) => {
+				this.diskInfo.size = rs.data;
+
+				callback && callback();
+			});
+		},
+
+		initKeyDown(flag) {
+			if (flag === 'stop') {
+				document.documentElement.removeEventListener('keydown', () => {}, true);
+
+				document.documentElement.removeEventListener('keyup', () => {}, true);
+
+				return;
+			}
+
+			document.addEventListener('keydown', (e) => {
+				if (this.popupWindowOpen || shareWin) {
+					return false;
+				}
+
+				if (!this.$isElectron) {
+					let count = 0;
+
+					for (let i in this.fileViewer) {
+						count++;
+					}
+
+					if (count) {
+						return false;
+					}
+				}
 
-    diskFeatureControl (commend) {
-      console.log(commend, 'commendcommend');
+				if (e.ctrlKey) {
+					if (e.key === 'c' && this.haveSelect) {
+						this.diskFeatureControl('copy');
+					} else if (e.key === 'x' && this.haveSelect) {
+						this.diskFeatureControl('cut');
+					} else if (e.key === 'v') {
+						this.diskFeatureControl('paste');
+					} else if (e.key === 'm' && this.diskInfo.selectFiles.length === 1) {
+						this.diskFeatureControl('rename');
+					} else if (e.key === 'o' && this.diskInfo.selectFiles.length === 1) {
+						this.diskFeatureControl('open');
+					} else if (e.key === 'd' && this.haveSelect) {
+						this.diskFeatureControl('download');
+					} else if (e.key === 'Delete' && this.haveSelect) {
+						this.diskFeatureControl('delete');
+					}
+				} else if (e.altKey) {
+					if (e.key === 'Enter' && this.diskInfo.selectFiles.length === 1) {
+						this.diskFeatureControl('info');
+					}
+				} else {
+					if (e.key === 'Delete' && this.haveSelect) {
+						this.diskFeatureControl(this.diskInfo.categoryType === 'trash' ? 'delete' : 'trash');
+					}
+				}
+
+				if (e.key === 'F2' && this.diskInfo.selectFiles.length === 1) {
+					this.diskFeatureControl('rename');
+				}
+
+				if (e.key === 'Control') {
+					this.diskInfo.keyFlag = 'Control';
+				}
 
-      let isDragMove = this.draggingFilesStyle.display === 'flex';
+				if (e.key === 'Shift') {
+					this.diskInfo.keyFlag = 'Shift';
+				}
+			});
 
-      switch (commend) {
-        case 'quick-open':
-          if (this.diskData[0]) {
-            this.$set(this.diskData[0], 'active', true);
-          }
+			document.addEventListener('keyup', (e) => {
+				this.diskInfo.keyFlag = null;
+			});
+		},
 
-          this.openFileHandle(this.diskData[0]);
+		categoryChange(category, type) {
+			this.diskInfo.categoryType = category.data;
 
-          break;
+			this.diskInfo.category = category.name === '全部文件' ? '网盘' : category.name;
+
+			this.resetData();
 
-        case 'go-where':
-          this.$api.disk.fileInfo(
-            {
-              id: this.diskInfo.select.id,
-            },
+			this.diskNavigationControl('clear');
 
-            (rs) => {
-              this.diskInfo.categoryType = 'all';
+			/** 切换到e-CTD */
 
-              this.diskInfo.category = '网盘';
+			if (type === 'ectd') {
+				/** 国家规范 */
 
-              if (rs.data.address.length === 1) {
-                this.resetData(1);
-              } else {
-                rs.data.address.splice(rs.data.address.length - 1, 1);
+				this.diskInfo.country = category.country;
+			} else if (type !== 'trans') {
+				this.getDiskData();
+			} else {
+				this.saveInfoToRoute();
 
-                let navData = rs.data.address;
+				this.updateCount();
+			}
+		},
 
-                this.resetData(navData[navData.length - 1].id);
+		resetData(id) {
+			this.diskInfo.id = id || 1;
 
-                this.diskInfo.navData = navData;
-              }
+			this.diskInfo.page = 1;
 
-              this.getDiskData();
-            }
-          );
+			this.diskData = [];
 
-          break;
+			this.loading = true;
 
-        case 'open':
-          if (this.navType === 'share') {
-            return;
-          }
+			this.clearSelect();
+		},
 
-          let item = this.diskInfo.select;
+		getDiskData(keyword) {
+			let obj = {
+				page: this.diskInfo.page,
 
-          if (item.type === 'folder') {
-            this.resetData(item.id);
+				parentId: this.diskInfo.id,
 
-            this.diskInfo.categoryType = 'all';
+				category: this.diskInfo.categoryType,
+			};
 
-            this.getDiskData();
+			this.saveInfoToRoute();
 
-            this.diskInfo.navData.push(item);
-          } else {
-            this.openFileHandle(item);
-          }
+			keyword ? (obj.keyWord = keyword) : '';
 
-          break;
+			this.$api.disk.list(obj, (rs) => {
+				this.loading = false;
 
-        case 'uploadFolder':
-          this.$refs.inputFolderFile.click();
+				this.diskInfo.count = rs.data.count;
 
-          break;
+				this.diskData = [...this.diskData, ...rs.data.rows];
+			});
+		},
 
-        case 'upload':
-          this.$refs.inputFile.click();
+		loadMoreDiskData(e) {
+			this.$scrollEnd(
+				e,
 
-          break;
+				() => {
+					if (!this.loading && this.diskData.length < this.diskInfo.count) {
+						this.diskInfo.page++;
 
-        case 'download':
-          let selectDownload = [];
+						this.getDiskData();
+					}
+				},
 
-          if (this.diskInfo.selectFiles.length) {
-            selectDownload = this.diskInfo.selectFiles.filter((item) => {
-              return item.type === 'file';
-            });
-          } else {
-            if (this.diskInfo.select && this.diskInfo.select.type === 'file') {
-              selectDownload.push(this.diskInfo.select);
-            }
-          }
+				0
+			);
+		},
 
-          let tips = selectDownload.length > 1 ? '所选' + selectDownload.length + '个项目' : selectDownload[0].name;
+		mainMouseControl(e) {
+			if (e.button === 0) {
+				this.clearSelect();
+			} else {
+				this.mouseDownWhere = 'area';
+			}
 
-          this.prepareDownload(selectDownload);
+			this.mouseSelect();
+		},
 
-          selectDownload = [];
+		selectFile(event, item, index) {
+			this.mouseDownWhere = 'file';
 
-          this.$Message.info(tips + '已加入下载列队');
+			//左键//右键
 
-          break;
+			if (event.button === 0 || event.button === 2) {
+				event.stopPropagation();
 
-        case 'reload':
-          this.diskNavigationControl('reload');
+				let area = this.$refs.diskFileArea;
 
-          break;
+				if (this.diskInfo.categoryType !== 'trash' && this.navType !== 'share') {
+					if (!this.diskInfo.keyFlag) {
+						if (this.diskInfo.selectFiles.length === 0) {
+							item.active = true;
 
-        case 'move':
-          treeViewer(
-            '请选择要移动到的目录',
+							this.diskInfo.select = item;
+						} else {
+							let hasFlag = this.diskInfo.selectFiles.filter((select) => {
+								return select.id === item.id;
+							});
 
-            (select) => {
-              if (select) {
-                let data = this.getSelectData(this.diskInfo.selectFiles);
+							if (!hasFlag.length) {
+								this.clearSelect();
 
-                this.$api.disk.move(
-                  {
-                    id: data,
+								item.active = true;
 
-                    target: select.id,
-                  },
+								this.diskInfo.select = item;
+							}
+						}
+					}
 
-                  () => {
-                    this.removeSelect(data);
-                  }
-                );
-              }
-            },
+					document.onmousemove = (e) => {
+						e.stopPropagation();
 
-            this.diskInfo.selectFiles
-          );
+						e.preventDefault();
 
-          break;
+						this.draggingFilesStyle = {
+							display: 'flex',
 
-        case 'copy':
+							left: e.clientX - area.getBoundingClientRect().left + 5 + 'px',
 
-        case 'cut':
-          this.diskFeatureControl('clear');
+							top: e.clientY - area.getBoundingClientRect().top + 5 + 'px',
+						};
+					};
+				}
 
-          this.diskInfo.clipboard = this.diskInfo.selectFiles;
+				document.onmouseup = () => {
+					document.onmousemove = null;
 
-          if (this.diskInfo.clipboard.length) {
-            if (!isDragMove) {
-              let tips = this.diskInfo.clipboard.length > 1 ? '所选' + this.diskInfo.clipboard.length + '个项目' : this.diskInfo.clipboard[0].name;
+					if (this.draggingFilesStyle.display === 'flex') {
+						let dropItem = this.diskData.filter((item) => {
+							return item.hover && item.type === 'folder';
+						});
 
-              tips = tips + '已' + (commend === 'copy' ? '复制' : '剪切') + '到剪贴板';
+						//拖拽移动文件不会经过默认的条件判断，所以在这里做了
 
-              this.$Message.info(tips);
-            }
+						if (dropItem.length) {
+							dropItem = dropItem[0];
 
-            this.diskInfo.clipboardType = commend === 'cut' ? 'move' : commend;
-          }
+							let flag = this.diskInfo.selectFiles.filter((item) => {
+								return item.id === dropItem.id;
+							});
 
-          break;
+							/*判断拖拽的文件在放置的时候是否包含自身*/
 
-        case 'paste': //粘贴
-          let cutFlag = true;
+							if (!flag.length) {
+								this.diskFeatureControl('cut');
 
-          let copySize = 0;
+								this.diskFeatureControl('paste');
+							}
+						}
 
-          let clipboardType = this.diskInfo.clipboardType;
+						this.draggingFilesStyle = {
+							display: 'none',
 
-          let targetId = this.diskInfo.id;
+							left: 0,
 
-          if (this.diskInfo.clipboard.length === 0) {
-            return;
-          }
+							top: 0,
+						};
 
-          this.diskInfo.clipboard.forEach((item) => {
-            copySize = copySize + parseInt(item.disk_size);
+						return;
+					}
 
-            if (this.diskInfo.id === item.id || (!isDragMove && item.parentId === this.diskInfo.id)) {
-              //剪切文件和目标地址相同
+					if (this.diskInfo.keyFlag === 'Control') {
+						//Ctrl多选
 
-              this.diskFeatureControl('clear');
+						item.active = !item.active; //反选
+					} else if (this.diskInfo.keyFlag === 'Shift') {
+						//Shift多选
 
-              cutFlag = false;
-            }
-          });
+						let Start = index,
+							End;
 
-          if (clipboardType === 'copy') {
-            if (copySize > this.diskInfo.size.left) {
-              return this.$Message.error('空间不足！请清理一些文件后重试');
-            }
-          } else {
-            if (isDragMove) {
-              targetId = this.diskData.filter((item) => {
-                return item.hover && item.type === 'folder';
-              })[0].id;
-            }
-          }
+						item.active = true;
 
-          if (!cutFlag) {
-            return this.$Message.warning('剪贴板内包含粘贴目标，请重新选择');
-          }
+						if (this.diskInfo.select.id) {
+							for (let i = 0; i < this.diskData.length; i++) {
+								if (this.diskData[i].id === this.diskInfo.select.id) {
+									Start = i;
+								}
 
-          if (!isDragMove) {
-            this.$Message.info(`正在${clipboardType === 'copy' ? '复制' : '剪切'}文件，请稍候`);
-          }
+								if (this.diskData[i].id === item.id) {
+									End = i;
+								}
+							}
+						}
 
-          let clipboardData = this.getSelectData(this.diskInfo.clipboard);
+						this.clearSelect(true);
 
-          this.$api.disk[clipboardType](
-            {
-              id: clipboardData,
+						for (let j = Math.min(End, Start); j < Math.max(End, Start) + 1; j++) {
+							this.diskData[j].active = true;
+						}
+					} else if (!this.diskInfo.keyFlag) {
+						if (event.button === 2) {
+							//如果是右键，判断当前是否在已选中的里面
 
-              target: targetId,
-            },
+							let hasIndex = this.diskInfo.selectFiles.filter((file) => {
+								return file.id === item.id;
+							});
 
-            () => {
-              let data = JSON.handle(this.diskInfo.clipboard);
+							if (!hasIndex.length) {
+								//单选
 
-              let CopyFlag = data.filter((item) => {
-                return item.parentId === this.diskInfo.id;
-              }); //判断是否有复制和粘贴时同一个目录的
+								this.clearSelect();
 
-              if (CopyFlag.length) {
-                this.diskNavigationControl('reload');
-              } else {
-                data.forEach((item) => {
-                  if (this.diskInfo.clipboardType === 'copy') {
-                    item.name = item.name + '-复制';
-                  }
+								item.active = true;
 
-                  item.parentId = this.diskInfo.id;
+								this.diskInfo.select = item;
+							}
+						} else {
+							//左键直接取消原有的选中
 
-                  this.diskData.push(item);
-                });
-              }
+							this.clearSelect();
 
-              if (!isDragMove) {
-                this.$Message.success(`${clipboardType === 'copy' ? '复制' : '剪切'}成功，共${this.diskInfo.clipboard.length}个项目`);
-              }
+							item.active = true;
 
-              this.diskFeatureControl('clear');
-            }
-          );
+							this.diskInfo.select = item;
+						}
+					}
+				};
+			}
+		},
 
-          break;
+		dropUploadTips(show) {
+			if (this.diskInfo.categoryType === 'all') {
+				this.showUploadTips = show;
+			}
+		},
 
-        case 'clear':
-          this.diskInfo.clipboard = [];
+		dropUpload(e) {
+			if (this.diskInfo.categoryType === 'all') {
+				dropHandle.init(e, (data) => {
+					this.uploadFolder(data.folder, 'drop');
 
-          break;
+					if (data.file.length) {
+						this.prepareUpload(data.file, 'drop');
+					}
+				});
 
-        case 'newFolder':
-          this.popupWindow({
-            title: '新建文件夹',
+				this.showUploadTips = false;
+			}
+		},
 
-            tips: '请输入文件夹名称',
+		mouseSelect() {
+			event.preventDefault();
 
-            callback: (value) => {
-              if (value.length === 0) {
-                return this.$Message.error('文件夹名称不能为空');
-              }
+			event.stopPropagation();
 
-              if (this.validateFileName(value)) {
-                return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
-              }
+			let area = this.$refs.diskFileArea;
 
-              this.$api.disk.newFolder(
-                {
-                  parentId: this.diskInfo.id,
+			let start = {
+				x: event.clientX - area.getBoundingClientRect().left + area.scrollLeft,
 
-                  name: value,
-                },
+				y: event.clientY - area.getBoundingClientRect().top + area.scrollTop,
 
-                (rs) => {
-                  this.diskData.push(this.$api.disk.diskData(rs.data));
+				maxy: area.scrollHeight,
+			};
 
-                  this.$Message.success(value + '已创建');
-                }
-              );
-            },
-          });
+			this.mouseSelectData.left = start.x;
 
-          break;
+			this.mouseSelectData.top = start.y;
 
-        case 'newAllFolder':
-          this.popupWindow({
-            title: '新建文件夹',
+			document.onmouseup = () => {
+				this.mouseSelectData = {
+					left: 0,
 
-            tips: '请输入生成的个数',
+					top: 0,
 
-            callback: (value) => {
-              if (value.length === 0) {
-                return this.$Message.error('文件夹名称不能为空');
-              }
+					width: 0,
 
-              if (this.validateFileName(value)) {
-                return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
-              }
+					height: 0,
+				};
 
-              let arr = [];
+				document.onmousemove = null;
+			};
 
-              if (this.diskInfo.navData.length) {
-                this.diskInfo.navData.map((item, index) => {
-                  arr.push(item.name);
-                });
+			document.onmousemove = (ev) => {
+				let end = {
+					x: ev.clientX - area.getBoundingClientRect().left + area.scrollLeft,
 
-                arr.push(value);
-              } else {
-                arr.push(value);
-              }
+					y: ev.clientY - area.getBoundingClientRect().top + area.scrollTop,
 
-              for (let i = 1; i <= value; i++) {
-                this.$api.disk.newFolder(
-                  {
-                    parentId: this.diskInfo.id,
+					scrolldown: Math.min(ev.clientY - area.getBoundingClientRect().top, event.clientY - area.getBoundingClientRect().top) + 10 + area.offsetHeight,
 
-                    name: Number(i),
-                  },
+					scrollup: Math.min(ev.clientY - area.getBoundingClientRect().top, event.clientY - area.getBoundingClientRect().top),
+				};
 
-                  (rs) => {
-                    this.$Message.success(i + '已创建');
+				this.mouseSelectData = {
+					left: Math.min(start.x, end.x) + 'px',
 
-                    this.diskData.push(this.$api.disk.diskData(rs.data));
-                  }
-                );
-              }
-            },
-          });
+					top: Math.min(start.y, end.y) + 'px',
 
-          break;
+					width: Math.abs(end.x - start.x) + 'px',
 
-        case 'rename':
-          this.popupWindow({
-            title: '重命名',
+					height: Math.abs(end.y - start.y) + 'px',
+				};
 
-            tips: '请输入新的文件/文件夹名称',
+				let area_data = {
+					left: Math.min(start.x, end.x),
 
-            value: this.diskInfo.selectFiles[0].name,
+					top: Math.min(start.y, end.y),
 
-            callback: (value) => {
-              if (value.length === 0) {
-                return this.$Message.error('文件名不能为空');
-              }
+					width: Math.abs(end.x - start.x),
 
-              if (this.validateFileName(value)) {
-                return this.$Message.error('文件名称不能包含【\\\\\\\\/:*?\\"<>|】');
-              }
+					height: Math.abs(end.y - start.y),
+				};
 
-              this.$api.disk.rename(
-                {
-                  id: this.diskInfo.selectFiles[0].id,
+				let selList = document.getElementsByClassName('file');
 
-                  name: value,
-                },
+				this.clearSelect();
 
-                () => {
-                  this.diskInfo.select.name = value;
+				for (let i = 0; i < selList.length; i++) {
+					let sl = selList[i].offsetWidth + selList[i].offsetLeft,
+						st = selList[i].offsetHeight + selList[i].offsetTop;
 
-                  this.$Message.success('重命名成功');
-                }
-              );
-            },
-          });
+					let area_l = area_data.left + area_data.width;
 
-          break;
+					let area_t = area_data.top + area_data.height;
 
-        case 'trash': //移入回收站
-          let data = this.getSelectData();
+					if (sl > area_data.left && st > area_data.top && selList[i].offsetLeft < area_l && selList[i].offsetTop < area_t) {
+						if (this.diskData[i].active !== true) {
+							this.diskData[i].active = true;
+						}
+					} else {
+						if (this.diskData[i].active) {
+							this.diskData[i].active = false;
+						}
+					}
+				}
+			};
+		},
 
-          this.$confirm('移入回收站', '是否将所选' + data.length + '个项目移入回收站', {}).then(() => {
-            this.$api.disk.trash(
-              {
-                id: data,
-              },
+		clearSelect(flag) {
+			this.diskData.forEach((item, index) => {
+				item.active = false;
 
-              () => {
-                this.removeSelect(data);
+				item.hover = false;
+			});
 
-                this.$Message.success('移入回收站成功');
-              }
-            );
-          });
+			if (!flag) {
+				this.diskInfo.select = {};
+			}
 
-          break;
+			//this.diskInfo.selectFiles = [];
+		},
 
-        case 'restore': //文件还原
-          let restoreData = this.getSelectData();
+		verifyUploadSize(files) {
+			let result = [];
 
-          this.$confirm('移出回收站', '是否将所选' + restoreData.length + '个项目移出回收站', {}).then(() => {
-            this.$api.disk.recover(
-              {
-                id: restoreData,
-              },
+			let totalSize = 0;
 
-              () => {
-                this.removeSelect(restoreData);
+			for (let i = 0; i < files.length; i++) {
+				if (files[i].size < this.maxFileSize) {
+					result.push(files[i]);
 
-                this.$Message.success('还原成功');
-              }
-            );
-          });
+					totalSize = totalSize + files[i].size;
+				} else {
+					this.$Message.warning(files[i].name + '超过' + this.maxFileSizeText + '已过滤');
+				}
+			}
 
-          break;
+			let uploadingSize = this.uploadList.reduce((a, b) => {
+				if (b._state !== 'finish') {
+					a = a + b.size;
+				}
 
-        case 'delete': //文件删除
-          let deleteData = this.getSelectData();
+				return a;
+			}, 0);
 
-          this.$confirm('删除', '是否将所选' + deleteData.length + '个项目彻底删除', {}).then(() => {
-            this.$api.disk.delete(
-              {
-                id: deleteData,
-              },
+			if (totalSize && totalSize > this.diskInfo.size.left - uploadingSize) {
+				this.$Message.error('剩余空间不足');
 
-              () => {
-                this.removeSelect(deleteData);
+				return [];
+			}
 
-                this.initDiskInfo();
+			return result;
+		},
 
-                this.$Message.success('删除成功');
-              }
-            );
-          });
+		uploadFolder(e, type = 'normal') {
+			let files = [];
 
-          break;
+			if (type === 'drop') {
+				files = e;
+			} else {
+				files = e.target.files;
+			}
 
-        case 'info':
-          let infoId = this.diskInfo.select.id + 'info';
+			files = this.verifyUploadSize(files);
 
-          if (this.fileViewer[infoId] && !this.$isElectron) {
-            return this.fileViewer[infoId].active();
-          }
+			if (files.length > 500) {
+				if (type === 'normal') {
+					e.target.value = '';
+				}
 
-          this.fileViewer[infoId] = this.$cloudWindow({
-            url: 'disk-file-info',
+				this.$Message.warning('文件/目录过多');
 
-            component: require('./viewer/diskInfo'),
+				return;
+			}
 
-            data: this.diskInfo.select,
+			this.$Message.info('空文件夹将不会创建');
 
-            only: true,
+			this.$api.disk.uploadFolder(
+				{
+					folder: uploadFolder.init(files),
 
-            name: infoId,
+					parentId: this.diskInfo.id,
+				},
 
-            width: 350,
+				(rs) => {
+					this.diskData.push(this.$api.disk.diskData(rs.data.main));
 
-            height: 450,
+					let data = uploadFolder.mateParent(files, rs.data.folders);
 
-            title: '文件属性',
+					for (let parentId in data) {
+						if (data.hasOwnProperty(parentId)) {
+							this.prepareUpload(data[parentId], 'folder', parentId, true);
+						}
+					}
 
-            maximizable: false,
+					uploadHandle.canStart();
 
-            minimizable: false,
+					if (type === 'normal') {
+						e.target.value = '';
+					}
+				},
 
-            resizable: false,
+				() => {
+					if (type === 'normal') {
+						e.target.value = '';
+					}
+				}
+			);
+		},
 
-            frame: this.isWebCloudDisk,
+		prepareUpload(e, type, parentId, paused) {
+			let files = [];
 
-            close: () => {
-              delete this.fileViewer[infoId];
-            },
+			if (type === 'folder' || type === 'drop') {
+				files = e;
+			} else {
+				files = e.target.files;
+			}
 
-            callback: (com) => {
-              com.init(this.diskInfo.select);
-            },
-          });
+			if (type !== 'folder') {
+				if (files.length === 0) {
+					if (!type) {
+						e.target.value = '';
+					}
 
-          break;
+					return;
+				}
 
-        case 'share':
-          let file = this.diskInfo.selectFiles[0];
+				files = this.verifyUploadSize(files);
+			}
 
-          if (file.share) {
-            this.$confirm('取消分享', '取消后将无法通过链接访问该分享', {}).then(() => {
-              this.$api.disk.cancelShare(
-                {
-                  id: file.id,
-                },
+			uploadHandle.init(
+				files,
 
-                () => {
-                  this.diskInfo.select.share = '';
+				{
+					parentId: parentId || this.diskInfo.id,
+				},
 
-                  this.$Message.success('分享已取消');
+				(data, fileData) => {
+					console.log(data, fileData, 'xxx');
 
-                  if (this.navType === 'share') {
-                    this.removeSelect([file.id]);
-                  }
-                }
-              );
-            });
+					this.uploadList = data;
 
-            return;
-          }
+					if (fileData && type !== 'folder') {
+						this.diskData.push(this.$api.disk.diskData(fileData));
 
-          if (shareWin) {
-            shareWin.component.init(this.diskInfo.select);
+						this.transFinish(fileData, 'upload');
 
-            shareWin.config.title = '分享文件:' + file.name;
+						this.initDiskInfo();
+					}
+				},
 
-            shareWin.active();
+				paused
+			);
 
-            return;
-          }
+			if (!type) {
+				e.target.value = '';
+			}
+		},
 
-          shareWin = this.$cloudWindow({
-            component: require('./viewer/shareViewer'),
+		prepareDownload(files, paused) {
+			downloadHandle.init(
+				files,
 
-            only: true,
+				this.$isElectron,
 
-            width: 600,
+				(data, finish) => {
+					this.downloadList = data;
 
-            height: 400,
+					if (finish) {
+						this.transFinish(finish, 'download');
+					}
+				},
 
-            background: '#eee',
+				paused
+			);
+		},
 
-            color: '#606060',
+		transFinish(item, type) {
+			if (this.settingConfig.noticeBubble) {
+				this.$notify(item.name, type === 'upload' ? '上传完成' : '下载完成');
+			}
 
-            title: '分享文件:' + file.name,
+			if (this.settingConfig.noticeFlag) {
+				if (this.noticeSrc) {
+					this.$refs.audio.play();
+				}
+			}
+		},
 
-            minimizable: false,
+		diskNavigationControl(commend, func) {
+			switch (commend) {
+				case 'back': //后退
+					if (this.diskInfo.navData.length > 1) {
+						this.diskNavigationControl(this.diskInfo.navData[this.diskInfo.navData.length - 2]);
+					} else {
+						this.diskNavigationControl('home');
+					}
 
-            maximizable: false,
+					break;
 
-            resizable: false,
+				case 'home': //返回顶层
+					if (this.diskInfo.categoryType === 'share') {
+						this.SwitchType('share');
 
-            frame: true,
+						this.diskNavigationControl('clear');
+					} else if (this.diskInfo.category !== '搜索') {
+						this.resetData(1);
 
-            close: (data) => {
-              shareWin = false;
+						this.getDiskData();
 
-              if (data) {
-                file.share = data;
-              }
-            },
+						this.diskNavigationControl('clear');
+					} else if (this.diskInfo.category === '搜索') {
+						this.SwitchType('disk');
 
-            callback: (com) => {
-              com.init(this.diskInfo.select);
-            },
-          });
+						this.diskNavigationControl('clear');
+					}
 
-          break;
-      }
-    },
+					break;
 
-    openFileHandle (item) {
-      let openType = item.openType;
+				case 'reload': //刷新
+					this.resetData(this.diskInfo.id);
 
-      console.log(item, 'iiii');
+					this.initDiskInfo();
 
-      let mediaFileType = ['image', 'video', 'audio'];
+					this.getDiskData();
 
-      if (openType === 'zip') {
-        this.openFile(openType, item);
-      } else if (openType) {
-        let mediaFile = [];
+					break;
 
-        if (mediaFileType.includes(openType)) {
-          if (this.diskInfo.categoryType === openType) {
-            mediaFile = JSON.handle(this.diskData);
-          } else {
-            this.diskData.forEach((file) => {
-              if (file.openType === openType) {
-                mediaFile.push(file);
-              }
-            });
-          }
+				case 'clear':
+					this.diskInfo.navData = [];
 
-          this.openFile(openType, mediaFile);
-        } else {
-          this.openFile(openType, item);
-        }
-      } else {
-        this.$Message.warning('暂不支持打开该类型文件');
-      }
-    },
+					break;
 
-    openFile (type, data) {
-      let config = {
-        audio: {
-          url: 'disk-music-player',
+				case 'sort':
+					this.diskData = func(this.diskData);
 
-          component: require('./viewer/musicPlayer'),
+					break;
 
-          data: data,
+				case 'search':
+					this.resetData();
 
-          only: true,
+					this.diskInfo.categoryType = 'all';
 
-          name: 'diskMusicPlayer',
+					this.diskInfo.category = '网盘';
 
-          title: '音乐播放器',
+					this.getDiskData(func);
 
-          hideTitle: true,
+					break;
 
-          width: 350,
+				default:
+					//默认切换
 
-          height: 535,
+					for (let i = this.diskInfo.navData.length - 1; i > 0; i--) {
+						if (commend === this.diskInfo.navData[i]) {
+							break;
+						}
 
-          maximizable: false,
+						this.diskInfo.navData.splice(i, 1);
+					}
 
-          minimizable: false,
+					this.resetData(commend.id);
 
-          resizable: false,
+					this.getDiskData();
 
-          frame: this.isWebCloudDisk,
+					break;
+			}
+		},
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+		diskFeatureControl(commend) {
+			console.log(commend, 'commendcommend');
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+			let isDragMove = this.draggingFilesStyle.display === 'flex';
 
-        video: {
-          url: 'disk-video-player',
+			switch (commend) {
+				case 'quick-open':
+					if (this.diskData[0]) {
+						this.$set(this.diskData[0], 'active', true);
+					}
 
-          component: require('./viewer/videoPlayer'),
+					this.openFileHandle(this.diskData[0]);
 
-          data: data,
+					break;
 
-          only: true,
+				case 'go-where':
+					this.$api.disk.fileInfo(
+						{
+							id: this.diskInfo.select.id,
+						},
 
-          name: 'diskVideoPlayer',
+						(rs) => {
+							this.diskInfo.categoryType = 'all';
 
-          title: '视频播放器',
+							this.diskInfo.category = '网盘';
 
-          width: 750,
+							if (rs.data.address.length === 1) {
+								this.resetData(1);
+							} else {
+								rs.data.address.splice(rs.data.address.length - 1, 1);
 
-          height: 500,
+								let navData = rs.data.address;
 
-          minWidth: 750,
+								this.resetData(navData[navData.length - 1].id);
 
-          minHeight: 500,
+								this.diskInfo.navData = navData;
+							}
 
-          background: '#1e1e1e',
+							this.getDiskData();
+						}
+					);
 
-          color: '#fff',
+					break;
 
-          minimizable: !this.isWebCloudDisk,
+				case 'open':
+					if (this.navType === 'share') {
+						return;
+					}
 
-          frame: this.isWebCloudDisk,
+					let item = this.diskInfo.select;
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+					if (item.type === 'folder') {
+						this.resetData(item.id);
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+						this.diskInfo.categoryType = 'all';
 
-        pdf: {
-          url: 'disk-pdf-viewer',
+						this.getDiskData();
 
-          component: require('./viewer/pdfViewer'),
+						this.diskInfo.navData.push(item);
+					} else {
+						this.openFileHandle(item);
+					}
 
-          data: data,
+					break;
 
-          only: true,
+				case 'uploadFolder':
+					this.$refs.inputFolderFile.click();
 
-          name: 'diskPdfViewer',
+					break;
 
-          title: 'PDF阅读器',
+				case 'upload':
+					this.$refs.inputFile.click();
 
-          width: 800,
+					break;
 
-          height: 600,
+				case 'download':
+					let selectDownload = [];
 
-          minWidth: 800,
+					if (this.diskInfo.selectFiles.length) {
+						selectDownload = this.diskInfo.selectFiles.filter((item) => {
+							return item.type === 'file';
+						});
+					} else {
+						if (this.diskInfo.select && this.diskInfo.select.type === 'file') {
+							selectDownload.push(this.diskInfo.select);
+						}
+					}
 
-          minHeight: 600,
+					let tips = selectDownload.length > 1 ? '所选' + selectDownload.length + '个项目' : selectDownload[0].name;
 
-          background: '#323639',
+					this.prepareDownload(selectDownload);
 
-          color: '#fff',
+					selectDownload = [];
 
-          minimizable: !this.isWebCloudDisk,
+					this.$Message.info(tips + '已加入下载列队');
 
-          frame: this.isWebCloudDisk,
+					break;
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+				case 'reload':
+					this.diskNavigationControl('reload');
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+					break;
 
-        image: {
-          url: 'disk-image-viewer',
+				case 'move':
+					treeViewer(
+						'请选择要移动到的目录',
 
-          component: require('./viewer/imageViewer'),
+						(select) => {
+							if (select) {
+								let data = this.getSelectData(this.diskInfo.selectFiles);
 
-          data: data,
+								this.$api.disk.move(
+									{
+										id: data,
 
-          only: true,
+										target: select.id,
+									},
 
-          name: 'diskImageViewer',
+									() => {
+										this.removeSelect(data);
+									}
+								);
+							}
+						},
 
-          title: '图片查看器',
+						this.diskInfo.selectFiles
+					);
 
-          width: 800,
+					break;
 
-          height: 600,
+				case 'copy':
 
-          minWidth: 800,
+				case 'cut':
+					this.diskFeatureControl('clear');
 
-          minHeight: 600,
+					this.diskInfo.clipboard = this.diskInfo.selectFiles;
 
-          background: '#f8fdff',
+					if (this.diskInfo.clipboard.length) {
+						if (!isDragMove) {
+							let tips = this.diskInfo.clipboard.length > 1 ? '所选' + this.diskInfo.clipboard.length + '个项目' : this.diskInfo.clipboard[0].name;
 
-          color: '#6d6d6d',
+							tips = tips + '已' + (commend === 'copy' ? '复制' : '剪切') + '到剪贴板';
 
-          minimizable: !this.isWebCloudDisk,
+							this.$Message.info(tips);
+						}
 
-          frame: this.isWebCloudDisk,
+						this.diskInfo.clipboardType = commend === 'cut' ? 'move' : commend;
+					}
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+					break;
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+				case 'paste': //粘贴
+					let cutFlag = true;
 
-        text: {
-          url: 'disk-text-viewer',
+					let copySize = 0;
 
-          component: require('./viewer/textViewer'),
+					let clipboardType = this.diskInfo.clipboardType;
 
-          data: data,
+					let targetId = this.diskInfo.id;
 
-          only: true,
+					if (this.diskInfo.clipboard.length === 0) {
+						return;
+					}
 
-          name: 'diskTextViewer',
+					this.diskInfo.clipboard.forEach((item) => {
+						copySize = copySize + parseInt(item.disk_size);
 
-          title: '文本查看器',
+						if (this.diskInfo.id === item.id || (!isDragMove && item.parentId === this.diskInfo.id)) {
+							//剪切文件和目标地址相同
 
-          width: 800,
+							this.diskFeatureControl('clear');
 
-          height: 600,
+							cutFlag = false;
+						}
+					});
 
-          minWidth: 800,
+					if (clipboardType === 'copy') {
+						if (copySize > this.diskInfo.size.left) {
+							return this.$Message.error('空间不足！请清理一些文件后重试');
+						}
+					} else {
+						if (isDragMove) {
+							targetId = this.diskData.filter((item) => {
+								return item.hover && item.type === 'folder';
+							})[0].id;
+						}
+					}
 
-          minHeight: 600,
+					if (!cutFlag) {
+						return this.$Message.warning('剪贴板内包含粘贴目标，请重新选择');
+					}
 
-          background: '#fff',
+					if (!isDragMove) {
+						this.$Message.info(`正在${clipboardType === 'copy' ? '复制' : '剪切'}文件，请稍候`);
+					}
 
-          color: '#6d6d6d',
+					let clipboardData = this.getSelectData(this.diskInfo.clipboard);
 
-          minimizable: !this.isWebCloudDisk,
+					this.$api.disk[clipboardType](
+						{
+							id: clipboardData,
 
-          frame: this.isWebCloudDisk,
+							target: targetId,
+						},
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+						() => {
+							let data = JSON.handle(this.diskInfo.clipboard);
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+							let CopyFlag = data.filter((item) => {
+								return item.parentId === this.diskInfo.id;
+							}); //判断是否有复制和粘贴时同一个目录的
 
-        office: {
-          url: 'disk-office-viewer',
+							if (CopyFlag.length) {
+								this.diskNavigationControl('reload');
+							} else {
+								data.forEach((item) => {
+									if (this.diskInfo.clipboardType === 'copy') {
+										item.name = item.name + '-复制';
+									}
 
-          component: require('./viewer/officeViewer'),
+									item.parentId = this.diskInfo.id;
 
-          data: data,
+									this.diskData.push(item);
+								});
+							}
 
-          only: true,
+							if (!isDragMove) {
+								this.$Message.success(`${clipboardType === 'copy' ? '复制' : '剪切'}成功，共${this.diskInfo.clipboard.length}个项目`);
+							}
 
-          name: 'diskOfficeViewer',
+							this.diskFeatureControl('clear');
+						}
+					);
 
-          title: 'office预览',
+					break;
 
-          width: 800,
+				case 'clear':
+					this.diskInfo.clipboard = [];
 
-          height: 600,
+					break;
 
-          minWidth: 800,
+				case 'newFolder':
+					this.popupWindow({
+						title: '新建文件夹',
 
-          minHeight: 600,
+						tips: '请输入文件夹名称',
 
-          background: '#fff',
+						callback: (value) => {
+							if (value.length === 0) {
+								return this.$Message.error('文件夹名称不能为空');
+							}
 
-          color: '#6d6d6d',
+							if (this.validateFileName(value)) {
+								return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
+							}
 
-          minimizable: !this.isWebCloudDisk,
+							this.$api.disk.newFolder(
+								{
+									parentId: this.diskInfo.id,
 
-          frame: this.isWebCloudDisk,
+									name: value,
+								},
 
-          eleCallback: 'listenOpen()',
+								(rs) => {
+									this.diskData.push(this.$api.disk.diskData(rs.data));
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+									this.$Message.success(value + '已创建');
+								}
+							);
+						},
+					});
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
+					break;
 
-        zip: {
-          url: 'disk-zipper-viewer',
+				case 'newAllFolder':
+					this.popupWindow({
+						title: '新建文件夹',
 
-          component: require('./viewer/zipViewer'),
+						tips: '请输入生成的个数',
 
-          data: data,
+						callback: (value) => {
+							if (value.length === 0) {
+								return this.$Message.error('文件夹名称不能为空');
+							}
 
-          only: true,
+							if (this.validateFileName(value)) {
+								return this.$Message.error('文件夹名称不能包含【\\\\\\\\/:*?\\"<>|】');
+							}
 
-          name: 'diskZipperViewer',
+							let arr = [];
 
-          title: data.name + '-压缩文件查看',
+							if (this.diskInfo.navData.length) {
+								this.diskInfo.navData.map((item, index) => {
+									arr.push(item.name);
+								});
 
-          width: 750,
+								arr.push(value);
+							} else {
+								arr.push(value);
+							}
 
-          height: 500,
+							for (let i = 1; i <= value; i++) {
+								this.$api.disk.newFolder(
+									{
+										parentId: this.diskInfo.id,
 
-          minWidth: 750,
+										name: Number(i),
+									},
 
-          minHeight: 500,
+									(rs) => {
+										this.$Message.success(i + '已创建');
 
-          background: 'linear-gradient(to right, #38f 0%, #00f2fe 100%)',
+										this.diskData.push(this.$api.disk.diskData(rs.data));
+									}
+								);
+							}
+						},
+					});
 
-          color: '#fff',
+					break;
 
-          minimizable: !this.isWebCloudDisk,
+				case 'rename':
+					this.popupWindow({
+						title: '重命名',
 
-          frame: this.isWebCloudDisk,
+						tips: '请输入新的文件/文件夹名称',
 
-          close: () => {
-            delete this.fileViewer[type];
-          },
+						value: this.diskInfo.selectFiles[0].name,
 
-          callback: (com) => {
-            com.init(data);
-          },
-        },
-      };
+						callback: (value) => {
+							if (value.length === 0) {
+								return this.$Message.error('文件名不能为空');
+							}
 
-      if (this.fileViewer[type] && !this.$isElectron) {
-        return this.fileViewer[type].active((com) => {
-          com.init(data);
-        });
-      }
+							if (this.validateFileName(value)) {
+								return this.$Message.error('文件名称不能包含【\\\\\\\\/:*?\\"<>|】');
+							}
 
-      this.fileViewer[type] = this.$cloudWindow(config[type]);
-    },
+							this.$api.disk.rename(
+								{
+									id: this.diskInfo.selectFiles[0].id,
 
-    getSelectData (data) {
-      data = data ? data : this.diskInfo.selectFiles;
+									name: value,
+								},
 
-      let result = data.reduce((a, b) => {
-        a.push(b.id);
+								() => {
+									this.diskInfo.select.name = value;
 
-        return a;
-      }, []);
+									this.$Message.success('重命名成功');
+								}
+							);
+						},
+					});
 
-      if (this.diskInfo.select && result.length === 0) {
-        result.push(this.diskInfo.select.id);
-      }
+					break;
 
-      return result;
-    },
+				case 'trash': //移入回收站
+					let data = this.getSelectData();
 
-    removeSelect (data) {
-      for (let i = 0; i < this.diskData.length; i++) {
-        for (let j = 0; j < data.length; j++) {
-          if (this.diskData[i] && data[j] === this.diskData[i].id) {
-            this.diskData.splice(i, 1);
-          }
-        }
-      }
-    },
+					this.$confirm('移入回收站', '是否将所选' + data.length + '个项目移入回收站', {}).then(() => {
+						this.$api.disk.trash(
+							{
+								id: data,
+							},
 
-    removeTrans (data) {
-      if (data._type === 'download') {
-        downloadHandle.removeList(data.key);
-      } else {
-        uploadHandle.removeList(data.key);
-      }
-    },
+							() => {
+								this.removeSelect(data);
 
-    updateCount () {
-      let uploading = this.uploadList.filter((item) => {
-        return item._state !== 'finish';
-      }).length;
+								this.$Message.success('移入回收站成功');
+							}
+						);
+					});
 
-      let downloading = this.downloadList.filter((item) => {
-        return item._state !== 'finish';
-      }).length;
+					break;
 
-      let finish = this.downloadList.length + this.uploadList.length - uploading - downloading;
+				case 'restore': //文件还原
+					let restoreData = this.getSelectData();
 
-      let data = {
-        uploading,
+					this.$confirm('移出回收站', '是否将所选' + restoreData.length + '个项目移出回收站', {}).then(() => {
+						this.$api.disk.recover(
+							{
+								id: restoreData,
+							},
 
-        downloading,
+							() => {
+								this.removeSelect(restoreData);
 
-        finish,
+								this.$Message.success('还原成功');
+							}
+						);
+					});
 
-        count: uploading + downloading,
-      };
+					break;
 
-      if (this.navType === 'trans') {
-        this.$nextTick(() => {
-          this.$refs.diskCategory.updateMenuCount(data);
-        });
-      }
+				case 'delete': //文件删除
+					let deleteData = this.getSelectData();
 
-      return data;
-    },
+					this.$confirm('删除', '是否将所选' + deleteData.length + '个项目彻底删除', {}).then(() => {
+						this.$api.disk.delete(
+							{
+								id: deleteData,
+							},
 
-    popupWindow (options) {
-      this.popupWindowOpen = true;
+							() => {
+								this.removeSelect(deleteData);
 
-      let { title, tips, value } = options;
+								this.initDiskInfo();
 
-      this.$inputConfirm({
-        title,
+								this.$Message.success('删除成功');
+							}
+						);
+					});
 
-        tips,
+					break;
 
-        value,
+				case 'info':
+					let infoId = this.diskInfo.select.id + 'info';
 
-        callback: options.callback,
+					if (this.fileViewer[infoId] && !this.$isElectron) {
+						return this.fileViewer[infoId].active();
+					}
 
-        close: () => {
-          this.popupWindowOpen = false;
-        },
-      });
-    },
+					this.fileViewer[infoId] = this.$cloudWindow({
+						url: 'disk-file-info',
 
-    confirm (options) {
-      this.popupWindowOpen = true;
+						component: require('./viewer/diskInfo'),
 
-      let { title, tips } = options;
+						data: this.diskInfo.select,
 
-      this.$confirm({
-        title,
+						only: true,
 
-        tips,
+						name: infoId,
 
-        callback: options.callback,
+						width: 350,
 
-        close: () => {
-          this.popupWindowOpen = false;
-        },
-      });
-    },
+						height: 450,
 
-    validateFileName: function (fileName) {
-      let reg = new RegExp('[\\\\/:*?"<>|]');
+						title: '文件属性',
 
-      return reg.test(fileName);
-    },
+						maximizable: false,
 
-    saveInfoToRoute () {
-      if (this.isWebCloudDisk) {
-        this.$router.replace({
-          query: {
-            // id: this.diskInfo.id,
+						minimizable: false,
 
-            // type: this.navType,
+						resizable: false,
 
-            category: this.diskInfo.categoryType,
+						frame: this.isWebCloudDisk,
 
-            // category_name: this.diskInfo.category,
-          },
-        });
-      }
-    },
-  },
+						close: () => {
+							delete this.fileViewer[infoId];
+						},
+
+						callback: (com) => {
+							com.init(this.diskInfo.select);
+						},
+					});
+
+					break;
+
+				case 'share':
+					let file = this.diskInfo.selectFiles[0];
+
+					if (file.share) {
+						this.$confirm('取消分享', '取消后将无法通过链接访问该分享', {}).then(() => {
+							this.$api.disk.cancelShare(
+								{
+									id: file.id,
+								},
+
+								() => {
+									this.diskInfo.select.share = '';
+
+									this.$Message.success('分享已取消');
+
+									if (this.navType === 'share') {
+										this.removeSelect([file.id]);
+									}
+								}
+							);
+						});
+
+						return;
+					}
+
+					if (shareWin) {
+						shareWin.component.init(this.diskInfo.select);
+
+						shareWin.config.title = '分享文件:' + file.name;
+
+						shareWin.active();
+
+						return;
+					}
+
+					shareWin = this.$cloudWindow({
+						component: require('./viewer/shareViewer'),
+
+						only: true,
+
+						width: 600,
+
+						height: 400,
+
+						background: '#eee',
+
+						color: '#606060',
+
+						title: '分享文件:' + file.name,
+
+						minimizable: false,
+
+						maximizable: false,
+
+						resizable: false,
+
+						frame: true,
+
+						close: (data) => {
+							shareWin = false;
+
+							if (data) {
+								file.share = data;
+							}
+						},
+
+						callback: (com) => {
+							com.init(this.diskInfo.select);
+						},
+					});
+
+					break;
+			}
+		},
+
+		openFileHandle(item) {
+			let openType = item.openType;
+
+			console.log(item, 'iiii');
+
+			let mediaFileType = ['image', 'video', 'audio'];
+
+			if (openType === 'zip') {
+				this.openFile(openType, item);
+			} else if (openType) {
+				let mediaFile = [];
+
+				if (mediaFileType.includes(openType)) {
+					if (this.diskInfo.categoryType === openType) {
+						mediaFile = JSON.handle(this.diskData);
+					} else {
+						this.diskData.forEach((file) => {
+							if (file.openType === openType) {
+								mediaFile.push(file);
+							}
+						});
+					}
+
+					this.openFile(openType, mediaFile);
+				} else {
+					this.openFile(openType, item);
+				}
+			} else {
+				this.$Message.warning('暂不支持打开该类型文件');
+			}
+		},
+
+		openFile(type, data) {
+			let config = {
+				audio: {
+					url: 'disk-music-player',
+
+					component: require('./viewer/musicPlayer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskMusicPlayer',
+
+					title: '音乐播放器',
+
+					hideTitle: true,
+
+					width: 350,
+
+					height: 535,
+
+					maximizable: false,
+
+					minimizable: false,
+
+					resizable: false,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				video: {
+					url: 'disk-video-player',
+
+					component: require('./viewer/videoPlayer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskVideoPlayer',
+
+					title: '视频播放器',
+
+					width: 750,
+
+					height: 500,
+
+					minWidth: 750,
+
+					minHeight: 500,
+
+					background: '#1e1e1e',
+
+					color: '#fff',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				pdf: {
+					url: 'disk-pdf-viewer',
+
+					component: require('./viewer/pdfViewer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskPdfViewer',
+
+					title: 'PDF阅读器',
+
+					width: 800,
+
+					height: 600,
+
+					minWidth: 800,
+
+					minHeight: 600,
+
+					background: '#323639',
+
+					color: '#fff',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				image: {
+					url: 'disk-image-viewer',
+
+					component: require('./viewer/imageViewer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskImageViewer',
+
+					title: '图片查看器',
+
+					width: 800,
+
+					height: 600,
+
+					minWidth: 800,
+
+					minHeight: 600,
+
+					background: '#f8fdff',
+
+					color: '#6d6d6d',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				text: {
+					url: 'disk-text-viewer',
+
+					component: require('./viewer/textViewer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskTextViewer',
+
+					title: '文本查看器',
+
+					width: 800,
+
+					height: 600,
+
+					minWidth: 800,
+
+					minHeight: 600,
+
+					background: '#fff',
+
+					color: '#6d6d6d',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				office: {
+					url: 'disk-office-viewer',
+
+					component: require('./viewer/officeViewer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskOfficeViewer',
+
+					title: 'office预览',
+
+					width: 800,
+
+					height: 600,
+
+					minWidth: 800,
+
+					minHeight: 600,
+
+					background: '#fff',
+
+					color: '#6d6d6d',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					eleCallback: 'listenOpen()',
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+
+				zip: {
+					url: 'disk-zipper-viewer',
+
+					component: require('./viewer/zipViewer'),
+
+					data: data,
+
+					only: true,
+
+					name: 'diskZipperViewer',
+
+					title: data.name + '-压缩文件查看',
+
+					width: 750,
+
+					height: 500,
+
+					minWidth: 750,
+
+					minHeight: 500,
+
+					background: 'linear-gradient(to right, #38f 0%, #00f2fe 100%)',
+
+					color: '#fff',
+
+					minimizable: !this.isWebCloudDisk,
+
+					frame: this.isWebCloudDisk,
+
+					close: () => {
+						delete this.fileViewer[type];
+					},
+
+					callback: (com) => {
+						com.init(data);
+					},
+				},
+			};
+
+			if (this.fileViewer[type] && !this.$isElectron) {
+				return this.fileViewer[type].active((com) => {
+					com.init(data);
+				});
+			}
+
+			this.fileViewer[type] = this.$cloudWindow(config[type]);
+		},
+
+		getSelectData(data) {
+			data = data ? data : this.diskInfo.selectFiles;
+
+			let result = data.reduce((a, b) => {
+				a.push(b.id);
+
+				return a;
+			}, []);
+
+			if (this.diskInfo.select && result.length === 0) {
+				result.push(this.diskInfo.select.id);
+			}
+
+			return result;
+		},
+
+		removeSelect(data) {
+			for (let i = 0; i < this.diskData.length; i++) {
+				for (let j = 0; j < data.length; j++) {
+					if (this.diskData[i] && data[j] === this.diskData[i].id) {
+						this.diskData.splice(i, 1);
+					}
+				}
+			}
+		},
+
+		removeTrans(data) {
+			if (data._type === 'download') {
+				downloadHandle.removeList(data.key);
+			} else {
+				uploadHandle.removeList(data.key);
+			}
+		},
+
+		updateCount() {
+			let uploading = this.uploadList.filter((item) => {
+				return item._state !== 'finish';
+			}).length;
+
+			let downloading = this.downloadList.filter((item) => {
+				return item._state !== 'finish';
+			}).length;
+
+			let finish = this.downloadList.length + this.uploadList.length - uploading - downloading;
+
+			let data = {
+				uploading,
+
+				downloading,
+
+				finish,
+
+				count: uploading + downloading,
+			};
+
+			if (this.navType === 'trans') {
+				this.$nextTick(() => {
+					this.$refs.diskCategory.updateMenuCount(data);
+				});
+			}
+
+			return data;
+		},
+
+		popupWindow(options) {
+			this.popupWindowOpen = true;
+
+			let { title, tips, value } = options;
+
+			this.$inputConfirm({
+				title,
+
+				tips,
+
+				value,
+
+				callback: options.callback,
+
+				close: () => {
+					this.popupWindowOpen = false;
+				},
+			});
+		},
+
+		confirm(options) {
+			this.popupWindowOpen = true;
+
+			let { title, tips } = options;
+
+			this.$confirm({
+				title,
+
+				tips,
+
+				callback: options.callback,
+
+				close: () => {
+					this.popupWindowOpen = false;
+				},
+			});
+		},
+
+		validateFileName: function (fileName) {
+			let reg = new RegExp('[\\\\/:*?"<>|]');
+
+			return reg.test(fileName);
+		},
+
+		saveInfoToRoute() {
+			if (this.isWebCloudDisk) {
+				this.$router.replace({
+					query: {
+						// id: this.diskInfo.id,
+
+						// type: this.navType,
+
+						category: this.diskInfo.categoryType,
+
+						// category_name: this.diskInfo.category,
+					},
+				});
+			}
+		},
+	},
 };
 </script>
 
 <style scoped lang="scss">
+.my-active-class {
+	box-sizing: content-box;
+	border: 2px dashed rgb(136, 255, 227) !important;
+  box-sizing: border-box;
+}
+.vdr{
+  border:0;
+}
 #draggingFile {
 	position: absolute;
 
@@ -2469,9 +2723,7 @@ export default {
 
 	.left {
 		width: 200px;
-
 		height: 100%;
-
 		background: #fdfdfd;
 	}
 
@@ -2576,10 +2828,10 @@ export default {
 
 		.box {
 			background-color: #fff;
-
-			width: 428.49px;
-
+			width: 100%;
 			height: 606.15px;
+      position: relative;
+      cursor: pointer;
 		}
 	}
 
@@ -2665,6 +2917,9 @@ export default {
 		.list:hover {
 			background-color: #ececec;
 		}
+    .list.active{
+      border:2px solid #ff4e60;
+    }
 	}
 
 	&-image {
@@ -2734,10 +2989,10 @@ export default {
 			margin-right: 0;
 		}
 	}
-	&-allFont{
+	&-allFont {
 		background-color: rgb(47, 47, 47);
-		padding:15px;
-		height:100vh;
+		padding: 15px;
+		height: 100vh;
 	}
 
 	// .down {
@@ -2797,6 +3052,26 @@ export default {
 
 ::v-deep .el-slider__bar {
 	background: #333;
+}
+::v-deep .handle-tm,
+::v-deep .handle-bm {
+	width: 0 !important;
+	height: 0 !important;
+	padding: 0 !important;
+	background: transparent;
+	border: 0;
+}
+::v-deep .handle-tl,
+::v-deep .handle-tr,
+::v-deep .handle-mr,
+::v-deep .handle-br,
+::v-deep .handle-bl,
+::v-deep .handle-ml {
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  background-color: #88ffe3;
+  border:1px solid #88ffe3;
 }
 </style>
 

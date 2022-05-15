@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3385429 */
-  src: url('//at.alicdn.com/t/font_3385429_un4hssiwk7.woff2?t=1652278763326') format('woff2'),
-       url('//at.alicdn.com/t/font_3385429_un4hssiwk7.woff?t=1652278763326') format('woff'),
-       url('//at.alicdn.com/t/font_3385429_un4hssiwk7.ttf?t=1652278763326') format('truetype');
+  src: url('//at.alicdn.com/t/font_3385429_d29gos36xdi.woff2?t=1652367974269') format('woff2'),
+       url('//at.alicdn.com/t/font_3385429_d29gos36xdi.woff?t=1652367974269') format('woff'),
+       url('//at.alicdn.com/t/font_3385429_d29gos36xdi.ttf?t=1652367974269') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,34 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-quanping:before {
+  content: "\e607";
+}
+
+.icon-quanping1:before {
+  content: "\e8fa";
+}
+
+.icon-tuichuquanping:before {
+  content: "\e8fb";
+}
+
+.icon-juzuo:before {
+  content: "\e603";
+}
+
+.icon-juzhong:before {
+  content: "\e604";
+}
+
+.icon-hengpai:before {
+  content: "\e605";
+}
+
+.icon-hengshuqiehuanheng:before {
+  content: "\e644";
 }
 
 .icon-bianda:before {

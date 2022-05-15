@@ -78,3 +78,6 @@ input[type="reset"] {
   /* Internet Explorer 10+ */
   color: #bebebe;
 }
+::v-deep .el-color-dropdown__btns,.el-color-dropdown__btns{
+  display: none!important;
+}

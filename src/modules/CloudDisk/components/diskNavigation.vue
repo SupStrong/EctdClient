@@ -16,6 +16,11 @@
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-tongguanshuju"></i></div>
 				</el-tooltip> -->
 			</div>
+			<div>
+				<el-tooltip class="item" effect="dark" content="点击全屏" placement="bottom">
+					<div @click="handleChange('fullScreen')"><i class="iconfont icon-quanping"></i></div>
+				</el-tooltip>
+			</div>
 		</div>
 		<div class="disk-func">
 			<div class="left" style="display: none">
@@ -148,19 +153,18 @@
 					<button class="btn default">全部暂停</button>-->
 				</template>
 			</div>
-			<!-- v-if="type == 'text'" -->
-			<div class="left font" v-if="isCurrent == 'textBox'">
+			<div class="left font" v-if="curData.type == 'text'">
 				<el-tooltip class="item" effect="dark" content="常用字体样式" placement="bottom">
 					<div @click="handleChange('fontBold')"><i class="iconfont icon-AApay"></i></div>
 				</el-tooltip>
 				<div class="font-family" @click="handleChange('fontFamily')">
-					<span>黑色字体</span>
+					<span>{{curData.familyText}}</span>
 					<i class="iconfont icon-xiala G-Ml-15"></i>
 				</div>
 				<div class="font-size" @click="handleChange('fontSize')">
-					<i class="iconfont icon-jiahao_o" @click="handleChange('fontSize', 'add')"></i>
-					<el-input value="122"></el-input>
 					<i class="iconfont icon-jian" @click="handleChange('fontSize', 'reduce')"></i>
+					<el-input v-model="curData.fSize"></el-input>
+					<i class="iconfont icon-jiahao_o" @click="handleChange('fontSize', 'add')"></i>	
 				</div>
 				<el-tooltip class="item" effect="dark" content="颜色" placement="bottom">
 					<div @click="handleChange('fontColor')">
@@ -168,39 +172,59 @@
 						<div></div>
 					</div>
 				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="加粗" placement="bottom">
+				<el-tooltip class="item" effect="dark" :class="{'active':curData.fWeight == '800'}" content="加粗" placement="bottom">
 					<div @click="handleChange('fontBold')"><i class="iconfont icon-zitijiacu"></i></div>
 				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="倾斜" placement="bottom">
+				<el-tooltip class="item" effect="dark" :class="{'active':curData.fStyle == 'italic'}" content="倾斜" placement="bottom">
 					<div @click="handleChange('fontItalic')"><i class="iconfont icon-zitixiahuaxian"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="文字间距" placement="bottom">
 					<div @click="handleChange('fontText')"><i class="iconfont icon-zijianju"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="行间距" placement="bottom">
-					<el-dropdown>
+					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
 						<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
-						<el-dropdown-menu slot="dropdown">
-							<el-dropdown-item>黄金糕</el-dropdown-item>
-							<el-dropdown-item>狮子头</el-dropdown-item>
-							<el-dropdown-item>螺蛳粉</el-dropdown-item>
-							<el-dropdown-item disabled>双皮奶</el-dropdown-item>
-							<el-dropdown-item divided>蚵仔煎</el-dropdown-item>
+						<el-dropdown-menu slot="dropdown" style="width:300px">
+						<el-dropdown-item>
+							<span class="demonstration">行间距</span>
+								<el-slider v-model="value1"></el-slider>
+							</el-dropdown-item>
+						<el-dropdown-item>
+							<span class="demonstration">字间距</span>
+							<el-slider v-model="value2"></el-slider>
+						</el-dropdown-item>	
 						</el-dropdown-menu>
 					</el-dropdown>
 				</el-tooltip>
 
 				<el-tooltip class="item" effect="dark" content="居中方式" placement="bottom">
+										<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
 					<div @click="handleChange('fontStroke')"><i class="iconfont icon-youduiqi"></i></div>
+						<el-dropdown-menu slot="dropdown" style="width:300px">
+						<el-dropdown-item>
+							<span class="demonstration">居中方式</span>
+								<el-slider v-model="value1"></el-slider>
+							</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="文字横竖" placement="bottom">
-					<div @click="handleChange('fontVertically')"><i class="iconfont icon-hengshuqiehuanshu"></i></div>
+					<div @click="handleChange('fontVertically')" v-if="a"><i class="iconfont icon-juzuo"></i></div>
+					<div @click="handleChange('fontVertically')" v-else><i class="iconfont icon-hengshuqiehuanheng"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="透明度" placement="bottom">
+					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
 					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-suodingtouming_huaban1"></i></div>
+						<el-dropdown-menu slot="dropdown" style="width:300px">
+						<el-dropdown-item>
+							<span class="demonstration">透明度</span>
+								<el-slider v-model="value1"></el-slider>
+							</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-if="isCurrent == 'imageBox'">
+			<div class="left font" v-if="curData.type == 'image'">
 				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
 					<div @click="handleChange('imageFilter')"><i class="iconfont icon-lvjing"></i></div>
 				</el-tooltip>
@@ -211,7 +235,7 @@
 					<div @click="handleChange('imageCut')"><i class="iconfont icon-jianqie"></i></div>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-if="isCurrent == 'templateBox'">
+			<div class="left font" v-if="curData.type == 'template'">
 				<el-tooltip class="item" effect="dark" content="我的模板" placement="bottom">
 					<div @click="handleChange('fontVertically')"><i class="iconfont icon-wode"></i></div>
 				</el-tooltip>
@@ -270,6 +294,7 @@
 </template>
 
 <script>
+import screenfull from "screenfull";  //引入依赖
 import ectdImport from './ectdcpn/importFile.vue';
 import sampleData from './sampleData.vue';
 import brandData from './brandData.vue';
@@ -290,6 +315,12 @@ export default {
 		type: String,
 		data: {
 			type: Object,
+			default: function () {
+				return {};
+			},
+		},
+		curData:{
+		type: Object,
 			default: function () {
 				return {};
 			},
@@ -319,6 +350,8 @@ export default {
 			showCompany: false,
 			showImgText: false,
 			isCurrent: 'textBox',
+			isFullFlag:false,
+			isFullscreen: false
 		};
 	},
 	computed: {
@@ -351,7 +384,18 @@ export default {
 			oInput.style.display = 'none';
 			this.$Message.success('复制成功');
 		},
-		handleChange(type = 'normal') {
+			mounted() {
+		// 监听页面全屏
+		window.addEventListener("fullscreenchange", (e)=> {
+		  if(screenfull.isFullscreen){
+			this.isFullFlag = true
+		  }else{
+			this.isFullFlag = false
+		  }
+		})
+	},	
+		handleChange(type = 'normal',nType) {
+			let { fWeight,fStyle } = this.curData;
 			switch (type) {
 				// 第一级
 				case 'textBox': //无
@@ -365,14 +409,24 @@ export default {
 					break;
 				// 字体的
 				case 'fontFamily': // 字体
+				// this.handleSelect
+					this.$emit('handleSelectFamily', { status: 'fontFamily' });
 					break;
 				case 'fontSize': // 字号
+				if(nType == 'reduce'){
+					this.curData.fSize--;
+				}else if(nType == 'add'){
+					this.curData.fSize++;
+				}
 					break;
 				case 'fontColor': // 颜色
+					this.$emit('handleSelectFamily', { status: 'fontColor' });
 					break;
 				case 'fontBold': // 粗细
+				fWeight == '400' ? this.curData.fWeight = '800' : this.curData.fWeight = '400'
 					break;
 				case 'fontItalic': // 倾斜
+				fStyle == 'inherit' ? this.curData.fStyle = 'italic' : this.curData.fStyle = 'inherit'
 					break;
 				case 'fontText': // 文字间距
 					break;
@@ -395,6 +449,13 @@ export default {
 					break;
 				case 'imageCut': // 剪裁图片
 					break;
+				case 'fullScreen':
+					if (!screenfull.isEnabled) {
+							this.$message('您的浏览器不能全屏');
+							return false
+					}
+						screenfull.toggle();
+				 break;
 			}
 		},
 		allKeyup(e) {
@@ -722,6 +783,9 @@ export default {
 			}
 		}
 	}
+	.active{
+		background-color: #ececec;
+	}
 	.iconfont {
 		font-size: 22px;
 		margin: 0 5px;
@@ -771,5 +835,12 @@ export default {
 			}
 		}
 	}
+}
+::v-deep .el-slider__button{
+	border: 2px solid rgb(47, 47, 47);
+}
+::v-deep .el-dropdown-menu__item:hover{
+	color: rgb(47, 47, 47);
+	background-color: #fff;
 }
 </style>
