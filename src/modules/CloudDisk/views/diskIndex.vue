@@ -159,7 +159,17 @@
 								<div class="list G-Mt-10" v-for="(item, index) in colorArr" :key="index" :style="{ 'background-color': 'rgb(' + item + ')' }" :class="{'active': item == curData.fColor}" @click="handleSelectStyle('fontColor',item)"></div>
 							</div>
 						</div>
-
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'imageFilter'">
+							<div class="list" v-for="(item,index) in filterArr" :key="index">
+								<img
+                :class="item.style"
+                  @click="handleSelectStyle('imageFilter',item)"
+									src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2Ftp06%2F20111116192A364-0-lp.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1655220839&t=590d59cd546171c54d87187829038cef"
+									alt
+								/>
+								<span>默认</span>
+							</div>
+						</div>
 						<div class="tool-image" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
 
@@ -182,15 +192,6 @@
 								</div>
 							</div>
 						</div>
-						<div class="tool-filter" hidden>
-							<div class="list" v-for="item in 10">
-								<img
-									src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F99882184926c415a3b33b5e90456e9e74b23df514f004-6Huk10_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654869395&t=e0d57cbcb6b9e584134f438fd43e74cf"
-									alt
-								/>
-								<span>默认</span>
-							</div>
-						</div>
 						<div class="tool-allFont" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">我的字体</el-button>
 							<el-button type="success" size="small" plain @click="handleChange('my')">官方字体</el-button>
@@ -211,109 +212,8 @@
 							>
 								美好人生
 							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
-							<div
-								style="
-									width: 50%;
-									float: left;
-									text-align: center;
-									cursor: pointer;
-									margin-top: 10px;
-									font-weight: 400;
-									font-style: normal;
-									color: rgb(136, 255, 227);
-									text-decoration: none;
-									font-size: 30px;
-									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
-								"
-							>
-								美好人生
-							</div>
 						</div>
+            <!-- <div class="tool-filter"></div> -->
 					</div>
 
 					<div class="template">
@@ -552,6 +452,12 @@ export default {
           'hsla(209, 100%, 56%, 0.73)',
           '#c7158577'
       ],
+      filterArr:[
+        {
+          name:'good',
+          style:'aden'
+        }
+      ],
 			colorArr: [
 				'0, 0, 0',
 				'84, 84, 84',
@@ -785,6 +691,8 @@ export default {
       if (e.keyCode === 17) {         // ctrl+c事件
         let item = JSON.parse(JSON.stringify(this.templateList[index][cindex]));
         item.rand = (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5)
+        item.x = item.x ? item.x + 10 : 10;
+        item.y = item.y ? item.y + 10 : 10;
         this.templateList[index].push(item);
 			} else if (e.keyCode === 8) {  // 删除事件
         this.templateList[index].splice(cindex, 1);

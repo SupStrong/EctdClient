@@ -241,11 +241,11 @@
 				</el-tooltip>
 			</div>
 			<div>
-				<el-tooltip class="item" effect="dark" content="保存模板" placement="bottom">
-					<el-button type="primary" size="small" @click="handleChange('save')">保存模板</el-button>
-				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="导出图片" placement="bottom">
 					<el-button type="success" size="small" @click="handleChange('export')">导出图片</el-button>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="保存模板+导出图片" placement="bottom">
+					<el-button type="primary" size="small" @click="handleChange('save')">保存模板+导出图片</el-button>
 				</el-tooltip>
 			</div>
 		</div>
@@ -444,6 +444,7 @@ export default {
 					break;
 				// 图片的
 				case 'imageFilter': // 图片滤镜
+				this.$emit('handleSelectFamily', { status: 'imageFilter' });
 					break;
 				case 'imageStyle': // 图片样式
 					break;
