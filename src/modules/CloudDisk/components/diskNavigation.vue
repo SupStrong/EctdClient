@@ -178,15 +178,15 @@
 				<el-tooltip class="item" effect="dark" :class="{'active':curData.fStyle == 'italic'}" content="倾斜" placement="bottom">
 					<div @click="handleChange('fontItalic')"><i class="iconfont icon-zitixiahuaxian"></i></div>
 				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="文字间距" placement="bottom">
+				<!-- <el-tooltip class="item" effect="dark" content="文字间距" placement="bottom">
 					<div @click="handleChange('fontText')"><i class="iconfont icon-zijianju"></i></div>
-				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="行间距" placement="bottom">
+				</el-tooltip> -->
+				<el-tooltip class="item" effect="dark" content="间距" placement="bottom">
 					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
 						<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
 						<el-dropdown-menu slot="dropdown" style="width:300px">
 						<el-dropdown-item>
-							<span class="demonstration">行间距</span>
+							<span class="demonstration">字间距</span>
 								<el-slider v-model="value1"></el-slider>
 							</el-dropdown-item>
 						<el-dropdown-item>
@@ -196,21 +196,18 @@
 						</el-dropdown-menu>
 					</el-dropdown>
 				</el-tooltip>
-
-				<el-tooltip class="item" effect="dark" content="居中方式" placement="bottom">
-										<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
-					<div @click="handleChange('fontStroke')"><i class="iconfont icon-youduiqi"></i></div>
-						<el-dropdown-menu slot="dropdown" style="width:300px">
-						<el-dropdown-item>
-							<span class="demonstration">居中方式</span>
-								<el-slider v-model="value1"></el-slider>
-							</el-dropdown-item>
-						</el-dropdown-menu>
-					</el-dropdown>
+				<el-tooltip class="item" effect="dark" :class="{'active':curData.fAlign == 'left'}" content="左对齐" placement="bottom">
+					<div @click="handleChange('fontStroke','left')"><i class="iconfont icon-juzuo"></i></div>
 				</el-tooltip>
-				<el-tooltip class="item" effect="dark" content="文字横竖" placement="bottom">
-					<div @click="handleChange('fontVertically')" v-if="a"><i class="iconfont icon-juzuo"></i></div>
-					<div @click="handleChange('fontVertically')" v-else><i class="iconfont icon-hengshuqiehuanheng"></i></div>
+				<el-tooltip class="item" effect="dark" :class="{'active':curData.fAlign == 'center'}" content="居中" placement="bottom">
+					<div @click="handleChange('fontStroke','center')"><i class="iconfont icon-juzhong"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{'active':curData.fAlign == 'right'}" content="右对齐" placement="bottom">
+					<div @click="handleChange('fontStroke','right')"><i class="iconfont icon-hengpai"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="文字横竖" :class="{'active':curData.fMode == 'tb'}"  placement="bottom">
+					<div @click="handleChange('fontVertically')" v-if="curData.fMode == 'inherit'"><i class="iconfont icon-hengshuqiehuanheng"></i></div>
+					<div @click="handleChange('fontVertically')" v-else><i class="iconfont icon-hengshuqiehuanshu"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="透明度" placement="bottom">
 					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
@@ -218,7 +215,7 @@
 						<el-dropdown-menu slot="dropdown" style="width:300px">
 						<el-dropdown-item>
 							<span class="demonstration">透明度</span>
-								<el-slider v-model="value1"></el-slider>
+								<el-slider :step="5" v-model="curData.fOpcity"></el-slider>
 							</el-dropdown-item>
 						</el-dropdown-menu>
 					</el-dropdown>
@@ -395,7 +392,7 @@ export default {
 		})
 	},	
 		handleChange(type = 'normal',nType) {
-			let { fWeight,fStyle } = this.curData;
+			let { fWeight,fStyle,fMode,textAlign } = this.curData;
 			switch (type) {
 				// 第一级
 				case 'textBox': //无
@@ -433,8 +430,11 @@ export default {
 				case 'fontline': // 行间距
 					break;
 				case 'fontStroke': //  居中方式
+				// textAlign
+				this.curData.fAlign = nType;
 					break;
 				case 'fontVertically': // 排列方式/横竖
+				fMode == 'inherit' ? this.curData.fMode = 'tb' : this.curData.fMode = 'inherit'
 					break;
 				case 'fontOpacity': // 透明度
 					break;
@@ -842,5 +842,8 @@ export default {
 ::v-deep .el-dropdown-menu__item:hover{
 	color: rgb(47, 47, 47);
 	background-color: #fff;
+}
+::v-deep .el-slider__bar {
+	background: #333;
 }
 </style>

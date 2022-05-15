@@ -322,9 +322,9 @@
 								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第{{ toChinesNum(index + 1) }}页</div>
 
 								<div class="icon G-t-r">
-									<!-- <el-tooltip class="item" effect="dark" content="删除模板" v-if="templateList.length != 1" placement="top-start">
+									<el-tooltip class="item" effect="dark" content="删除模板" v-if="templateList.length != 1" placement="top-start">
 										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete', index)"></i>
-									</el-tooltip> -->
+									</el-tooltip>
 
 									<el-tooltip class="item" effect="dark" content="添加一个新模板" placement="top-start">
 										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add', index)"></i>
@@ -360,8 +360,9 @@
 												fontFamily: citem.fFamily,
 												fontStyle: citem.fStyle,
 												textAlign: citem.fAlign,
-												opacity: citem.fOpcity,
+												opacity: citem.fOpcity / 100,
                         fontWeight:citem.fWeight,
+                        writingMode:citem.fMode,
                        transform: citem['fScale'] || ''
 											}"
 											>{{ citem.name }}</p
@@ -640,7 +641,7 @@ export default {
       ],
 			templateList: [
 				[
-					{ rand:'1',fScale:'1',type: 'text', name: '你好', fColor: '0,0,0', fSize: 20, fFamily: 'cursive', fWeight: '400', fStyle: 'inherit', fAlign: 'center', fOpcity: '1',familyText:'第一个'},
+					{ rand:'1',fScale:'1',type: 'text', name: '你好', fColor: '0,0,0', fSize: 20, fFamily: 'cursive', fWeight: '400', fStyle: 'inherit',fMode:'inherit', fAlign: 'center', fOpcity: 100,familyText:'第一个'},
 					{ rand:'2',fScale:'1',type: 'image', url: 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/8.png', iFilter: '' },
 				],
 				// [{type:'image',url:'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/12.png',iFilter:''}],
