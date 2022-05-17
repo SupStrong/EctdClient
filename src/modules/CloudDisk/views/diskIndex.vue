@@ -12,11 +12,11 @@
 					:data="diskInfo"
 					:type="navType"
 					:loading="loading"
-          :curData='curData'
+					:curData="curData"
 					@callback="diskNavigationControl"
 					@action="diskFeatureControl"
 					@change="changeGenerate"
-          @handleSelectFamily="handleSelectFamily"
+					@handleSelectFamily="handleSelectFamily"
 				></diskNavigation>
 
 				<!-- <div v-if="diskInfo.categoryType == 'toolTable'" class="toolBox">
@@ -144,30 +144,67 @@
 				<div class="tool-box">
 					<div class="tool">
 						<div class="tool-font" v-if="handleOpenDrawer == 'fontFamily'">
-							<div class="list" v-for="(item,index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily',item)">
-								<span class="G-Fsize-14 G-color-333">{{item.name}}</span>
-								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou" v-if="curData.fFamily == item.path"></i>
+							<div class="list" v-for="(item, index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily', item)">
+								<span class="G-Fsize-14 G-color-333">{{ item.name }}</span>
+								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou"></i>
 							</div>
 						</div>
-						<div class="tool-color"  v-else-if="handleOpenDrawer == 'fontColor'">
+						<div class="tool-color" v-else-if="handleOpenDrawer == 'fontColor'">
 							<div class="demonstration G-bold">自设样式</div>
 							<div class="block G-Mt-10">
-								<el-color-picker v-model="curData.fColor" @active-change="handleColor" :show-alpha="false" :predefine="predefineColors" color-format="hsv"></el-color-picker>
+								<el-color-picker
+									v-model="curData.fColor"
+									@active-change="handleColor"
+									:show-alpha="false"
+									:predefine="predefineColors"
+									color-format="hsv"
+								></el-color-picker>
 							</div>
 							<div class="G-bold">默认颜色</div>
 							<div>
-								<div class="list G-Mt-10" v-for="(item, index) in colorArr" :key="index" :style="{ 'background-color': 'rgb(' + item + ')' }" :class="{'active': item == curData.fColor}" @click="handleSelectStyle('fontColor',item)"></div>
+								<div
+									class="list G-Mt-10"
+									v-for="(item, index) in colorArr"
+									:key="index"
+									:style="{ 'background-color': 'rgb(' + item + ')' }"
+									:class="{ active: item == curData.fColor }"
+									@click="handleSelectStyle('fontColor', item)"
+								></div>
+							</div>
+						</div>
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'fontOften'">
+							<div class="list" v-for="(citem, index) in fontOften" :key="index">
+								
+								<p
+								:style="{
+									color: `rgb(${citem.fColor})`,
+									fontSize: citem.fSize + 'px',
+									fontFamily: citem.fFamily,
+									fontStyle: citem.fStyle,
+									textAlign: citem.fAlign,
+									opacity: citem.fOpcity / 100,
+									fontWeight: citem.fWeight,
+									writingMode: citem.fMode,
+									transform: citem['fScale'] || '',
+								}"
+								>{{ citem.name }}</p>
 							</div>
 						</div>
 						<div class="tool-filter" v-else-if="handleOpenDrawer == 'imageFilter'">
-							<div class="list" v-for="(item,index) in filterArr" :key="index">
+							<div class="list" v-for="(item, index) in filterArr" :key="index">
 								<img
-                :class="item.style"
-                  @click="handleSelectStyle('imageFilter',item)"
+									:class="[item.style, curData.iFilter == item.style ? 'active' : '']"
+									@click="handleSelectStyle('imageFilter', item)"
 									src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2Ftp06%2F20111116192A364-0-lp.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1655220839&t=590d59cd546171c54d87187829038cef"
 									alt
 								/>
-								<span>默认</span>
+								<span>{{ item.name }}</span>
+							</div>
+						</div>
+						<div class="tool-imgstyle" v-else-if="handleOpenDrawer == 'imageStyle'">
+							<div class="list" v-for="(item, index) in imgStyleArr" :key="index" @click="handleSelectStyle('imageStyle', item)">
+								<div class="list-box" :class="item.style"></div>
+								<span>{{ item.name }}</span>
 							</div>
 						</div>
 						<div class="tool-image" hidden>
@@ -213,19 +250,23 @@
 								美好人生
 							</div>
 						</div>
-            <!-- <div class="tool-filter"></div> -->
+						<!-- <div class="tool-filter"></div> -->
 					</div>
 
 					<div class="template">
 						<div class="template-main" v-for="(item, index) in templateList" ref="mainBox" :key="index">
 							<div class="fl-row-justy">
 								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第{{ toChinesNum(index + 1) }}页</div>
-
 								<div class="icon G-t-r">
 									<el-tooltip class="item" effect="dark" content="删除模板" v-if="templateList.length != 1" placement="top-start">
 										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete', index)"></i>
 									</el-tooltip>
-
+									<el-tooltip class="item" effect="dark" content="背景色" placement="top-start">
+										<i class="iconfont icon-beijingse G-Fsize-20 G-Mr-10" @click="handleChange('bgColor', index)"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="背景图" placement="top-start">
+										<i class="iconfont icon-beijingtupian G-Fsize-20 G-Mr-10" @click="handleChange('bgImage', index)"></i>
+									</el-tooltip>
 									<el-tooltip class="item" effect="dark" content="添加一个新模板" placement="top-start">
 										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add', index)"></i>
 									</el-tooltip>
@@ -237,23 +278,23 @@
 							</div>
 							<div class="box" ref="mainChildBox">
 								<div v-for="(citem, cindex) in item" :key="citem.rand">
-									<vue-draggable-resizable 
-                  style="display: flex; align-items: center; justify-content: center"
-                  class-name-active="my-active-class" 
-                  v-if="citem.type == 'text'"
-                  :w="citem.w || 'auto'"
-					      	:h="citem.h || 'auto'"
-                  :x="citem.x"
-                  :y="citem.y"
-                  :lock-aspect-ratio="true"
-                  @dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
-                  @activated="(left, top, width, height) => onActivated(citem, index,cindex)"
-                  @resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index,cindex)"
-                >
+									<vue-draggable-resizable
+										style="display: flex; align-items: center; justify-content: center"
+										class-name-active="my-active-class"
+										v-if="citem.type == 'text'"
+										:w="citem.w || 'auto'"
+										:h="citem.h || 'auto'"
+										:x="citem.x"
+										:y="citem.y"
+										:lock-aspect-ratio="true"
+										@dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+										@activated="(left, top, width, height) => onActivated(citem, index, cindex)"
+										@resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index, cindex)"
+									>
 										<p
-                      :ref="citem.rand"
-							        :tabindex="citem.rand"
-							        @keyup="handleQuick($event, index,cindex)"
+											:ref="citem.rand"
+											:tabindex="citem.rand"
+											@keyup="handleQuick($event, index, cindex)"
 											:style="{
 												color: `rgb(${citem.fColor})`,
 												fontSize: citem.fSize + 'px',
@@ -261,36 +302,38 @@
 												fontStyle: citem.fStyle,
 												textAlign: citem.fAlign,
 												opacity: citem.fOpcity / 100,
-                        fontWeight:citem.fWeight,
-                        writingMode:citem.fMode,
-                       transform: citem['fScale'] || ''
+												fontWeight: citem.fWeight,
+												writingMode: citem.fMode,
+												transform: citem['fScale'] || '',
 											}"
-											>{{ citem.name }}</p
 										>
+											{{ citem.name }}
+										</p>
 									</vue-draggable-resizable>
-									<vue-draggable-resizable 
-                   :w="citem.w || 'auto'"
-					      	:h="citem.h || 'auto'"
-                  :x="citem.x"
-                  :y="citem.y"
-                  class-name-active="my-active-class" 
-                  v-if="citem.type == 'image'"
-                  :lock-aspect-ratio="true"
-                  @dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
-                  @activated="(left, top, width, height) => onActivated(citem, index)"
-                  @resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index,cindex)"
-                  >
-                  	<img
-                      :src="citem.url" 
-							        :tabindex="citem.rand"
-                      :ref="citem.rand" 
-							        @keyup="handleQuick($event, index,cindex)"
-                      :style="{
-                      transform: citem['fScale'] || '',
-                      width: citem.w ? citem.w + 'px' : '100px',
-                      height: citem.h ? citem.h + 'px' : '100px',
-                    }" 
-                    />
+									<vue-draggable-resizable
+										:w="citem.w || 'auto'"
+										:h="citem.h || 'auto'"
+										:x="citem.x"
+										:y="citem.y"
+										class-name-active="my-active-class"
+										v-if="citem.type == 'image'"
+										:lock-aspect-ratio="true"
+										@dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+										@activated="(left, top, width, height) => onActivated(citem, index)"
+										@resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index, cindex)"
+									>
+										<img
+											:src="citem.url"
+											:tabindex="citem.rand"
+											:ref="citem.rand"
+											@keyup="handleQuick($event, index, cindex)"
+											:class="[citem.iFilter, citem.iStyle]"
+											:style="{
+												transform: citem['fScale'] || '',
+												width: citem.w ? citem.w + 'px' : '100px',
+												height: citem.h ? citem.h + 'px' : '100px',
+											}"
+										/>
 									</vue-draggable-resizable>
 								</div>
 							</div>
@@ -436,28 +479,73 @@ export default {
 
 				selectAll: false,
 			},
-      predefineColors:[
-           '#ff4500',
-          '#ff8c00',
-          '#ffd700',
-          '#90ee90',
-          '#00ced1',
-          '#1e90ff',
-          '#c71585',
-          'rgba(255, 69, 0, 0.68)',
-          'rgb(255, 120, 0)',
-          'hsv(51, 100, 98)',
-          'hsva(120, 40, 94, 0.5)',
-          'hsl(181, 100%, 37%)',
-          'hsla(209, 100%, 56%, 0.73)',
-          '#c7158577'
-      ],
-      filterArr:[
-        {
-          name:'good',
-          style:'aden'
-        }
-      ],
+			predefineColors: [
+				'#ff4500',
+				'#ff8c00',
+				'#ffd700',
+				'#90ee90',
+				'#00ced1',
+				'#1e90ff',
+				'#c71585',
+				'rgba(255, 69, 0, 0.68)',
+				'rgb(255, 120, 0)',
+				'hsv(51, 100, 98)',
+				'hsva(120, 40, 94, 0.5)',
+				'hsl(181, 100%, 37%)',
+				'hsla(209, 100%, 56%, 0.73)',
+				'#c7158577',
+			],
+			filterArr: [
+				{
+					name: '默认1',
+					style: 'aden',
+				},
+				{
+					name: '默认1',
+					style: 'aden',
+				},
+				{
+					name: '默认1',
+					style: 'aden',
+				},
+				{
+					name: '默认1',
+					style: 'aden',
+				},
+			],
+			fontOften:[
+				{
+					fScale: '1',
+					type: 'text',
+					name: '你好',
+					fColor: '0,0,0',
+					fSize: 20,
+					fFamily: 'cursive',
+					fWeight: '400',
+					fStyle: 'inherit',
+					fMode: 'inherit',
+					fAlign: 'center',
+					fOpcity: 100,
+				},
+			],
+			imgStyleArr: [
+				{
+					name: '圆角黑边',
+					style: 'style1',
+				},
+				{
+					name: '圆角金边',
+					style: 'style2',
+				},
+				{
+					name: '圆角黑边',
+					style: 'style1',
+				},
+				{
+					name: '圆角金边',
+					style: 'style1',
+				},
+			],
 			colorArr: [
 				'0, 0, 0',
 				'84, 84, 84',
@@ -532,27 +620,49 @@ export default {
 
 				noticeFlag: true, //提醒声音
 			},
-      curData:{},
+			curData: {},
 			noticeSrc: false,
 			mainScale: 0,
-      fontFamilyArr:[
-        {
-          name:'第一个',
-          path:'Family-1'
-        },
-        {
-          name:'第二个',
-          path:'Family-2'
-        }
-      ],
+			fontFamilyArr: [
+				{
+					name: '第一个',
+					path: 'Family-1',
+				},
+				{
+					name: '第二个',
+					path: 'Family-2',
+				},
+			],
 			templateList: [
 				[
-					{ rand:'1',fScale:'1',type: 'text', name: '你好', fColor: '0,0,0', fSize: 20, fFamily: 'cursive', fWeight: '400', fStyle: 'inherit',fMode:'inherit', fAlign: 'center', fOpcity: 100,familyText:'第一个'},
-					{ rand:'2',fScale:'1',type: 'image', url: 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/8.png', iFilter: '' },
+					{
+						rand: '1',
+						fScale: '1', //缩放度
+						type: 'text', // 类型
+						name: '你好', //
+						fColor: '0,0,0', // 颜色
+						fSize: 20, // 字号
+						fFamily: 'cursive', // 字体
+						fWeight: '400', // 宽度
+						fStyle: 'inherit', // 倾斜度
+						fMode: 'inherit', // 横竖
+						fAlign: 'center', // 居中
+						fOpcity: 100, // 透明度
+						fShadow:'', // 阴影
+						familyText: '第一个', //
+					},
+					{
+						rand: '2',
+						fScale: '1',
+						type: 'image',
+						url: 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/8.png',
+						iFilter: '',
+						iStyle: '',
+					},
 				],
 				// [{type:'image',url:'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/12.png',iFilter:''}],
 			],
-      handleOpenDrawer:'',
+			handleOpenDrawer: '',
 			generateData: {
 				type: '',
 
@@ -687,51 +797,57 @@ export default {
 				// this.$refs.mainChildBox[index].style.transform = 'scale(1.1)'
 			});
 		},
-    handleQuick(e,index,cindex){
-      if (e.keyCode === 17) {         // ctrl+c事件
-        let item = JSON.parse(JSON.stringify(this.templateList[index][cindex]));
-        item.rand = (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5)
-        item.x = item.x ? item.x + 10 : 10;
-        item.y = item.y ? item.y + 10 : 10;
-        this.templateList[index].push(item);
-			} else if (e.keyCode === 8) {  // 删除事件
-        this.templateList[index].splice(cindex, 1);
+		handleQuick(e, index, cindex) {
+			if (e.keyCode === 17) {
+				// ctrl+c事件
+				let item = JSON.parse(JSON.stringify(this.templateList[index][cindex]));
+				item.rand = (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + new Date().getTime() + '-' + Math.random().toString().substr(2, 5);
+				item.x = item.x ? item.x + 10 : 10;
+				item.y = item.y ? item.y + 10 : 10;
+				this.templateList[index].push(item);
+			} else if (e.keyCode === 8) {
+				// 删除事件
+				this.templateList[index].splice(cindex, 1);
 			}
-    },
-    handleColor(e){
-      let str = e.match(/\d+(\.\d+)?/g);
-      this.curData.fColor = str.toString();
-    },
-    handleSelectStyle(type,item){
-      if(type == 'fontFamily'){
-        this.curData.fFamily = item.path;
-        this.curData.familyText = item.name;
-      }else if(type == 'fontColor'){
-        this.curData.fColor = item;
-      }
-    },
-    handleSelectFamily(e){
-        this.handleOpenDrawer = e.status;
-    },
-    dragstop(data, x, y, width, height) {
+		},
+		handleColor(e) {
+			let str = e.match(/\d+(\.\d+)?/g);
+			this.curData.fColor = str.toString();
+		},
+		handleSelectStyle(type, item) {
+			if (type === 'fontFamily') {
+				this.curData.fFamily = item.path;
+				this.curData.familyText = item.name;
+			} else if (type === 'fontColor') {
+				this.curData.fColor = item;
+			} else if (type === 'imageFilter') {
+				this.curData.iFilter = item.style;
+			} else if (type === 'imageStyle') {
+				this.curData.iStyle = item.style;
+			}
+		},
+		handleSelectFamily(e) {
+			this.handleOpenDrawer = e.status;
+		},
+		dragstop(data, x, y, width, height) {
 			data.x = x;
 			data.y = y;
 		},
-    onResize(data, x, y, width, height, index,cindex) {
+		onResize(data, x, y, width, height, index, cindex) {
 			let dom_width = this.$refs[data.rand][0].clientWidth;
 			let dom_height = this.$refs[data.rand][0].clientHeight;
 			this.$set(this.templateList[index][cindex], 'fScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][0].style.transform = `scale(${width / dom_width},${height / dom_height})`;
-      console.log(width,this.$refs[data.rand][0].clientWidth,height / dom_height,"@1212")
+			console.log(width, this.$refs[data.rand][0].clientWidth, height / dom_height, '@1212');
 			data.w = width;
 			data.h = height;
 		},
-    onActivated(ele, index,cindex) {
-      if(ele.type === 'text'){
-        this.curData = ele;
-      }else if(ele.type === 'image'){
-        this.curData = ele;
-      }
+		onActivated(ele, index, cindex) {
+			if (ele.type === 'text') {
+				this.curData = ele;
+			} else if (ele.type === 'image') {
+				this.curData = ele;
+			}
 			// let width = this.$refs[ele.rand][0].clientWidth;
 			// let height = this.$refs[ele.rand][0].clientHeight;
 			// let scaleW = 1;
@@ -855,6 +971,9 @@ export default {
 				case 'my':
 					//
 
+					break;
+				case 'bgColor':
+					//
 					break;
 			}
 		},
@@ -2560,10 +2679,10 @@ export default {
 .my-active-class {
 	box-sizing: content-box;
 	border: 2px dashed rgb(136, 255, 227) !important;
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
-.vdr{
-  border:0;
+.vdr {
+	border: 0;
 }
 #draggingFile {
 	position: absolute;
@@ -2739,8 +2858,8 @@ export default {
 			background-color: #fff;
 			width: 100%;
 			height: 606.15px;
-      position: relative;
-      cursor: pointer;
+			position: relative;
+			cursor: pointer;
 		}
 	}
 
@@ -2826,9 +2945,9 @@ export default {
 		.list:hover {
 			background-color: #ececec;
 		}
-    .list.active{
-      border:2px solid #ff4e60;
-    }
+		.list.active {
+			border: 2px solid #ff4e60;
+		}
 	}
 
 	&-image {
@@ -2878,23 +2997,35 @@ export default {
 			margin-bottom: 10px;
 
 			text-align: center;
-
 			img {
 				width: 96px;
-
 				height: 96px;
-
 				border-radius: 8px;
-
 				margin-left: 0;
 			}
-
 			img.active {
 				border: 2px solid #333;
 			}
 		}
 
 		.list:nth-child(3n) {
+			margin-right: 0;
+		}
+	}
+	&-imgstyle {
+		padding: 8px;
+		.list {
+			float: left;
+			margin-right: 15px;
+			margin-bottom: 10px;
+			text-align: center;
+		}
+		.list-box {
+			width: 100px;
+			height: 100px;
+			cursor: pointer;
+		}
+		div:nth-child(3n) {
 			margin-right: 0;
 		}
 	}
@@ -2976,11 +3107,18 @@ export default {
 ::v-deep .handle-br,
 ::v-deep .handle-bl,
 ::v-deep .handle-ml {
-  width: 12px;
-  height: 12px;
-  border-radius: 12px;
-  background-color: #88ffe3;
-  border:1px solid #88ffe3;
+	width: 12px;
+	height: 12px;
+	border-radius: 12px;
+	background-color: #88ffe3;
+	border: 1px solid #88ffe3;
+}
+.style1 {
+	border: 1px dashed #333;
+}
+.style2 {
+	border: 2px dashed #333;
+	border-radius: 50%;
 }
 </style>
 

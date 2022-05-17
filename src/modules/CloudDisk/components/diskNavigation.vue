@@ -155,7 +155,7 @@
 			</div>
 			<div class="left font" v-if="curData.type == 'text'">
 				<el-tooltip class="item" effect="dark" content="常用字体样式" placement="bottom">
-					<div @click="handleChange('fontBold')"><i class="iconfont icon-AApay"></i></div>
+					<div @click="handleChange('fontOften')"><i class="iconfont icon-AApay"></i></div>
 				</el-tooltip>
 				<div class="font-family" @click="handleChange('fontFamily')">
 					<span>{{curData.familyText}}</span>
@@ -171,6 +171,10 @@
 						<i class="iconfont icon-yanse"></i>
 						<div></div>
 					</div>
+				</el-tooltip>
+				
+				<el-tooltip class="item" effect="dark" content="文字阴影" placement="bottom">
+					<div @click="handleChange('fontShadow')"><i class="iconfont icon-yinying"></i></div>
 				</el-tooltip>
 				<el-tooltip class="item" effect="dark" :class="{'active':curData.fWeight == '800'}" content="加粗" placement="bottom">
 					<div @click="handleChange('fontBold')"><i class="iconfont icon-zitijiacu"></i></div>
@@ -394,6 +398,9 @@ export default {
 		handleChange(type = 'normal',nType) {
 			let { fWeight,fStyle,fMode,textAlign } = this.curData;
 			switch (type) {
+				// 常用字体样式
+				case 'fontOften':
+					this.$emit('handleSelectFamily', { status: 'fontOften' });
 				// 第一级
 				case 'textBox': //无
 					this.isCurrent = 'textBox';
@@ -410,9 +417,9 @@ export default {
 					this.$emit('handleSelectFamily', { status: 'fontFamily' });
 					break;
 				case 'fontSize': // 字号
-				if(nType == 'reduce'){
+				if(nType === 'reduce'){
 					this.curData.fSize--;
-				}else if(nType == 'add'){
+				}else if(nType === 'add'){
 					this.curData.fSize++;
 				}
 					break;
@@ -420,10 +427,10 @@ export default {
 					this.$emit('handleSelectFamily', { status: 'fontColor' });
 					break;
 				case 'fontBold': // 粗细
-				fWeight == '400' ? this.curData.fWeight = '800' : this.curData.fWeight = '400'
+				fWeight === '400' ? this.curData.fWeight = '800' : this.curData.fWeight = '400'
 					break;
 				case 'fontItalic': // 倾斜
-				fStyle == 'inherit' ? this.curData.fStyle = 'italic' : this.curData.fStyle = 'inherit'
+				fStyle === 'inherit' ? this.curData.fStyle = 'italic' : this.curData.fStyle = 'inherit'
 					break;
 				case 'fontText': // 文字间距
 					break;
@@ -447,6 +454,8 @@ export default {
 				this.$emit('handleSelectFamily', { status: 'imageFilter' });
 					break;
 				case 'imageStyle': // 图片样式
+				this.$emit('handleSelectFamily', { status: 'imageStyle' });
+				imageStyle
 					break;
 				case 'imageCut': // 剪裁图片
 					break;
