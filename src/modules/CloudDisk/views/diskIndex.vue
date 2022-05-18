@@ -30,7 +30,6 @@
 				<!-- v-show="navType != 'trans' && navType != 'ectd' && navType != 'image' && navType != 'template'" -->
 
 				<div
-					style="display: none"
 					ref="diskFileArea"
 					class="cloud-disk-content"
 					:class="diskFileShowType"
@@ -149,11 +148,11 @@
 								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou"></i>
 							</div>
 						</div>
-						<div class="tool-color" v-else-if="handleOpenDrawer == 'fontColor'">
+						<div class="tool-color" v-else-if="handleOpenDrawer == 'fontColor' || handleOpenDrawer == 'bgColor'">
 							<div class="demonstration G-bold">自设样式</div>
 							<div class="block G-Mt-10">
 								<el-color-picker
-									v-model="curData.fColor"
+									v-model="isTF"
 									@active-change="handleColor"
 									:show-alpha="false"
 									:predefine="predefineColors"
@@ -174,20 +173,21 @@
 						</div>
 						<div class="tool-filter" v-else-if="handleOpenDrawer == 'fontOften'">
 							<div class="list" v-for="(citem, index) in fontOften" :key="index">
-								
 								<p
-								:style="{
-									color: `rgb(${citem.fColor})`,
-									fontSize: citem.fSize + 'px',
-									fontFamily: citem.fFamily,
-									fontStyle: citem.fStyle,
-									textAlign: citem.fAlign,
-									opacity: citem.fOpcity / 100,
-									fontWeight: citem.fWeight,
-									writingMode: citem.fMode,
-									transform: citem['fScale'] || '',
-								}"
-								>{{ citem.name }}</p>
+									:style="{
+										color: `rgb(${citem.fColor})`,
+										fontSize: citem.fSize + 'px',
+										fontFamily: citem.fFamily,
+										fontStyle: citem.fStyle,
+										textAlign: citem.fAlign,
+										opacity: citem.fOpcity / 100,
+										fontWeight: citem.fWeight,
+										writingMode: citem.fMode,
+										transform: citem['fScale'] || '',
+									}"
+								>
+									{{ citem.name }}
+								</p>
 							</div>
 						</div>
 						<div class="tool-filter" v-else-if="handleOpenDrawer == 'imageFilter'">
@@ -207,10 +207,34 @@
 								<span>{{ item.name }}</span>
 							</div>
 						</div>
-						<div class="tool-image" hidden>
-							<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
-
+						<div class="tool-image" v-else-if="handleOpenDrawer == 'imageSource'">
+							<div style="display:flex">
+								<Poptip
+									trigger="hover"
+									placement="bottom-start"
+									width="85"
+									padding="0"
+									@on-popper-show="hoverUpload = true"
+									@on-popper-hide="hoverUpload = false"
+								>
+									<button class="btn primary">
+										<div class="upload-text">
+											<span>上传</span>
+											<Icon :class="['arrow', { rotate: hoverUpload }]" type="ios-arrow-up" />
+										</div>
+									</button>
+									<ul class="upload-type" slot="content">
+										<li @click="actionControl('upload')">文件</li>
+										<li @click="actionControl('uploadFolder')">文件夹</li>
+									</ul>
+								</Poptip>
+								<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
+								<button class="btn default" @click="actionControl('newAllFolder')">新建子文件夹</button>
+							</div>
+							<div class="G-Mt-15">
 							<el-button type="success" size="small" plain @click="handleChange('my')">我的素材</el-button>
+								<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
+							</div>
 
 							<el-breadcrumb class="G-Mt-15" separator-class="el-icon-arrow-right">
 								<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -223,10 +247,117 @@
 							</el-breadcrumb>
 
 							<div class="G-Mt-15">
-								<div class="list" v-for="item in 20">
-									<img src="https://img1.baidu.com/it/u=3078839842,1528260431&fm=253&fmt=auto&app=138&f=JPEG?w=658&h=368" alt />
-									<div class="G-t-c">文件夹</div>
-								</div>
+								<div
+					ref="diskFileArea"
+					class="cloud-disk-content"
+					:class="diskFileShowType"
+					@scroll="loadMoreDiskData"
+					@mousedown="mainMouseControl"
+					@dragover.prevent.stop="dropUploadTips(true)"
+					@dragleave.prevent.stop="dropUploadTips(false)"
+					@drop.prevent.stop="dropUpload"
+					v-contextmenu:contextmenuWrap
+				>
+					<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
+
+					<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
+
+					<diskFile
+						v-for="(item, index) in diskData"
+						:key="item.id"
+						:item="item"
+						@mousedown.stop="selectFile($event, item, index)"
+						@open="diskFeatureControl"
+					></diskFile>
+
+					<div class="mouse-select" v-show="mouseSelectData.width" :style="mouseSelectData" />
+
+					<div class="upload-tips" v-if="showUploadTips">松开鼠标开始上传文件</div>
+
+					<contextmenu ref="contextmenuWrap">
+						<template v-if="mouseDownWhere === 'area'">
+							<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
+
+							<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
+
+							<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
+
+							<contextmenu-item divider></contextmenu-item>
+
+							<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+								>清空剪贴板</contextmenu-item
+							>
+
+							<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+								>粘贴</contextmenu-item
+							>
+
+							<contextmenu-item divider></contextmenu-item>
+
+							<contextmenu-item @click="diskFeatureControl('reload')">刷新</contextmenu-item>
+						</template>
+
+						<template v-else>
+							<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
+								<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
+
+								<contextmenu-item divider></contextmenu-item>
+							</template>
+
+							<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
+
+							<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
+								<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
+
+								<!-- <contextmenu-item divider></contextmenu-item> -->
+
+								<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
+
+								<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
+
+								<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
+
+								<!-- <contextmenu-item divider></contextmenu-item> -->
+
+								<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
+							</template>
+
+							<!-- <contextmenu-item divider v-else></contextmenu-item> -->
+
+							<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
+
+							<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
+
+							<!-- </template> -->
+
+							<template v-if="navType !== 'share'">
+								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
+
+								<contextmenu-item divider></contextmenu-item>
+							</template>
+
+							<template v-if="navType === 'share'">
+								<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect">取消分享</contextmenu-item>
+							</template>
+
+							<template v-else-if="diskInfo.categoryType !== 'trash'">
+								<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect"
+									>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item
+								>
+							</template>
+
+							<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
+						</template>
+					</contextmenu>
+
+					<loading :loading="loading" :length="diskData.length"></loading>
+
+					<div id="draggingFile" :style="draggingFilesStyle">
+						<div class="icon sf-icon-file">
+							<span>{{ diskInfo.selectFiles.length }}</span>
+						</div>
+					</div>
+				</div>
 							</div>
 						</div>
 						<div class="tool-allFont" hidden>
@@ -276,7 +407,14 @@
 									</el-tooltip>
 								</div>
 							</div>
-							<div class="box" ref="mainChildBox">
+							<div
+								class="box"
+								:style="{
+									backgroundColor: `rgb(${templateListBgc[index].bgColor})`,
+									backgroundImage: `url(${templateListBgc[index].bgImage})`,
+								}"
+								ref="mainChildBox"
+							>
 								<div v-for="(citem, cindex) in item" :key="citem.rand">
 									<vue-draggable-resizable
 										style="display: flex; align-items: center; justify-content: center"
@@ -513,7 +651,7 @@ export default {
 					style: 'aden',
 				},
 			],
-			fontOften:[
+			fontOften: [
 				{
 					fScale: '1',
 					type: 'text',
@@ -648,7 +786,7 @@ export default {
 						fMode: 'inherit', // 横竖
 						fAlign: 'center', // 居中
 						fOpcity: 100, // 透明度
-						fShadow:'', // 阴影
+						fShadow: '', // 阴影
 						familyText: '第一个', //
 					},
 					{
@@ -662,6 +800,13 @@ export default {
 				],
 				// [{type:'image',url:'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/12.png',iFilter:''}],
 			],
+			templateListBgc: [
+				{
+					bgColor: '255,255,255',
+					bgImage: '',
+				},
+			],
+			templateIdx: null,
 			handleOpenDrawer: '',
 			generateData: {
 				type: '',
@@ -684,6 +829,9 @@ export default {
 	computed: {
 		diskFileShowType: function () {
 			return this.$store.state.fileStateIcon === 'sf-icon-th-large' ? 'block-file' : 'list-file';
+		},
+		isTF() {
+			return this.handleOpenDrawer === 'fontColor' ? this.curData.fColor : this.templateListBgc[this.templateIdx].bgColor;
 		},
 
 		haveSelect: function () {
@@ -790,6 +938,9 @@ export default {
 	},
 
 	methods: {
+		actionControl(commend){
+			this.diskFeatureControl(commend);
+		},
 		handleMainScale(e) {
 			console.log(this.toChinesNum(1), '1212');
 			this.$refs.mainBox.map((item, index) => {
@@ -819,7 +970,9 @@ export default {
 				this.curData.fFamily = item.path;
 				this.curData.familyText = item.name;
 			} else if (type === 'fontColor') {
-				this.curData.fColor = item;
+				this.handleOpenDrawer === 'fontColor'
+					? (this.curData.fColor = item)
+					: this.$set(this.templateListBgc, this.templateIdx, { ...this.templateListBgc[this.templateIdx], bgColor: item });
 			} else if (type === 'imageFilter') {
 				this.curData.iFilter = item.style;
 			} else if (type === 'imageStyle') {
@@ -827,6 +980,7 @@ export default {
 			}
 		},
 		handleSelectFamily(e) {
+			console.log(e.status, 'e.status');
 			this.handleOpenDrawer = e.status;
 		},
 		dragstop(data, x, y, width, height) {
@@ -838,15 +992,16 @@ export default {
 			let dom_height = this.$refs[data.rand][0].clientHeight;
 			this.$set(this.templateList[index][cindex], 'fScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][0].style.transform = `scale(${width / dom_width},${height / dom_height})`;
-			console.log(width, this.$refs[data.rand][0].clientWidth, height / dom_height, '@1212');
 			data.w = width;
 			data.h = height;
 		},
 		onActivated(ele, index, cindex) {
 			if (ele.type === 'text') {
 				this.curData = ele;
+				this.handleOpenDrawer = 'fontOften';
 			} else if (ele.type === 'image') {
 				this.curData = ele;
+				this.handleOpenDrawer = 'imageSource';
 			}
 			// let width = this.$refs[ele.rand][0].clientWidth;
 			// let height = this.$refs[ele.rand][0].clientHeight;
@@ -950,12 +1105,15 @@ export default {
 			switch (commend) {
 				case 'delete': //删除
 					this.templateList.splice(index, 1);
+					this.templateListBgc.splice(index, 1);
 					break;
 				case 'add':
 					this.templateList.push({ text: 'text' });
+					this.templateListBgc.push({ bgColor: 'white', bgImage: '' });
 					break;
 				case 'clone':
 					this.templateList.push(this.templateList[index]);
+					this.templateListBgc.push(this.templateListBgc[index]);
 					break;
 
 				case 'down':
@@ -973,7 +1131,14 @@ export default {
 
 					break;
 				case 'bgColor':
-					//
+					// 背景色
+					this.templateIdx = index;
+					this.handleOpenDrawer = 'bgColor';
+					break;
+				case 'bgImage':
+					// 背景图
+					this.templateIdx = index;
+					this.handleOpenDrawer = 'imageSource';
 					break;
 			}
 		},
@@ -3119,6 +3284,51 @@ export default {
 .style2 {
 	border: 2px dashed #333;
 	border-radius: 50%;
+}
+.btn {
+	padding: 2px 10px;
+	border-radius: 3px;
+	font-size: 12px;
+	display: flex;
+	align-items: center;
+	margin-right: 10px;
+	border: 1px solid rgba(0, 0, 0, 0);
+	.icon {
+		margin-right: 5px;
+	}
+	&.primary {
+		background: $diskMainColor;
+		color: #fff;
+	}
+	&.default {
+		background: #fff;
+		color: #6d6d6d;
+		border: 1px solid #eee;
+	}
+	&.text {
+		color: #6d6d6d;
+		background: none;
+		&:hover {
+			color: $diskMainColor;
+		}
+	}
+	&.remove {
+		color: #fff;
+		background: #f5491f;
+	}
+	.upload-text {
+		display: flex;
+		align-items: center;
+		.arrow {
+			transition: all 350ms;
+			font-size: 16px;
+			margin-top: -1px;
+			margin-left: 5px;
+		}
+		.rotate {
+			transform: rotate(180deg) !important;
+		}
+	}
 }
 </style>
 

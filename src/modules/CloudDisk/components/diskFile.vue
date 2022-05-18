@@ -44,7 +44,7 @@ export default {
 /*文件图标视图*/
 .block-file {
 	.file {
-		width: 90px;
+		width: 85px;
 		height: 80px;
 		float: left;
 		margin: 10px 10px 0 0;

@@ -226,6 +226,9 @@
 				</el-tooltip>
 			</div>
 			<div class="left font" v-if="curData.type == 'image'">
+				<el-tooltip class="item" effect="dark" content="图片素材" placement="bottom">
+					<div @click="handleChange('imageSource')"><i class="iconfont icon-sucaiku"></i></div>
+				</el-tooltip>
 				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
 					<div @click="handleChange('imageFilter')"><i class="iconfont icon-lvjing"></i></div>
 				</el-tooltip>
@@ -253,6 +256,7 @@
 				</el-tooltip>
 			</div>
 		</div>
+		<!-- 网盘 -->
 		<!-- <div class="navigation-container">
 			<div class="left" v-if="type !== 'trans'">
 				<button class="sf-icon-chevron-left" @click="navControl('back')" :disabled="data.navData.length === 0" />
@@ -302,6 +306,8 @@ import brandData from './brandData.vue';
 import classifyData from './classifyData.vue';
 import companyData from './companyData.vue';
 import imgTextData from './imgTextData.vue';
+import html2canvas from 'html2canvas'; //生成图片
+import $ from 'jquery'
 export default {
 	name: 'diskNavigation',
 	components: {
@@ -441,17 +447,21 @@ export default {
 				this.curData.fAlign = nType;
 					break;
 				case 'fontVertically': // 排列方式/横竖
-				fMode == 'inherit' ? this.curData.fMode = 'tb' : this.curData.fMode = 'inherit'
+				fMode === 'inherit' ? this.curData.fMode = 'tb' : this.curData.fMode = 'inherit'
 					break;
 				case 'fontOpacity': // 透明度
 					break;
 				case 'save': // 保存模板
 					break;
 				case 'export': // 导出图片
+				this.getJs();
 					break;
 				// 图片的
 				case 'imageFilter': // 图片滤镜
 				this.$emit('handleSelectFamily', { status: 'imageFilter' });
+					break;
+				case 'imageSource': // 图片素材
+				this.$emit('handleSelectFamily', { status: 'imageSource' });
 					break;
 				case 'imageStyle': // 图片样式
 				this.$emit('handleSelectFamily', { status: 'imageStyle' });
@@ -466,6 +476,38 @@ export default {
 					}
 						screenfull.toggle();
 				 break;
+			}
+		},
+		getJs() {
+			let self = this;
+			let length = $('.template-main').length;
+			var canvas = document.createElement('canvas');
+			window.pageYoffset = 0;
+			document.documentElement.scrollTop = 0;
+			document.body.scrollTop = 0;
+			for (let i = 0; i < length; i++) {
+					html2canvas($('.template-main').eq(i).find('.box')[0], {
+						logging: false,
+						scrollY: 0,
+						scrollX: 0,
+						useCORS: true,
+						allowTaint: false,
+						tainTaint: false,
+						scale: 6,
+						height: 606.15,
+						width: 428.49,
+						windowWidth: document.body.scrollWidth,
+						windowHeight: document.body.scrollHeight,
+					}).then(function (canvas) {
+						console.log(canvas.toDataURL(),"canvas.toDataURL()")
+						// if (imgsSrc.length === self.swiperBanner.length) {
+						// 	if (parentId) {
+						// 		// self.packageImages(imgsSrc, parentId);
+						// 	} else {
+						// 		// self.packageImages(imgsSrc);
+						// 	}
+						// }
+					});
 			}
 		},
 		allKeyup(e) {
