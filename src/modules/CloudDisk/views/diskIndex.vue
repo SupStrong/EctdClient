@@ -9,6 +9,7 @@
 
 			<div class="right">
 				<diskNavigation
+					ref="diskNavigation"
 					:data="diskInfo"
 					:type="navType"
 					:loading="loading"
@@ -132,7 +133,7 @@
 						</template>
 					</contextmenu>
 
-					<loading :loading="loading" :length="diskData.length"></loading>
+					<!-- <loading :loading="loading" :length="diskData.length"></loading> -->
 
 					<div id="draggingFile" :style="draggingFilesStyle">
 						<div class="icon sf-icon-file">
@@ -142,6 +143,8 @@
 				</div>
 				<div class="tool-box">
 					<div class="tool">
+						
+						{{handleOpenDrawer}}
 						<div class="tool-font" v-if="handleOpenDrawer == 'fontFamily'">
 							<div class="list" v-for="(item, index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily', item)">
 								<span class="G-Fsize-14 G-color-333">{{ item.name }}</span>
@@ -208,7 +211,7 @@
 							</div>
 						</div>
 						<div class="tool-image" v-else-if="handleOpenDrawer == 'imageSource'">
-							<div style="display:flex">
+							<div style="display: flex">
 								<Poptip
 									trigger="hover"
 									placement="bottom-start"
@@ -231,134 +234,135 @@
 								<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
 								<button class="btn default" @click="actionControl('newAllFolder')">新建子文件夹</button>
 							</div>
-							<div class="G-Mt-15">
-							<el-button type="success" size="small" plain @click="handleChange('my')">我的素材</el-button>
-								<el-button type="primary" size="small" plain @click="handleChange('official')">官方素材</el-button>
+							<!-- 网盘 -->
+							<div class="navigation-container">
+								<div class="container">
+									<button class="sf-icon-home G-bg-white G-Mr-5" @click="navControl('home')" style="font-size: 15px" />
+									<div class="item" @click="navControl('home')">{{ diskInfo.category }}</div>
+									<div v-for="(item, index) in diskInfo.navData" :key="index" @mouseover="handleDragEnter" class="item" @click="navControl(item)">
+										{{ item.name }}
+									</div>
+								</div>
 							</div>
-
-							<el-breadcrumb class="G-Mt-15" separator-class="el-icon-arrow-right">
-								<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-
-								<el-breadcrumb-item>活动管理</el-breadcrumb-item>
-
-								<el-breadcrumb-item>活动列表</el-breadcrumb-item>
-
-								<el-breadcrumb-item>活动详情</el-breadcrumb-item>
-							</el-breadcrumb>
-
 							<div class="G-Mt-15">
 								<div
-					ref="diskFileArea"
-					class="cloud-disk-content"
-					:class="diskFileShowType"
-					@scroll="loadMoreDiskData"
-					@mousedown="mainMouseControl"
-					@dragover.prevent.stop="dropUploadTips(true)"
-					@dragleave.prevent.stop="dropUploadTips(false)"
-					@drop.prevent.stop="dropUpload"
-					v-contextmenu:contextmenuWrap
-				>
-					<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
-
-					<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
-
-					<diskFile
-						v-for="(item, index) in diskData"
-						:key="item.id"
-						:item="item"
-						@mousedown.stop="selectFile($event, item, index)"
-						@open="diskFeatureControl"
-					></diskFile>
-
-					<div class="mouse-select" v-show="mouseSelectData.width" :style="mouseSelectData" />
-
-					<div class="upload-tips" v-if="showUploadTips">松开鼠标开始上传文件</div>
-
-					<contextmenu ref="contextmenuWrap">
-						<template v-if="mouseDownWhere === 'area'">
-							<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
-
-							<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
-
-							<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
-
-							<contextmenu-item divider></contextmenu-item>
-
-							<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
-								>清空剪贴板</contextmenu-item
-							>
-
-							<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
-								>粘贴</contextmenu-item
-							>
-
-							<contextmenu-item divider></contextmenu-item>
-
-							<contextmenu-item @click="diskFeatureControl('reload')">刷新</contextmenu-item>
-						</template>
-
-						<template v-else>
-							<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
-								<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
-
-								<contextmenu-item divider></contextmenu-item>
-							</template>
-
-							<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
-
-							<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
-								<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
-
-								<!-- <contextmenu-item divider></contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
-
-								<!-- <contextmenu-item divider></contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
-							</template>
-
-							<!-- <contextmenu-item divider v-else></contextmenu-item> -->
-
-							<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
-
-							<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
-
-							<!-- </template> -->
-
-							<template v-if="navType !== 'share'">
-								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
-
-								<contextmenu-item divider></contextmenu-item>
-							</template>
-
-							<template v-if="navType === 'share'">
-								<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect">取消分享</contextmenu-item>
-							</template>
-
-							<template v-else-if="diskInfo.categoryType !== 'trash'">
-								<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect"
-									>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item
+									ref="diskFileArea"
+									class="cloud-disk-content"
+									:class="diskFileShowType"
+									@scroll="loadMoreDiskData"
+									@mousedown="mainMouseControl"
+									@dragover.prevent.stop="dropUploadTips(true)"
+									@dragleave.prevent.stop="dropUploadTips(false)"
+									@drop.prevent.stop="dropUpload"
+									v-contextmenu:contextmenuWrap
 								>
-							</template>
+									<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
 
-							<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
-						</template>
-					</contextmenu>
+									<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
+									<diskFile
+										v-for="(item, index) in diskData"
+										:key="item.id"
+										:item="item"
+										@mousedown.stop="selectFile($event, item, index)"
+										@open="diskFeatureControl"
+									></diskFile>
+									<!-- @open="diskFeatureControl" -->
+									<div class="mouse-select" v-show="mouseSelectData.width" :style="mouseSelectData" />
 
-					<loading :loading="loading" :length="diskData.length"></loading>
+									<div class="upload-tips" v-if="showUploadTips">松开鼠标开始上传文件</div>
 
-					<div id="draggingFile" :style="draggingFilesStyle">
-						<div class="icon sf-icon-file">
-							<span>{{ diskInfo.selectFiles.length }}</span>
-						</div>
-					</div>
-				</div>
+									<contextmenu ref="contextmenuWrap">
+										<template v-if="mouseDownWhere === 'area'">
+											<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
+
+											<contextmenu-item divider></contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+												>清空剪贴板</contextmenu-item
+											>
+
+											<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+												>粘贴</contextmenu-item
+											>
+
+											<contextmenu-item divider></contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('reload')">刷新</contextmenu-item>
+										</template>
+
+										<template v-else>
+											<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
+												<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
+
+												<contextmenu-item divider></contextmenu-item>
+											</template>
+
+											<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
+
+											<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
+												<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
+
+												<!-- <contextmenu-item divider></contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
+
+												<!-- <contextmenu-item divider></contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
+											</template>
+
+											<!-- <contextmenu-item divider v-else></contextmenu-item> -->
+
+											<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
+
+											<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
+
+											<!-- </template> -->
+
+											<template v-if="navType !== 'share'">
+												<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
+
+												<contextmenu-item divider></contextmenu-item>
+											</template>
+
+											<template v-if="navType === 'share'">
+												<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect">取消分享</contextmenu-item>
+											</template>
+
+											<template v-else-if="diskInfo.categoryType !== 'trash'">
+												<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect"
+													>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item
+												>
+											</template>
+
+											<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
+										</template>
+									</contextmenu>
+
+									<!-- <loading :loading="loading" :length="diskData.length"></loading> -->
+
+									<div id="draggingFile" :style="draggingFilesStyle">
+										<div class="icon sf-icon-file">
+											<span>{{ diskInfo.selectFiles.length }}</span>
+										</div>
+									</div>
+								</div>
 							</div>
+						</div>
+						<!-- 数据 -->
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableText'">
+							常用文字
+						</div>
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableAll'">
+							常用表格
 						</div>
 						<div class="tool-allFont" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">我的字体</el-button>
@@ -409,6 +413,8 @@
 							</div>
 							<div
 								class="box"
+								@click="handleTemplateIndex(index)"
+								:class="{'active':index == templateIdx}"
 								:style="{
 									backgroundColor: `rgb(${templateListBgc[index].bgColor})`,
 									backgroundImage: `url(${templateListBgc[index].bgImage})`,
@@ -453,9 +459,9 @@
 										:h="citem.h || 'auto'"
 										:x="citem.x"
 										:y="citem.y"
+										:lock-aspect-ratio="false"
 										class-name-active="my-active-class"
 										v-if="citem.type == 'image'"
-										:lock-aspect-ratio="true"
 										@dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
 										@activated="(left, top, width, height) => onActivated(citem, index)"
 										@resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index, cindex)"
@@ -468,8 +474,8 @@
 											:class="[citem.iFilter, citem.iStyle]"
 											:style="{
 												transform: citem['fScale'] || '',
-												width: citem.w ? citem.w + 'px' : '100px',
-												height: citem.h ? citem.h + 'px' : '100px',
+												maxWidth: citem.w ? citem.w + 'px' : '100px',
+												maxheight: citem.h ? citem.h + 'px' : '100px',
 											}"
 										/>
 									</vue-draggable-resizable>
@@ -938,7 +944,17 @@ export default {
 	},
 
 	methods: {
-		actionControl(commend){
+		navControl(type) {
+			console.log(type, 'deded');
+			this.diskNavigationControl(type);
+		},
+		handleTemplateIndex(index){
+			this.templateIdx = index;
+		},
+		handleDragEnter(e) {
+			console.log(e);
+		},
+		actionControl(commend) {
 			this.diskFeatureControl(commend);
 		},
 		handleMainScale(e) {
@@ -1108,7 +1124,7 @@ export default {
 					this.templateListBgc.splice(index, 1);
 					break;
 				case 'add':
-					this.templateList.push({ text: 'text' });
+					this.templateList.push([{ text: 'text' }]);
 					this.templateListBgc.push({ bgColor: 'white', bgImage: '' });
 					break;
 				case 'clone':
@@ -1326,8 +1342,8 @@ export default {
 				this.loading = false;
 
 				this.diskInfo.count = rs.data.count;
-
 				this.diskData = [...this.diskData, ...rs.data.rows];
+				console.log(this.diskData, 'diskDatadiskData');
 			});
 		},
 
@@ -1871,8 +1887,6 @@ export default {
 		},
 
 		diskFeatureControl(commend) {
-			console.log(commend, 'commendcommend');
-
 			let isDragMove = this.draggingFilesStyle.display === 'flex';
 
 			switch (commend) {
@@ -1930,7 +1944,19 @@ export default {
 
 						this.diskInfo.navData.push(item);
 					} else {
-						this.openFileHandle(item);
+						if(item.openType === 'image'){
+							console.log(item,"dede")
+								this.templateList[this.templateIdx].push({
+									rand: '2',
+									fScale: '1',
+									type: 'image',
+									url: `https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com` + item.content,
+									iFilter: '',
+									iStyle: '',
+								});
+						}else{
+							this.openFileHandle(item);
+						}
 					}
 
 					break;
@@ -2405,8 +2431,6 @@ export default {
 
 		openFileHandle(item) {
 			let openType = item.openType;
-
-			console.log(item, 'iiii');
 
 			let mediaFileType = ['image', 'video', 'audio'];
 
@@ -3009,7 +3033,7 @@ export default {
 	margin: 0 auto;
 
 	&-main {
-		width: 428.49px;
+		width: 514.188px;
 
 		margin-top: 10px;
 
@@ -3022,9 +3046,14 @@ export default {
 		.box {
 			background-color: #fff;
 			width: 100%;
-			height: 606.15px;
+			height: 727.38px;
 			position: relative;
 			cursor: pointer;
+			box-sizing: border-box;
+			border: 2px solid white;
+			&.active{
+				border: 2px dashed #88ffe3 !important;
+			}
 		}
 	}
 
@@ -3330,5 +3359,32 @@ export default {
 		}
 	}
 }
+		.container {
+			width: 100%;
+			height: 35px;
+			flex: 1;
+			display: flex;
+			align-items: center;
+			padding: 0 10px;
+			.item {
+				height: 35px;
+				line-height: 35px;
+				color: #757575;
+				font-size: 14px;
+				text-overflow: ellipsis;
+				cursor: pointer;
+				padding: 0 2px;
+			}
+			.item:before {
+				content: '/';
+				color: #dadada;
+			}
+			.item:first-child:before {
+				display: none;
+			}
+			.item:hover {
+				color: $diskMainColor;
+			}
+		}
 </style>
 
