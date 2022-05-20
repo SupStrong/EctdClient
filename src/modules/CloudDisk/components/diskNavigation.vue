@@ -242,7 +242,7 @@
 					<div @click="handleChange('imageCut')"><i class="iconfont icon-jianqie"></i></div>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-else-if="isCurrent == 'tableBox'">
+			<div class="left font" v-else-if="curData.type == 'table'">
 				<el-tooltip class="item" effect="dark" content="常用文案" placement="bottom">
 					<div @click="handleChange('tableText')"><i class="iconfont icon-icon"></i></div>
 				</el-tooltip>
@@ -250,7 +250,7 @@
 					<div @click="handleChange('tableAll')"><i class="iconfont icon-changyongshili"></i></div>
 				</el-tooltip>
 			</div>
-			<div class="left font" v-else-if="isCurrent == 'templateBox'">
+			<div class="left font" v-else-if="curData.type == 'template'">
 				<el-tooltip class="item" effect="dark" content="我的模板" placement="bottom">
 					<div @click="handleChange('fontVertically')"><i class="iconfont icon-wode"></i></div>
 				</el-tooltip>
@@ -382,6 +382,7 @@ export default {
 		haveSelect() {
 			return this.$parent.haveSelect;
 		},
+		
 	},
 	methods: {
 		navControl(commend) {
@@ -420,27 +421,21 @@ export default {
 					this.$emit('handleSelectFamily', { status: 'fontOften' });
 				// 第一级
 				case 'textBox': //无
-					this.isCurrent = 'textBox'
 					break;
 				case 'imageBox': //无
-					this.isCurrent = 'imageBox'
 					break;
 				case 'templateBox': //无	
-					this.curData = {};
-					this.isCurrent = 'templateBox'
+					this.curData = {type:'template'};
 					break;
 				case 'tableBox': //无
-				this.curData = {};
-					this.isCurrent = 'tableBox'
+				this.curData = {type:'table'};
 					break;
 				// 数据的
 				case 'tableText': //无
-					this.isCurrent = 'tableText';
-						this.$emit('handleSelectFamily', { status: 'tableText' });
+						this.$emit('handleSelectFamily', { status: 'tableText',data:{} });
 					break;
 				case 'tableAll': //无
-					this.isCurrent = 'tableAll';
-						this.$emit('handleSelectFamily', { status: 'tableAll' });
+				this.$emit('handleSelectFamily', { status: 'tableAll',data:{} });
 					break;
 				// 字体的
 				case 'fontFamily': // 字体

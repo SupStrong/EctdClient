@@ -143,8 +143,6 @@
 				</div>
 				<div class="tool-box">
 					<div class="tool">
-						
-						{{handleOpenDrawer}}
 						<div class="tool-font" v-if="handleOpenDrawer == 'fontFamily'">
 							<div class="list" v-for="(item, index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily', item)">
 								<span class="G-Fsize-14 G-color-333">{{ item.name }}</span>
@@ -359,10 +357,43 @@
 						</div>
 						<!-- 数据 -->
 						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableText'">
-							常用文字
+							<el-collapse>
+								<el-collapse-item v-for="(item,index) in Object.keys(tagArr)" :key="index" :title="item" :name="index + 1">
+									<button class="btn warning" @click="actionControl('addTableText',item)">{{item}}</button>
+									<span v-for="(citem,cindex) in tagArr[item]" :key="cindex" class="G-Mr-10 G-Mt-5 G-Fsize-15 G-dis-block G-cursor" @dblclick="handleTag(citem)">{{citem}}</span>
+								</el-collapse-item>
+							</el-collapse>
 						</div>
 						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableAll'">
-							常用表格
+							<el-table
+							:data="tableData"
+							style="width: 100%">
+							<el-table-column type="expand">
+								<template slot-scope="props">
+									<el-form label-position="left" inline class="demo-table-expand">
+										<el-form-item label="产品名称：">
+											<span class="G-cursor">{{ props.row.name }}</span>
+										</el-form-item>
+										<el-form-item label="别称：">
+											<span class="G-cursor">{{ props.row.shopId }}</span>
+										</el-form-item>
+										<el-form-item label="品牌：">
+											<span class="G-cursor">{{ props.row.shop }}</span>
+										</el-form-item>
+										<el-form-item label="分类：">
+											<span class="G-cursor">{{ props.row.id }}</span>
+										</el-form-item>
+										<el-form-item label="功效：">
+											<span class="G-cursor">{{ props.row.category }}</span>
+										</el-form-item>
+									</el-form>
+								</template>
+							</el-table-column>
+							<el-table-column
+								label="产品名称"
+								prop="name">
+							</el-table-column>
+						</el-table>
 						</div>
 						<div class="tool-allFont" hidden>
 							<el-button type="primary" size="small" plain @click="handleChange('official')">我的字体</el-button>
@@ -414,7 +445,7 @@
 							<div
 								class="box"
 								@click="handleTemplateIndex(index)"
-								:class="{'active':index == templateIdx}"
+								:class="{ active: index == templateIdx }"
 								:style="{
 									backgroundColor: `rgb(${templateListBgc[index].bgColor})`,
 									backgroundImage: `url(${templateListBgc[index].bgImage})`,
@@ -583,7 +614,6 @@ export default {
 	data() {
 		return {
 			navType: 'disk',
-
 			diskData: [],
 
 			isTure: true,
@@ -716,7 +746,45 @@ export default {
 				'255, 189, 89',
 				'255, 145, 77',
 			],
-
+			tagArr:{
+				'产品文案':['绝绝子','绝绝子','绝绝子绝绝子','绝绝子绝绝子绝绝子绝绝子绝绝子绝绝子','第四个','绝绝子','绝绝子','第四个','第五个','第四个','第五个','第五个','第四个','第五个'],
+				'分类文案':['第二个'],
+				'标签文案':['第三个'],
+				'其他文案':['第四个','第五个']
+			},
+			tableData: [{
+          id: '12987122',
+          name: '好滋好味鸡蛋仔',
+          category: '江浙小吃、小吃零食',
+          desc: '荷兰优质淡奶，奶香浓而不腻',
+          address: '上海市普陀区真北路',
+          shop: '王小虎夫妻店',
+          shopId: '10333'
+        }, {
+          id: '12987123',
+          name: '好滋好味鸡蛋仔',
+          category: '江浙小吃、小吃零食',
+          desc: '荷兰优质淡奶，奶香浓而不腻',
+          address: '上海市普陀区真北路',
+          shop: '王小虎夫妻店',
+          shopId: '10333'
+        }, {
+          id: '12987125',
+          name: '好滋好味鸡蛋仔',
+          category: '江浙小吃、小吃零食',
+          desc: '荷兰优质淡奶，奶香浓而不腻',
+          address: '上海市普陀区真北路',
+          shop: '王小虎夫妻店',
+          shopId: '10333'
+        }, {
+          id: '12987126',
+          name: '好滋好味鸡蛋仔',
+          category: '江浙小吃、小吃零食',
+          desc: '荷兰优质淡奶，奶香浓而不腻',
+          address: '上海市普陀区真北路',
+          shop: '王小虎夫妻店',
+          shopId: '10333'
+        }],
 			loading: true,
 
 			/*拖拽选择参数*/
@@ -779,30 +847,7 @@ export default {
 			],
 			templateList: [
 				[
-					{
-						rand: '1',
-						fScale: '1', //缩放度
-						type: 'text', // 类型
-						name: '你好', //
-						fColor: '0,0,0', // 颜色
-						fSize: 20, // 字号
-						fFamily: 'cursive', // 字体
-						fWeight: '400', // 宽度
-						fStyle: 'inherit', // 倾斜度
-						fMode: 'inherit', // 横竖
-						fAlign: 'center', // 居中
-						fOpcity: 100, // 透明度
-						fShadow: '', // 阴影
-						familyText: '第一个', //
-					},
-					{
-						rand: '2',
-						fScale: '1',
-						type: 'image',
-						url: 'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/8.png',
-						iFilter: '',
-						iStyle: '',
-					},
+					
 				],
 				// [{type:'image',url:'https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com/image/2022/4-5/12.png',iFilter:''}],
 			],
@@ -948,14 +993,34 @@ export default {
 			console.log(type, 'deded');
 			this.diskNavigationControl(type);
 		},
-		handleTemplateIndex(index){
+		handleTag(item,index){
+			this.templateList[this.templateIdx].push(
+				{
+						rand: '1',
+						fScale: '1', //缩放度
+						type: 'text', // 类型
+						name: item, //
+						fColor: '0,0,0', // 颜色
+						fSize: 20, // 字号
+						fFamily: 'cursive', // 字体
+						fWeight: '400', // 宽度
+						fStyle: 'inherit', // 倾斜度
+						fMode: 'inherit', // 横竖
+						fAlign: 'center', // 居中
+						fOpcity: 100, // 透明度
+						fShadow: '', // 阴影
+						familyText: '第一个', //
+					},
+			)
+		},
+		handleTemplateIndex(index) {
 			this.templateIdx = index;
 		},
 		handleDragEnter(e) {
 			console.log(e);
 		},
-		actionControl(commend) {
-			this.diskFeatureControl(commend);
+		actionControl(commend,type) {
+			this.diskFeatureControl(commend,type);
 		},
 		handleMainScale(e) {
 			console.log(this.toChinesNum(1), '1212');
@@ -996,7 +1061,9 @@ export default {
 			}
 		},
 		handleSelectFamily(e) {
-			console.log(e.status, 'e.status');
+			if (e.status === 'tableText' || e.status === 'tableAll') {
+				this.curData = { type: 'table' };
+			}
 			this.handleOpenDrawer = e.status;
 		},
 		dragstop(data, x, y, width, height) {
@@ -1886,10 +1953,32 @@ export default {
 			}
 		},
 
-		diskFeatureControl(commend) {
+		diskFeatureControl(commend,type) {
 			let isDragMove = this.draggingFilesStyle.display === 'flex';
 
 			switch (commend) {
+				case 'addTableText':
+					this.popupWindow({
+						title: '',
+						tips: `请输入${type}(逗号分割上传多条)`,
+						callback: (value) => {
+							if (value.length === 0) {
+								return this.$Message.error('文件夹名称不能为空');
+							}
+							this.$api.disk.newFolder(
+								{
+									parentId: this.diskInfo.id,
+									name: value,
+								},
+								(rs) => {
+									this.diskData.push(this.$api.disk.diskData(rs.data));
+									this.$Message.success(value + '已创建');
+								}
+							);
+						},
+					});
+
+				break;
 				case 'quick-open':
 					if (this.diskData[0]) {
 						this.$set(this.diskData[0], 'active', true);
@@ -1944,17 +2033,17 @@ export default {
 
 						this.diskInfo.navData.push(item);
 					} else {
-						if(item.openType === 'image'){
-							console.log(item,"dede")
-								this.templateList[this.templateIdx].push({
-									rand: '2',
-									fScale: '1',
-									type: 'image',
-									url: `https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com` + item.content,
-									iFilter: '',
-									iStyle: '',
-								});
-						}else{
+						if (item.openType === 'image') {
+							console.log(item, 'dede');
+							this.templateList[this.templateIdx].push({
+								rand: '2',
+								fScale: '1',
+								type: 'image',
+								url: `https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com` + item.content,
+								iFilter: '',
+								iStyle: '',
+							});
+						} else {
 							this.openFileHandle(item);
 						}
 					}
@@ -2865,6 +2954,24 @@ export default {
 </script>
 
 <style scoped lang="scss">
+::v-deep .el-collapse-item__content{
+	padding: 0 0 10px 0;
+}
+::v-deep .el-collapse-item__content{
+	padding: 0 0 10px 0;
+}
+::v-deep .el-form-item{
+	margin-bottom: 0;
+}
+::v-deep .el-table td{
+	padding: 6px 0;
+}
+::v-deep .el-form-item__content, ::v-deep .el-form-item__label{
+	line-height: 30px;
+}
+::v-deep .el-table__expanded-cell[class*=cell]{
+	padding: 10px 50px;
+}
 .my-active-class {
 	box-sizing: content-box;
 	border: 2px dashed rgb(136, 255, 227) !important;
@@ -3051,7 +3158,7 @@ export default {
 			cursor: pointer;
 			box-sizing: border-box;
 			border: 2px solid white;
-			&.active{
+			&.active {
 				border: 2px dashed #88ffe3 !important;
 			}
 		}
@@ -3359,32 +3466,32 @@ export default {
 		}
 	}
 }
-		.container {
-			width: 100%;
-			height: 35px;
-			flex: 1;
-			display: flex;
-			align-items: center;
-			padding: 0 10px;
-			.item {
-				height: 35px;
-				line-height: 35px;
-				color: #757575;
-				font-size: 14px;
-				text-overflow: ellipsis;
-				cursor: pointer;
-				padding: 0 2px;
-			}
-			.item:before {
-				content: '/';
-				color: #dadada;
-			}
-			.item:first-child:before {
-				display: none;
-			}
-			.item:hover {
-				color: $diskMainColor;
-			}
-		}
+.container {
+	width: 100%;
+	height: 35px;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	.item {
+		height: 35px;
+		line-height: 35px;
+		color: #757575;
+		font-size: 14px;
+		text-overflow: ellipsis;
+		cursor: pointer;
+		padding: 0 2px;
+	}
+	.item:before {
+		content: '/';
+		color: #dadada;
+	}
+	.item:first-child:before {
+		display: none;
+	}
+	.item:hover {
+		color: $diskMainColor;
+	}
+}
 </style>
 
