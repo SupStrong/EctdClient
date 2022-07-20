@@ -85,3 +85,5 @@ import '../style/flex.scss';
 import '../style/foot.scss';
 import '../style/public.scss';
 import '../style/reset.scss';
+// import '../style/bootstrap.min.css';
+// import '../style/style.css';

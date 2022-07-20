@@ -130,13 +130,398 @@
 						</div>
 					</div>
 				</div>
+				<div class="tool-box">
+					<div class="tool">
+						<div class="tool-font" v-if="handleOpenDrawer == 'fontFamily'">
+							<div class="list" v-for="(item, index) in fontFamilyArr" :key="index" @click="handleSelectStyle('fontFamily', item)">
+								<span class="G-Fsize-14 G-color-333">{{ item.name }}</span>
+								<i class="iconfont G-Fsize-16 G-color-333 icon-duigou"></i>
+							</div>
+						</div>
+						<div class="tool-color" v-else-if="handleOpenDrawer == 'fontColor' || handleOpenDrawer == 'bgColor'">
+							<div class="demonstration G-bold">自设样式</div>
+							<div class="block G-Mt-10">
+								<el-color-picker
+									v-model="isTF"
+									@active-change="handleColor"
+									:show-alpha="false"
+									:predefine="predefineColors"
+									color-format="hsv"
+								></el-color-picker>
+							</div>
+							<div class="G-bold">默认颜色</div>
+							<div>
+								<div
+									class="list G-Mt-10"
+									v-for="(item, index) in colorArr"
+									:key="index"
+									:style="{ 'background-color': 'rgb(' + item + ')' }"
+									:class="{ active: item == curData.fColor }"
+									@click="handleSelectStyle('fontColor', item)"
+								></div>
+							</div>
+						</div>
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'fontOften'">
+							<div class="list" v-for="(citem, index) in fontOften" :key="index">
+								<p
+									:style="{
+										color: `rgb(${citem.fColor})`,
+										fontSize: citem.fSize + 'px',
+										fontFamily: citem.fFamily,
+										fontStyle: citem.fStyle,
+										textAlign: citem.fAlign,
+										opacity: citem.fOpcity / 100,
+										fontWeight: citem.fWeight,
+										writingMode: citem.fMode,
+										transform: citem['fScale'] || '',
+									}"
+								>
+									{{ citem.name }}
+								</p>
+							</div>
+						</div>
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'imageFilter'">
+							<div class="list" v-for="(item, index) in filterArr" :key="index">
+								<img
+									:class="[item.style, curData.iFilter == item.style ? 'active' : '']"
+									@click="handleSelectStyle('imageFilter', item)"
+									src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2Ftp06%2F20111116192A364-0-lp.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1655220839&t=590d59cd546171c54d87187829038cef"
+									alt
+								/>
+								<span>{{ item.name }}</span>
+							</div>
+						</div>
+						<div class="tool-imgstyle" v-else-if="handleOpenDrawer == 'imageStyle'">
+							<div class="list" v-for="(item, index) in imgStyleArr" :key="index" @click="handleSelectStyle('imageStyle', item)">
+								<div class="list-box" :class="item.style"></div>
+								<span>{{ item.name }}</span>
+							</div>
+						</div>
+						<div class="tool-image" v-else-if="handleOpenDrawer == 'imageSource'">
+							<div style="display: flex">
+								<Poptip
+									trigger="hover"
+									placement="bottom-start"
+									width="85"
+									padding="0"
+									@on-popper-show="hoverUpload = true"
+									@on-popper-hide="hoverUpload = false"
+								>
+									<button class="btn primary">
+										<div class="upload-text">
+											<span>上传</span>
+											<Icon :class="['arrow', { rotate: hoverUpload }]" type="ios-arrow-up" />
+										</div>
+									</button>
+									<ul class="upload-type" slot="content">
+										<li @click="actionControl('upload')">文件</li>
+										<li @click="actionControl('uploadFolder')">文件夹</li>
+									</ul>
+								</Poptip>
+								<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
+								<button class="btn default" @click="actionControl('newAllFolder')">新建子文件夹</button>
+							</div>
+							<!-- 网盘 -->
+							<div class="navigation-container">
+								<div class="container">
+									<button class="sf-icon-home G-bg-white G-Mr-5" @click="navControl('home')" style="font-size: 15px" />
+									<div class="item" @click="navControl('home')">{{ diskInfo.category }}</div>
+									<div v-for="(item, index) in diskInfo.navData" :key="index" @mouseover="handleDragEnter" class="item" @click="navControl(item)">
+										{{ item.name }}
+									</div>
+								</div>
+							</div>
+							<div class="G-Mt-15">
+								<div
+									ref="diskFileArea"
+									class="cloud-disk-content"
+									:class="diskFileShowType"
+									@scroll="loadMoreDiskData"
+									@mousedown="mainMouseControl"
+									@dragover.prevent.stop="dropUploadTips(true)"
+									@dragleave.prevent.stop="dropUploadTips(false)"
+									@drop.prevent.stop="dropUpload"
+									v-contextmenu:contextmenuWrap
+								>
+									<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
+
+									<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
+									<diskFile
+										v-for="(item, index) in diskData"
+										:key="item.id"
+										:item="item"
+										@mousedown.stop="selectFile($event, item, index)"
+										@open="diskFeatureControl"
+									></diskFile>
+									<!-- @open="diskFeatureControl" -->
+									<div class="mouse-select" v-show="mouseSelectData.width" :style="mouseSelectData" />
+
+									<div class="upload-tips" v-if="showUploadTips">松开鼠标开始上传文件</div>
+
+									<contextmenu ref="contextmenuWrap">
+										<template v-if="mouseDownWhere === 'area'">
+											<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
+
+											<contextmenu-item divider></contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+												>清空剪贴板</contextmenu-item
+											>
+
+											<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
+												>粘贴</contextmenu-item
+											>
+
+											<contextmenu-item divider></contextmenu-item>
+
+											<contextmenu-item @click="diskFeatureControl('reload')">刷新</contextmenu-item>
+										</template>
+
+										<template v-else>
+											<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
+												<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
+
+												<contextmenu-item divider></contextmenu-item>
+											</template>
+
+											<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
+
+											<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
+												<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
+
+												<!-- <contextmenu-item divider></contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
+
+												<!-- <contextmenu-item divider></contextmenu-item> -->
+
+												<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
+											</template>
+
+											<!-- <contextmenu-item divider v-else></contextmenu-item> -->
+
+											<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
+
+											<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
+
+											<!-- </template> -->
+
+											<template v-if="navType !== 'share'">
+												<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
+
+												<contextmenu-item divider></contextmenu-item>
+											</template>
+
+											<template v-if="navType === 'share'">
+												<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect">取消分享</contextmenu-item>
+											</template>
+
+											<template v-else-if="diskInfo.categoryType !== 'trash'">
+												<contextmenu-item @click="diskFeatureControl('share')" :disabled="moreThanOneSelect"
+													>{{ diskInfo.select.share ? '取消' : '' }}分享</contextmenu-item
+												>
+											</template>
+
+											<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
+										</template>
+									</contextmenu>
+
+									<!-- <loading :loading="loading" :length="diskData.length"></loading> -->
+
+									<div id="draggingFile" :style="draggingFilesStyle">
+										<div class="icon sf-icon-file">
+											<span>{{ diskInfo.selectFiles.length }}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 数据 -->
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableText'">
+							<el-collapse>
+								<el-collapse-item v-for="(item,index) in Object.keys(tagArr)" :key="index" :title="item" :name="index + 1">
+									<button class="btn warning" @click="actionControl('addTableText',item)">{{item}}</button>
+									<span v-for="(citem,cindex) in tagArr[item]" :key="cindex" class="G-Mr-10 G-Mt-5 G-Fsize-15 G-dis-block G-cursor" @dblclick="handleTag(citem)">{{citem}}</span>
+								</el-collapse-item>
+							</el-collapse>
+						</div>
+						<div class="tool-filter" v-else-if="handleOpenDrawer == 'tableAll'">
+							<el-table
+							:data="tableData"
+							style="width: 100%">
+							<el-table-column type="expand">
+								<template slot-scope="props">
+									<el-form label-position="left" inline class="demo-table-expand">
+										<el-form-item label="产品名称：">
+											<span class="G-cursor">{{ props.row.name }}</span>
+										</el-form-item>
+										<el-form-item label="别称：">
+											<span class="G-cursor">{{ props.row.shopId }}</span>
+										</el-form-item>
+										<el-form-item label="品牌：">
+											<span class="G-cursor">{{ props.row.shop }}</span>
+										</el-form-item>
+										<el-form-item label="分类：">
+											<span class="G-cursor">{{ props.row.id }}</span>
+										</el-form-item>
+										<el-form-item label="功效：">
+											<span class="G-cursor">{{ props.row.category }}</span>
+										</el-form-item>
+									</el-form>
+								</template>
+							</el-table-column>
+							<el-table-column
+								label="产品名称"
+								prop="name">
+							</el-table-column>
+						</el-table>
+						</div>
+						<div class="tool-allFont" hidden>
+							<el-button type="primary" size="small" plain @click="handleChange('official')">我的字体</el-button>
+							<el-button type="success" size="small" plain @click="handleChange('my')">官方字体</el-button>
+							<div
+								style="
+									width: 50%;
+									float: left;
+									text-align: center;
+									cursor: pointer;
+									margin-top: 10px;
+									font-weight: 400;
+									font-style: normal;
+									color: rgb(136, 255, 227);
+									text-decoration: none;
+									font-size: 30px;
+									text-shadow: rgba(118, 85, 180, 0.74) 3.84525px 3.84525px 0px;
+								"
+							>
+								美好人生
+							</div>
+						</div>
+						<!-- <div class="tool-filter"></div> -->
+					</div>
+
+					<div class="template">
+						<div class="template-main" v-for="(item, index) in templateList" ref="mainBox" :key="index">
+							<div class="fl-row-justy">
+								<div class="G-t-r G-bold G-color-333 G-Fsize-16">第{{ toChinesNum(index + 1) }}页</div>
+								<div class="icon G-t-r">
+									<el-tooltip class="item" effect="dark" content="删除模板" v-if="templateList.length != 1" placement="top-start">
+										<i class="iconfont icon-shanchu G-Fsize-22 G-Mr-10" @click="handleChange('delete', index)"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="背景色" placement="top-start">
+										<i class="iconfont icon-beijingse G-Fsize-20 G-Mr-10" @click="handleChange('bgColor', index)"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="背景图" placement="top-start">
+										<i class="iconfont icon-beijingtupian G-Fsize-20 G-Mr-10" @click="handleChange('bgImage', index)"></i>
+									</el-tooltip>
+									<el-tooltip class="item" effect="dark" content="添加一个新模板" placement="top-start">
+										<i class="iconfont icon-tianjia G-Fsize-20 G-Mr-10" @click="handleChange('add', index)"></i>
+									</el-tooltip>
+
+									<el-tooltip class="item" effect="dark" content="复制一个新模板" placement="top-start">
+										<i class="iconfont icon-fuzhi G-Fsize-20 G-Mr-10" @click="handleChange('clone', index)"></i>
+									</el-tooltip>
+								</div>
+							</div>
+							<div
+								class="box"
+								@click="handleTemplateIndex(index)"
+								:class="{ active: index == templateIdx }"
+								:style="{
+									backgroundColor: `rgb(${templateListBgc[index].bgColor})`,
+									backgroundImage: `url(${templateListBgc[index].bgImage})`,
+								}"
+								ref="mainChildBox"
+							>
+								<div v-for="(citem, cindex) in item" :key="citem.rand">
+									<vue-draggable-resizable
+										style="display: flex; align-items: center; justify-content: center"
+										class-name-active="my-active-class"
+										v-if="citem.type == 'text'"
+										:w="citem.w || 'auto'"
+										:h="citem.h || 'auto'"
+										:x="citem.x"
+										:y="citem.y"
+										:lock-aspect-ratio="true"
+										@dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+										@activated="(left, top, width, height) => onActivated(citem, index, cindex)"
+										@resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index, cindex)"
+									>
+										<p
+											:ref="citem.rand"
+											:tabindex="citem.rand"
+											@keyup="handleQuick($event, index, cindex)"
+											:style="{
+												color: `rgb(${citem.fColor})`,
+												fontSize: citem.fSize + 'px',
+												fontFamily: citem.fFamily,
+												fontStyle: citem.fStyle,
+												textAlign: citem.fAlign,
+												opacity: citem.fOpcity / 100,
+												fontWeight: citem.fWeight,
+												writingMode: citem.fMode,
+												transform: citem['fScale'] || '',
+											}"
+										>
+											{{ citem.name }}
+										</p>
+									</vue-draggable-resizable>
+									<vue-draggable-resizable
+										:w="citem.w || 'auto'"
+										:h="citem.h || 'auto'"
+										:x="citem.x"
+										:y="citem.y"
+										:lock-aspect-ratio="true"
+										class-name-active="my-active-class"
+										v-if="citem.type == 'image'"
+										@dragstop="(left, top, width, height) => dragstop(citem, left, top, width, height)"
+										@activated="(left, top, width, height) => onActivated(citem, index)"
+										@resizing="(left, top, width, height) => onResize(citem, left, top, width, height, index, cindex)"
+									>
+										<img
+											:src="citem.url"
+											:tabindex="citem.rand"
+											:ref="citem.rand"
+											@keyup="handleQuick($event, index, cindex)"
+											@load="urlInfo($event, index,cindex)"
+											:class="[citem.iFilter, citem.iStyle]"
+											:style="{
+												transform: citem['fScale'] || '',
+												maxWidth: citem.w ? citem.w + 'px' : '100px'
+											}"
+										/>
+									</vue-draggable-resizable>
+								</div>
+							</div>
+						</div>
+
+						<!-- <div class="template-foot">Bottom</div> -->
+					</div>
+				</div>
 
 				<div class="cloud-disk-content" v-if="navType === 'trans'">
 					<transferList type="upload" :data="uploadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
+
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 
-				<!-- <ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex> -->
+				<ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex>
+
+				<!-- 生成图片 -->
+
+				<bannerImage v-if="navType === 'image' && diskInfo.categoryType == 'all'" @change="childChange" :popupData.sync="generateData"></bannerImage>
+
+				<latticeIndex v-if="navType === 'image' && diskInfo.categoryType == 'lattice'" @change="childChange" :popupData.sync="generateData"></latticeIndex>
+
+				<!-- 模板 -->
 			</div>
 		</section>
 
@@ -2680,7 +3065,7 @@ export default {
 
 	.left {
 		height: 100%;
-		background: #0e1630;
+		background: #fdfdfd;
 	}
 
 	.right {
@@ -2694,11 +3079,9 @@ export default {
 
 		flex: 1px;
 
-		background-color: white;
+		background-color: rgba(236, 236, 236, 1);
 
 		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
-		margin:15px;
-		box-sizing: border-box;
 
 		.cloud-disk-content {
 			width: 100%;

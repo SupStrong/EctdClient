@@ -4,35 +4,13 @@
 		<header class="header fl-row-justy">
 			<div style="width: 100%; display: flex">
 				<div class="logo">
-					<img src="https://img1.baidu.com/it/u=2847626372,3815971220&fm=253&fmt=auto&app=138&f=JPEG?w=708&h=500" alt="" />
+					<img src="http://106.13.238.154:3000/_nuxt/img/logo.7793f60.png" alt="" />
 				</div>
 				<div class="nav">
-					<div class="nav-list">
+					<!-- <div class="nav-list">
 						<div>热门模板</div>
 						<div></div>
-					</div>
-					<div class="nav-list">
-						<div>素材中心</div>
-						<div></div>
-					</div>
-					<div class="nav-list">
-						<div>红薯基地</div>
-						<div></div>
-					</div>
-					<div class="nav-list">
-						<div>美妆</div>
-						<div></div>
-					</div>
-					<div class="nav-list">
-						<div>美妆方向</div>
-						<div></div>
-					</div>
-					<div class="nav-list">
-						<div>
-							<router-link style="color: white" to="/toolMain/search">YOYO查词</router-link>
-						</div>
-						<div></div>
-					</div>
+					</div> -->
 				</div>
 			</div>
 			<div class="login">
@@ -116,9 +94,9 @@ export default {
 
 <style scoped lang="scss">
 .header {
-	height: 65px;
+	height: 56px;
 	padding: 0 32px;
-	background-color: #2f2f2f;
+	background-color: #0e1630;
 }
 .logo {
 	width: 130px;

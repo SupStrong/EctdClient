@@ -1,6 +1,7 @@
 <template>
 	<div class="cloud-login-module">
 		<template v-if="head">
+			211212
 			<p class="title">{{ tipsText[0] }}</p>
 			<p class="sec-title">{{ tipsText[1] }}</p>
 		</template>

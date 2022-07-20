@@ -1,14 +1,31 @@
 <template>
-	<div class="category-container" style="height: 100%; background: #2f2f2f">
-		<el-menu class="el-menu-vertical-demo" style="background: #2f2f2f" :collapse="false">
+	<div class="category-container" style="height: 100%; background: #0e1630">
+		<p @click="handleCollapse">左右</p>
+		<el-menu
+			class="el-menu-vertical-demo"
+			style="background: #0e1630"
+			text-color="white"
+			active-text-color="#ff4e60"
+			background-color="#0e1630"
+			:unique-opened="true"
+			:collapse="isCollapse"
+			:collapse-transition="true"
+			:style="{ width: isCollapse ? 'auto' : '200px' }"
+		>
 			<template v-for="(item, index) in categoryMenuData">
-				<el-submenu :index="index" :key="index">
+				<el-submenu :index="index" :key="index" style="background: #0e1630">
 					<template slot="title">
-						<i :class="item.icon" />
+						<i :class="['el-icon', item.icon]"><p v-if="isCollapse == true">{{item.nickName}}</p></i>
 						<span>{{ item.name }}</span>
 					</template>
-					<el-menu-item v-for="(subItem, subIndex) in item.child" :index="index + '-' + subIndex" :key="subIndex" @click="change(subItem)">
-						<i :class="subItem.icon" />
+					<el-menu-item
+						style="background: #0e1630"
+						v-for="(subItem, subIndex) in item.child"
+						:index="index + '-' + subIndex"
+						:key="subIndex"
+						@click="change(subItem)"
+					>
+						<i :class="['el-icon', subItem.icon]" />
 						<span slot="title" style="margin-left: 10px">{{ subItem.name }}</span>
 					</el-menu-item>
 				</el-submenu>
@@ -33,10 +50,12 @@ export default {
 	},
 	data() {
 		return {
+			isCollapse: true,
 			typeData: [
 				{
 					name: '我的工具',
-					icon: '',
+					nickName: '工具',
+					icon: 'sf-icon-unlink',
 					child: [
 						{ name: '工作台', icon: 'sf-icon-unlink', data: 'toolTable' },
 						{ name: '我的模板', icon: 'sf-icon-link', data: 'template' },
@@ -45,7 +64,8 @@ export default {
 				},
 				{
 					name: '资源管理',
-					icon: '',
+					nickName: '素材',
+					icon: 'sf-icon-unlink',
 					child: [
 						{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },
 						{ name: '图片', icon: 'sf-icon-image', data: 'picture' },
@@ -58,7 +78,8 @@ export default {
 				},
 				{
 					name: '分享管理',
-					icon: '',
+					nickName: '分享',
+					icon: 'sf-icon-unlink',
 					child: [
 						{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
 						{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
@@ -66,7 +87,8 @@ export default {
 				},
 				{
 					name: '数据管理',
-					icon: '',
+					nickName: '数据',
+					icon: 'sf-icon-unlink',
 					child: [{ name: '美妆数据', icon: 'sf-icon-link', data: 'beauty' }],
 				},
 			],
@@ -124,6 +146,9 @@ export default {
 		},
 	},
 	methods: {
+		handleCollapse(){
+			this.isCollapse = !this.isCollapse
+		},
 		background() {
 			let season = 'Spring';
 			let tag = 0;
@@ -379,23 +404,53 @@ export default {
 	border: 0;
 }
 ::v-deep .el-menu-item {
-	background: rgb(47, 47, 47);
+	background-color: rgb(14, 22, 48) !important;
 	span {
 		color: white;
 	}
+}
+::v-deep .el-submenu__title .el-icon {
+	vertical-align: middle;
+	margin-right: 10px;
+	width: 24px;
+	text-align: center;
+	font-size: 16px;
+	// display: grid;
+}
+::v-deep .el-menu--collapse .el-icon {
+	display: grid;
+}
+::v-deep .el-submenu__title .el-icon p{
+	font-size: 10px;
+}
+::v-deep .el-menu--collapse .el-submenu {
+	height: 80px;
+	display: flex;
+	align-items: center;
+}
+::v-deep .el-menu-item:hover {
+	background: rgb(14, 22, 48) !important;
+}
+::v-deep .el-menu--popup {
+	background-color: rgb(14, 22, 48) !important;
+}
+::v-deep .el-menu--popup-right-start {
+	background-color: rgb(14, 22, 48) !important;
+	margin-left: 0 !important;
 }
 ::v-deep .el-submenu__title {
 	width: 100%;
 	color: white;
 }
 ::v-deep .el-submenu:hover {
-	background-color: rgb(47, 47, 47);
+	background-color: #0e1630;
 }
 ::v-deep .el-menu {
-	background-color: #2f2f2f;
+	background-color: #0e1630;
+	border-right: 0;
 }
 ::v-deep .el-submenu__title:hover {
-	background-color: #2f2f2f;
+	background-color: #0e1630;
 }
 ::v-deep .el-menu-item.is-active {
 	color: #ff4e60;
@@ -411,7 +466,7 @@ export default {
 			.count {
 			}
 			&:hover {
-				background: #2f2f2f;
+				background: #0e1630;
 				span {
 					// color: white;
 				}
@@ -419,7 +474,7 @@ export default {
 		}
 		.active {
 			color: #ff4e60;
-			background: #3388ff2e !important;
+			background: #0e1630 !important;
 		}
 	}
 }

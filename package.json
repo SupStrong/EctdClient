@@ -9,12 +9,15 @@
     "build:electron": "vue-cli-service electron:build",
     "build:web": "vue-cli-service build",
     "dev:electron": "vue-cli-service electron:serve",
-    "dev": "vue-cli-service serve"
+    "dev": "vue-cli-service serve",
+    "upload": "node upload.js",
+    "deploy": "npm run build:web && npm run upload"
   },
   "main": "background.js",
   "dependencies": {
     "ali-oss": "^6.17.1",
     "axios": "^0.21.1",
+    "scp2": "^0.5.0",
     "browser-md5-file": "^1.1.1",
     "chalk": "^4.1.0",
     "core-js": "^3.8.2",
@@ -28,7 +31,6 @@
     "jsmediatags": "^3.9.4",
     "ora": "^5.2.0",
     "react-native-fs": "^2.16.6",
-    "screenfull": "^6.0.1",
     "simple-syntax-highlighter": "^1.4.4",
     "view-design": "^4.6.1",
     "vue": "^2.6.12",

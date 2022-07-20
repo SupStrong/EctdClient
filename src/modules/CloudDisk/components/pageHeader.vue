@@ -1,10 +1,12 @@
 <template>
 	<header class="index-header">
-		<div class="logo" @click="goHome">
+		<div class="logo">
 			<img src="../../../assets/common/img/app/CloudDisk.png" alt="" draggable="false" />
 			<div class="info">
-				<p class="name">LC-XHS</p>
-				<p class="site">愿长夜漫漫 总有人为你留一盏灯</p>
+				<!-- <p class="name">LC-XHS</p>
+				<p class="site">愿长夜漫漫 总有人为你留一盏灯</p> -->
+				<div class="name anniu btnInput" style="margin-bottom:10px;border:1px solid red" id="btnInput" @click="btnInput">按钮阿</div>
+				<input type="text" ref="anniuInput" id="anniuInput" style="border:1px solid red" placeholder="hhhhhh">
 			</div>
 		</div>
 		<div class="action">
@@ -39,6 +41,11 @@ export default {
 		this.getUser();
 	},
 	methods: {
+		btnInput(){
+			var apple = document.getElementById( 'anniuInput' );
+			let a = document.getElementById('btnInput');
+			apple.focus();
+		},
 		getUser() {
 			this.$api.user.verifyToken(
 				() => {

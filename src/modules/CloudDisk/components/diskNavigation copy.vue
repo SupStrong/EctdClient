@@ -1,8 +1,274 @@
 <template>
 	<div class="cloud-disk-navigation" tabindex="1" @keyup="allKeyup($event)">
 		<!-- 上方工具栏 新建 导入 浏览 编辑-->
+		<div class="disk-func">
+			<div class="left font">
+				<el-tooltip class="item" effect="dark" content="文字管理" placement="bottom">
+					<div @click="handleChange('textBox')"><i class="iconfont icon-ziti"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片管理" placement="bottom">
+					<div @click="handleChange('imageBox')"><i class="iconfont icon-tupian_o"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
+					<div @click="handleChange('tableBox')"><i class="iconfont icon-biaoge"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="模板管理" placement="bottom">
+					<div @click="handleChange('templateBox')"><i class="iconfont icon-mobankuangjia-xianxing"></i></div>
+				</el-tooltip>
+				<!-- <el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-tongguanshuju"></i></div>
+				</el-tooltip> -->
+			</div>
+			<div>
+				<el-tooltip class="item" effect="dark" content="点击全屏" placement="bottom">
+					<div @click="handleChange('fullScreen')"><i class="iconfont icon-quanping"></i></div>
+				</el-tooltip>
+			</div>
+		</div>
+		<div class="disk-func">
+			<div class="left" style="display: none">
+				<template v-if="type === 'disk'">
+					<button class="btn primary" v-if="data.clipboard.length !== 0 && data.categoryType === 'all'" @click="actionControl('paste')">
+						<span class="icon sf-icon-paste"></span>
+						<span>粘贴</span>
+					</button>
+					<template v-if="haveSelect">
+						<template v-if="data.categoryType !== 'trash'">
+							<button class="btn text" @click="actionControl('download')">
+								<span class="icon sf-icon-download"></span>
+								<span>下载</span>
+							</button>
+							<button class="btn text" @click="actionControl('move')">
+								<span class="icon sf-icon-arrows"></span>
+								<span>移动到</span>
+							</button>
+							<button class="btn text" @click="actionControl('copy')">
+								<span class="icon sf-icon-copy"></span>
+								<span>复制</span>
+							</button>
+							<button class="btn text" @click="actionControl('cut')">
+								<span class="icon sf-icon-cut"></span>
+								<span>剪切</span>
+							</button>
+							<button class="btn text" @click="actionControl('trash')">
+								<span class="icon sf-icon-trash-alt"></span>
+								<span>删除</span>
+							</button>
+							<!-- <button class="btn text" @click="actionControl('rename')" v-if="data.selectFiles.length === 1">
+								<span class="icon sf-icon-file-edit"></span>
+								<span>重命名</span>
+							</button> -->
+							<button class="btn text" v-if="data.selectFiles.length === 1">
+								<span class="icon sf-icon-share"></span>
+								<span>分享</span>
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'trash'">
+							<button class="btn text" @click="actionControl('restore')">
+								<span class="icon sf-icon-share"></span>
+								<span>还原</span>
+							</button>
+							<button class="btn text" @click="actionControl('delete')">
+								<span class="icon sf-icon-trash-alt"></span>
+								<span>彻底删除</span>
+							</button>
+						</template>
+					</template>
+					<template v-else>
+						<template v-if="data.categoryType === 'data'">
+							<button class="btn primary">
+								<span class="icon sf-icon-images"></span>
+								<span @click="createData()">创建</span>
+							</button>
+						</template>
+						<template v-if="data.categoryType === 'all'">
+							<Poptip
+								trigger="hover"
+								placement="bottom-start"
+								width="85"
+								padding="0"
+								@on-popper-show="hoverUpload = true"
+								@on-popper-hide="hoverUpload = false"
+							>
+								<button class="btn primary">
+									<div class="upload-text">
+										<span>上传</span>
+										<Icon :class="['arrow', { rotate: hoverUpload }]" type="ios-arrow-up" />
+									</div>
+								</button>
+								<ul class="upload-type" slot="content">
+									<li @click="actionControl('upload')">文件</li>
+									<li @click="actionControl('uploadFolder')">文件夹</li>
+								</ul>
+							</Poptip>
+							<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
+							<button class="btn default" @click="actionControl('newAllFolder')">新建子文件夹</button>
+						</template>
+						<template v-else-if="data.categoryType === 'trash'">
+							<button class="btn remove" :disabled="cleanDisabled" @click="cleanTrash">清空</button>
+							<button class="btn default" :disabled="cleanDisabled" @click="actionControl('restore')">全部还原</button>
+						</template>
+						<template v-else-if="data.categoryType === 'picture'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-images"></span>
+								查看
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'music'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-play"></span>
+								音乐
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'video'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-youtube-play"></span>
+								视频
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'toolTable'"> </template>
+						<template v-else-if="data.categoryType === 'template'">
+							<el-button class="btn" type="primary" plain @click="changeData('data')">样品数据</el-button>
+							<el-button class="btn" type="success" plain @click="changeData('classify')">分类</el-button>
+							<el-button class="btn" type="info" plain @click="changeData('text')">文案</el-button>
+							<el-button class="btn" type="warning" plain @click="changeData('image')">插画</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('filter')">滤镜</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('tool')">组件</el-button>
+							<el-button class="btn" type="primary" plain @click="changeData('template')">模板</el-button>
+						</template>
+						<template v-else-if="data.categoryType === 'beauty'">
+							<el-button class="btn" type="info" @click="showSample = true">样品</el-button>
+							<el-button class="btn" type="primary" @click="showBrand = true">品牌</el-button>
+							<el-button class="btn" type="danger" @click="showClassify = true">分类</el-button>
+							<el-button class="btn" type="info" @click="showCompany = true">单位</el-button>
+							<el-button class="btn" type="info" @click="showImgText = true">文案</el-button>
+						</template>
+					</template>
+				</template>
+				<template v-else-if="type === 'share'">
+					<button class="btn primary" :disabled="data.selectFiles.length !== 1" @click="copyShareAddress">复制链接</button>
+					<button class="btn remove" v-if="data.categoryType === 'share'" :disabled="data.selectFiles.length !== 1" @click="actionControl('share')">
+						取消分享
+					</button>
+				</template>
+				<template v-else>
+					<!--<button class="btn default">全部开始</button>
+					<button class="btn default">全部暂停</button>-->
+				</template>
+			</div>
+			<div class="left font" v-if="curData.type == 'text'">
+				<el-tooltip class="item" effect="dark" content="常用字体样式" placement="bottom">
+					<div @click="handleChange('fontOften')"><i class="iconfont icon-AApay"></i></div>
+				</el-tooltip>
+				<div class="font-family" @click="handleChange('fontFamily')">
+					<span>{{ curData.familyText }}</span>
+					<i class="iconfont icon-xiala G-Ml-15"></i>
+				</div>
+				<div class="font-size" @click="handleChange('fontSize')">
+					<i class="iconfont icon-jian" @click="handleChange('fontSize', 'reduce')"></i>
+					<el-input v-model="curData.fSize"></el-input>
+					<i class="iconfont icon-jiahao_o" @click="handleChange('fontSize', 'add')"></i>
+				</div>
+				<el-tooltip class="item" effect="dark" content="颜色" placement="bottom">
+					<div @click="handleChange('fontColor')">
+						<i class="iconfont icon-yanse"></i>
+						<div></div>
+					</div>
+				</el-tooltip>
+
+				<el-tooltip class="item" effect="dark" content="文字阴影" placement="bottom">
+					<div @click="handleChange('fontShadow')"><i class="iconfont icon-yinying"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{ active: curData.fWeight == '800' }" content="加粗" placement="bottom">
+					<div @click="handleChange('fontBold')"><i class="iconfont icon-zitijiacu"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{ active: curData.fStyle == 'italic' }" content="倾斜" placement="bottom">
+					<div @click="handleChange('fontItalic')"><i class="iconfont icon-zitixiahuaxian"></i></div>
+				</el-tooltip>
+				<!-- <el-tooltip class="item" effect="dark" content="文字间距" placement="bottom">
+					<div @click="handleChange('fontText')"><i class="iconfont icon-zijianju"></i></div>
+				</el-tooltip> -->
+				<el-tooltip class="item" effect="dark" content="间距" placement="bottom">
+					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
+						<div @click="handleChange('fontline')"><i class="iconfont icon-hangjianju1"></i></div>
+						<el-dropdown-menu slot="dropdown" style="width: 300px">
+							<el-dropdown-item>
+								<span class="demonstration">字间距</span>
+								<el-slider v-model="value1"></el-slider>
+							</el-dropdown-item>
+							<el-dropdown-item>
+								<span class="demonstration">字间距</span>
+								<el-slider v-model="value2"></el-slider>
+							</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{ active: curData.fAlign == 'left' }" content="左对齐" placement="bottom">
+					<div @click="handleChange('fontStroke', 'left')"><i class="iconfont icon-juzuo"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{ active: curData.fAlign == 'center' }" content="居中" placement="bottom">
+					<div @click="handleChange('fontStroke', 'center')"><i class="iconfont icon-juzhong"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" :class="{ active: curData.fAlign == 'right' }" content="右对齐" placement="bottom">
+					<div @click="handleChange('fontStroke', 'right')"><i class="iconfont icon-hengpai"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="文字横竖" :class="{ active: curData.fMode == 'tb' }" placement="bottom">
+					<div @click="handleChange('fontVertically')" v-if="curData.fMode == 'inherit'"><i class="iconfont icon-hengshuqiehuanheng"></i></div>
+					<div @click="handleChange('fontVertically')" v-else><i class="iconfont icon-hengshuqiehuanshu"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="透明度" placement="bottom">
+					<el-dropdown trigger="click" :hide-on-click="false" placement="bottom">
+						<div @click="handleChange('fontOpacity')"><i class="iconfont icon-suodingtouming_huaban1"></i></div>
+						<el-dropdown-menu slot="dropdown" style="width: 300px">
+							<el-dropdown-item>
+								<span class="demonstration">透明度</span>
+								<el-slider :step="5" v-model="curData.fOpcity"></el-slider>
+							</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</el-tooltip>
+			</div>
+			<div class="left font" v-else-if="curData.type == 'image'">
+				<el-tooltip class="item" effect="dark" content="图片素材" placement="bottom">
+					<div @click="handleChange('imageSource')"><i class="iconfont icon-sucaiku"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片滤镜" placement="bottom">
+					<div @click="handleChange('imageFilter')"><i class="iconfont icon-lvjing"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片样式" placement="bottom">
+					<div @click="handleChange('imageStyle')"><i class="iconfont icon-yuanjiao"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="图片裁剪" placement="bottom">
+					<div @click="handleChange('imageCut')"><i class="iconfont icon-jianqie"></i></div>
+				</el-tooltip>
+			</div>
+			<div class="left font" v-else-if="curData.type == 'table'">
+				<el-tooltip class="item" effect="dark" content="常用文案" placement="bottom">
+					<div @click="handleChange('tableText')"><i class="iconfont icon-icon"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="数据管理" placement="bottom">
+					<div @click="handleChange('tableAll')"><i class="iconfont icon-changyongshili"></i></div>
+				</el-tooltip>
+			</div>
+			<div class="left font" v-else-if="curData.type == 'template'">
+				<el-tooltip class="item" effect="dark" content="我的模板" placement="bottom">
+					<div @click="handleChange('fontVertically')"><i class="iconfont icon-wode"></i></div>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="所有模板" placement="bottom">
+					<div @click="handleChange('fontOpacity')"><i class="iconfont icon-24gl-borderAll"></i></div>
+				</el-tooltip>
+			</div>
+			<div>
+				<el-tooltip class="item" effect="dark" content="导出图片" placement="bottom">
+					<el-button type="success" size="small" @click="handleChange('export')">导出图片</el-button>
+				</el-tooltip>
+				<el-tooltip class="item" effect="dark" content="保存模板+导出图片" placement="bottom">
+					<el-button type="primary" size="small" @click="handleChange('save')">保存模板+导出图片</el-button>
+				</el-tooltip>
+			</div>
+		</div>
 		<!-- 网盘 -->
-		<div class="navigation-container">
+		<!-- <div class="navigation-container">
 			<div class="left" v-if="type !== 'trans'">
 				<button class="sf-icon-chevron-left" @click="navControl('back')" :disabled="data.navData.length === 0" />
 				<button class="sf-icon-home" @click="navControl('home')" style="font-size: 15px" />
@@ -15,7 +281,7 @@
 					{{ item.name }}
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<ul class="sort-container" v-if="fileStateIcon !== 'sf-icon-th-large' && type !== 'trans'">
 			<li class="select-all">
 				<!-- <Checkbox v-model="data.selectAll" @on-change="selectChange"></Checkbox> -->
@@ -493,7 +759,8 @@ export default {
 	.navigation-container {
 		width: 100%;
 		display: flex;
-		border-bottom:1px solid rgb(236,236,236);		.left {
+		border-bottom:1px solid rgb(236,236,236);
+		.left {
 			display: flex;
 			align-items: center;
 			.line {
