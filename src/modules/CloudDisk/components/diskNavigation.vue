@@ -1,7 +1,135 @@
 <template>
 	<div class="cloud-disk-navigation" tabindex="1" @keyup="allKeyup($event)">
 		<!-- 上方工具栏 新建 导入 浏览 编辑-->
-		<!-- 网盘 -->
+				<div class="disk-func">
+			<div class="left">
+				<template v-if="type === 'disk'">
+					<button class="btn primary" v-if="data.clipboard.length !== 0 && data.categoryType === 'all'" @click="actionControl('paste')">
+						<span class="icon sf-icon-paste"></span>
+						<span>粘贴</span>
+					</button>
+					<template v-if="haveSelect">
+						<template v-if="data.categoryType !== 'trash'">
+							<button class="btn text" @click="actionControl('download')">
+								<span class="icon sf-icon-download"></span>
+								<span>下载</span>
+							</button>
+							<button class="btn text" @click="actionControl('move')">
+								<span class="icon sf-icon-arrows"></span>
+								<span>移动到</span>
+							</button>
+							<button class="btn text" @click="actionControl('copy')">
+								<span class="icon sf-icon-copy"></span>
+								<span>复制</span>
+							</button>
+							<button class="btn text" @click="actionControl('cut')">
+								<span class="icon sf-icon-cut"></span>
+								<span>剪切</span>
+							</button>
+							<button class="btn text" @click="actionControl('trash')">
+								<span class="icon sf-icon-trash-alt"></span>
+								<span>删除</span>
+							</button>
+							<button class="btn text" @click="actionControl('rename')" v-if="data.selectFiles.length === 1">
+								<span class="icon sf-icon-file-edit"></span>
+								<span>重命名</span>
+							</button>
+							<!-- <button class="btn text" v-if="data.selectFiles.length === 1">
+								<span class="icon sf-icon-share"></span>
+								<span>分享</span>
+							</button> -->
+						</template>
+						<template v-else-if="data.categoryType === 'trash'">
+							<button class="btn text" @click="actionControl('restore')">
+								<span class="icon sf-icon-share"></span>
+								<span>还原</span>
+							</button>
+							<button class="btn text" @click="actionControl('delete')">
+								<span class="icon sf-icon-trash-alt"></span>
+								<span>彻底删除</span>
+							</button>
+						</template>
+					</template>
+					<template v-else>
+						<template v-if="data.categoryType === 'data'">
+							<button class="btn primary">
+								<span class="icon sf-icon-images"></span>
+								<span @click="createData()">创建</span>
+							</button>
+						</template>
+						<template v-if="data.categoryType === 'all'">
+							<Poptip
+								trigger="hover"
+								placement="bottom-start"
+								width="85"
+								padding="0"
+								@on-popper-show="hoverUpload = true"
+								@on-popper-hide="hoverUpload = false"
+							>
+								<button class="btn primary">
+									<div class="upload-text">
+										<span>上传</span>
+										<Icon :class="['arrow', { rotate: hoverUpload }]" type="ios-arrow-up" />
+									</div>
+								</button>
+								<ul class="upload-type" slot="content">
+									<li @click="actionControl('upload')">文件</li>
+									<li @click="actionControl('uploadFolder')">文件夹</li>
+								</ul>
+							</Poptip>
+							<button class="btn default" @click="actionControl('newFolder')">新建文件夹</button>
+						</template>
+						<template v-else-if="data.categoryType === 'trash'">
+							<button class="btn remove" :disabled="cleanDisabled" @click="cleanTrash">清空</button>
+							<button class="btn default" :disabled="cleanDisabled" @click="actionControl('restore')">全部还原</button>
+						</template>
+						<template v-else-if="data.categoryType === 'picture'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-images"></span>
+								查看
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'music'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-play"></span>
+								音乐
+							</button>
+						</template>
+						<template v-else-if="data.categoryType === 'video'">
+							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
+								<span class="icon sf-icon-youtube-play"></span>
+								视频
+							</button>
+						</template>
+					</template>
+				</template>
+				<template v-else-if="type === 'share'">
+					<button class="btn primary" :disabled="data.selectFiles.length !== 1" @click="copyShareAddress">复制链接</button>
+					<button class="btn remove" v-if="data.categoryType === 'share'" :disabled="data.selectFiles.length !== 1" @click="actionControl('share')">
+						取消分享
+					</button>
+				</template>
+				<template v-else-if="type === 'ectd'">
+					<button class="btn primary" @click="showEctdCreate = true">新建</button>
+				</template>
+				<template v-else>
+					<!--					<button class="btn default">全部开始</button>
+					<button class="btn default">全部暂停</button>-->
+				</template>
+			</div>
+			<div class="right" v-if="type !== 'trans'">
+				<input
+					type="text"
+					placeholder="搜索我的素材"
+					v-model="searchKey"
+					@keyup.enter="switchSearch"
+					:style="showSearch ? { width: '200px', border: '1px solid #eee' } : ''"
+				/>
+				<button class="action sf-icon-search" @click="switchSearch" v-show="type === 'disk'" />
+				<button :class="'action sf-icon-sort-amount-' + amountSort" @click="diskSort(sortData[0])" />
+				<!-- <button class="action" :class="fileStateIcon" @click="changeFileState" /> -->
+			</div>
+		</div>
 		<div class="navigation-container">
 			<div class="left" v-if="type !== 'trans'">
 				<button class="sf-icon-chevron-left" @click="navControl('back')" :disabled="data.navData.length === 0" />
@@ -35,11 +163,6 @@
 			<p><i class="sf-icon-info-circle" /> 回收站仍然占用网盘空间，文件保存10天后将被自动清除</p>
 		</div>
 		<ectd-import v-model="showEctdImport"></ectd-import>
-		<!-- <sampleData v-model="showSample" status="news" @input="showSample = false"></sampleData>
-		<brandData v-model="showBrand" status="news" @input="showBrand = false"></brandData>
-		<classifyData v-model="showClassify" status="news" @input="showClassify = false"></classifyData>
-		<companyData v-model="showCompany" status="news" @input="showCompany = false"></companyData>
-		<imgTextData v-model="showImgText" status="news" @input="showImgText = false"></imgTextData> -->
 	</div>
 </template>
 
@@ -289,11 +412,11 @@ export default {
 			console.log(commend, 'commendcommend');
 			this.$emit('action', commend);
 		},
-		changeFileState() {
-			this.DiskShowState === 'cd-disk-block-file' ? (this.DiskShowState = 'cd-disk-list-file') : (this.DiskShowState = 'cd-disk-block-file');
-			this.$store.commit('updateFileStateIcon');
-			this.$emit('feature', 'state', this.DiskShowState);
-		},
+		// changeFileState() {
+		// 	this.DiskShowState === 'cd-disk-block-file' ? (this.DiskShowState = 'cd-disk-list-file') : (this.DiskShowState = 'cd-disk-block-file');
+		// 	this.$store.commit('updateFileStateIcon');
+		// 	this.$emit('feature', 'state', this.DiskShowState);
+		// },
 		changeData(val) {
 			this.$emit('change', { type: val });
 		},

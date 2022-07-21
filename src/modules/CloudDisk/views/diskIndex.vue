@@ -1,10 +1,10 @@
 <template>
 	<main class="cloud-main">
-		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType"></diskHeader>
+		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType" :isCollapse="isCollapse" :type="navType"  @handleClick="handleIsCollapse"></diskHeader>
 
 		<section class="cloud-disk-main">
 			<div class="left">
-				<diskCategory ref="diskCategory" :data="diskInfo" :type="navType" @change="categoryChange"></diskCategory>
+				<diskCategory ref="diskCategory" :data="diskInfo" :isCollapse="isCollapse" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
 
 			<div class="right">
@@ -140,9 +140,9 @@
 			</div>
 		</section>
 
-		<div class="silder-icon">
+		<!-- <div class="silder-icon">
 			<el-slider v-model="mainScale" vertical @input="handleMainScale($event)" height="200px"></el-slider>
-		</div>
+		</div> -->
 
 		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
 	</main>
@@ -177,15 +177,6 @@ import '../components/contextmenu/styles/index.css';
 import { directive, Contextmenu, ContextmenuItem } from '../components/contextmenu';
 
 import loading from '../components/loading';
-
-import ectdIndex from './ectd/ectdIndex.vue';
-
-// 生成图片
-
-import bannerImage from './banner/index.vue';
-
-import latticeIndex from './banner/lattice.vue';
-// 模板
 let shareWin = null;
 
 export default {
@@ -205,21 +196,14 @@ export default {
 		Contextmenu,
 
 		ContextmenuItem,
-
-		loading,
-
-		ectdIndex,
-
-		bannerImage,
-
-		latticeIndex,
+		loading
 	},
 
 	data() {
 		return {
 			navType: 'disk',
 			diskData: [],
-
+			isCollapse:true,
 			isTure: true,
 
 			diskInfo: {
@@ -617,8 +601,10 @@ export default {
 	},
 
 	methods: {
+		handleIsCollapse(v){
+			this.isCollapse = v;
+		},
 		navControl(type) {
-			console.log(type, 'deded');
 			this.diskNavigationControl(type);
 		},
 		urlInfo(e,index,cindex){
@@ -1667,16 +1653,7 @@ export default {
 						this.diskInfo.navData.push(item);
 					} else {
 						if (item.openType === 'image') {
-							this.templateList[this.templateIdx].push({
-								rand: '2',
-								fScale: '1',
-								type: 'image',
-								url: `https://aliyun-wb-bvqq7ezi1t.oss-cn-beijing.aliyuncs.com` + item.content,
-								iFilter: '',
-								iStyle: '',
-							});
-						} else {
-							console.log(item, 'dede');
+						
 							this.openFileHandle(item);
 						}
 					}

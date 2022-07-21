@@ -1,6 +1,5 @@
 <template>
 	<div class="category-container" style="height: 100%; background: #0e1630">
-		<p @click="handleCollapse">左右</p>
 		<el-menu
 			class="el-menu-vertical-demo"
 			style="background: #0e1630"
@@ -44,6 +43,12 @@ export default {
 				return 'disk';
 			},
 		},
+		isCollapse:{
+			type: Boolean,
+			default :function () {
+				return  false;
+			},
+		},
 		data: {
 			type: Object,
 		},
@@ -84,13 +89,7 @@ export default {
 						{ name: '我的分享', icon: 'sf-icon-link', data: 'share' },
 						{ name: '失效分享', icon: 'sf-icon-unlink', data: 'disshare' },
 					],
-				},
-				{
-					name: '数据管理',
-					nickName: '数据',
-					icon: 'sf-icon-unlink',
-					child: [{ name: '美妆数据', icon: 'sf-icon-link', data: 'beauty' }],
-				},
+				}
 			],
 			// typeData: [
 			// 	{ name: '全部文件', icon: 'sf-icon-hdd', data: 'all' },

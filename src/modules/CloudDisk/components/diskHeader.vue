@@ -3,6 +3,10 @@
 		<windowHeader ref="windowHeader" :config="headerConfig" width="32px" mode="hide"></windowHeader>
 		<header class="header fl-row-justy">
 			<div style="width: 100%; display: flex">
+				<p class="multibtn" @click="handleCollapse" multibtn>
+					<i class="el-icon-s-fold"></i>
+				</p>
+
 				<div class="logo">
 					<img src="http://106.13.238.154:3000/_nuxt/img/logo.7793f60.png" alt="" />
 				</div>
@@ -41,11 +45,6 @@ export default {
 				},
 			},
 			navTypes: [
-				// { name: '网盘', flag: 'disk', icon: 'sf-icon-hdd' },
-				// { name: '分享', flag: 'share', icon: 'sf-icon-share-alt' },
-				// { name: '传输', flag: 'trans', icon: 'sf-icon-exchange-alt', rotate: '90deg' },
-				// { name: '基础数据', flag: 'ectd', icon: 'sf-icon-share-alt' },
-				// { name: '模板', flag: 'image', icon: 'sf-icon-share-alt' },
 			],
 			platform: process.platform,
 		};
@@ -53,6 +52,12 @@ export default {
 	props: {
 		data: {
 			type: Object,
+		},
+		isCollapse:{
+			type: Boolean,
+			default :function () {
+				return  false;
+			},
 		},
 		type: {
 			type: String,
@@ -74,6 +79,9 @@ export default {
 		},
 	},
 	methods: {
+		handleCollapse(){
+			this.$emit('handleClick', !this.isCollapse);
+		},
 		navTypeChange(value) {
 			this.$emit('update:type', value);
 		},
@@ -95,7 +103,7 @@ export default {
 <style scoped lang="scss">
 .header {
 	height: 56px;
-	padding: 0 32px;
+	padding: 0 23px;
 	background-color: #0e1630;
 }
 .logo {
@@ -144,5 +152,22 @@ export default {
 		border: 1px solid #ff4e60;
 		font-size: 14px;
 	}
+}
+.multibtn{
+	width: 38px;
+    max-width: 38px;
+    height: 38px;
+    max-height: 38px;
+    font-size: 18px;
+    border-radius: 38px;
+    margin: 2px;
+    cursor: pointer;
+    display: inline-flex;
+    vertical-align: middle;
+		i{
+			color:white;
+			display: flex;
+			align-items: center;
+		}
 }
 </style>
