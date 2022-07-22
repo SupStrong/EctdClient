@@ -92,13 +92,15 @@
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
 			</div>
-			<div class="right" v-else>
-				<!-- 数据台 -->
-				<!-- <reportHandle></reportHandle>  -->
+			<div class="right" :style="{'margin':diskInfo.categoryType == 'toolTable' ? '0' : '15px'}" v-else>
+				<!-- 我的模板 -->
+				<reportHandle  v-if="diskInfo.categoryType == 'template'"></reportHandle> 
 				<!-- 控制台 -->
-				<!-- <disabledHandle></disabledHandle> -->
+				<dataHandle v-else-if="diskInfo.categoryType == 'collect'"></dataHandle>
+				<disabledHandle v-else-if="diskInfo.categoryType == 'toolTable'"></disabledHandle>
 				<!-- 字体弹幕 -->
-				<typefaceHandle></typefaceHandle>
+				<!-- <typefaceHandle></typefaceHandle> -->
+				<!--  -->
 			</div>
 		</section>
 
@@ -106,7 +108,7 @@
 			<el-slider v-model="mainScale" vertical @input="handleMainScale($event)" height="200px"></el-slider>
 		</div> -->
 
-		<audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio>
+		<!-- <audio v-if="noticeSrc" style="display: none" ref="audio" :src="noticeSrc"></audio> -->
 	</main>
 </template>
 
@@ -144,6 +146,7 @@ import loading from '../components/loading';
 import reportHandle from '../components/reportHandle'
 import disabledHandle from '../components/disabledHandle';
 import typefaceHandle from '../components/typefaceHandle'
+import dataHandle from '../components/dataHandle'
 let shareWin = null;
 
 export default {
@@ -166,7 +169,8 @@ export default {
 		loading,
 		disabledHandle,
 		reportHandle,
-		typefaceHandle
+		typefaceHandle,
+		dataHandle
 	},
 
 	data() {

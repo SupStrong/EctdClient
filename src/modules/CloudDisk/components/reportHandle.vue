@@ -229,7 +229,9 @@ export default {
 			type: Object,
 		},
 	},
-	data() {},
+	data() {
+		return {}
+	},
 };
 </script>
 
