@@ -1,13 +1,12 @@
 <template>
 	<main class="cloud-main">
-		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType" :isCollapse="isCollapse" :type="navType"  @handleClick="handleIsCollapse"></diskHeader>
+		<diskHeader ref="drag" :data="diskInfo" :type.sync="navType" :isCollapse="isCollapse" :type="navType" @handleClick="handleIsCollapse"></diskHeader>
 
 		<section class="cloud-disk-main">
 			<div class="left">
 				<diskCategory ref="diskCategory" :data="diskInfo" :isCollapse="isCollapse" :type="navType" @change="categoryChange"></diskCategory>
 			</div>
-
-			<div class="right">
+			<div class="right" v-if="diskInfo.categoryType != 'toolTable' && diskInfo.categoryType != 'template' && diskInfo.categoryType != 'collect'">
 				<diskNavigation
 					ref="diskNavigation"
 					:data="diskInfo"
@@ -31,9 +30,7 @@
 					v-contextmenu:contextmenuWrap
 				>
 					<input type="file" @change="uploadFolder" webkitdirectory style="display: none" ref="inputFolderFile" multiple="multiple" />
-
 					<input type="file" @change="prepareUpload" style="display: none" ref="inputFile" multiple="multiple" />
-
 					<diskFile
 						v-for="(item, index) in diskData"
 						:key="item.id"
@@ -41,34 +38,23 @@
 						@mousedown.stop="selectFile($event, item, index)"
 						@open="diskFeatureControl"
 					></diskFile>
-
 					<div class="mouse-select" v-show="mouseSelectData.width" :style="mouseSelectData" />
-
 					<div class="upload-tips" v-if="showUploadTips">松开鼠标开始上传文件</div>
-
 					<contextmenu ref="contextmenuWrap">
 						<template v-if="mouseDownWhere === 'area'">
 							<contextmenu-item @click="diskFeatureControl('upload')" :disabled="diskInfo.categoryType !== 'all'">上传文件</contextmenu-item>
-
 							<contextmenu-item @click="diskFeatureControl('uploadFolder')" :disabled="diskInfo.categoryType !== 'all'">上传文件夹</contextmenu-item>
-
 							<contextmenu-item @click="diskFeatureControl('newFolder')" :disabled="diskInfo.categoryType !== 'all'">新建文件夹</contextmenu-item>
-
 							<contextmenu-item divider></contextmenu-item>
-
 							<contextmenu-item @click="diskFeatureControl('clear')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
 								>清空剪贴板</contextmenu-item
 							>
-
 							<contextmenu-item @click="diskFeatureControl('paste')" :disabled="diskInfo.clipboard.length === 0 || diskInfo.categoryType !== 'all'"
 								>粘贴</contextmenu-item
 							>
-
 							<contextmenu-item divider></contextmenu-item>
-
 							<contextmenu-item @click="diskFeatureControl('reload')">刷新</contextmenu-item>
 						</template>
-
 						<template v-else>
 							<template v-if="diskInfo.categoryType !== 'all' && diskInfo.categoryType !== 'trash' && navType === 'disk'">
 								<contextmenu-item @click="diskFeatureControl('go-where')" :disabled="moreThanOneSelect">打开文件所在位置</contextmenu-item>
@@ -77,30 +63,9 @@
 							</template>
 
 							<contextmenu-item @click="diskFeatureControl('open')" :disabled="moreThanOneSelect">打开</contextmenu-item>
-
 							<template v-if="navType === 'disk' && diskInfo.categoryType !== 'trash'">
 								<contextmenu-item @click="diskFeatureControl('download')">下载</contextmenu-item>
-
-								<!-- <contextmenu-item divider></contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('move')">移动到</contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('copy')">复制</contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('cut')">剪切</contextmenu-item> -->
-
-								<!-- <contextmenu-item divider></contextmenu-item> -->
-
-								<!-- <contextmenu-item @click="diskFeatureControl('rename')" :disabled="moreThanOneSelect">重命名</contextmenu-item> -->
 							</template>
-
-							<!-- <contextmenu-item divider v-else></contextmenu-item> -->
-
-							<!-- <template v-if="diskInfo.categoryType === 'trash'"> -->
-
-							<!-- <contextmenu-item @click="diskFeatureControl('restore')">还原<	/contextmenu-item> -->
-
-							<!-- </template> -->
 
 							<template v-if="navType !== 'share'">
 								<contextmenu-item @click="diskFeatureControl(diskInfo.categoryType === 'trash' ? 'delete' : 'trash')">删除</contextmenu-item>
@@ -121,22 +86,19 @@
 							<contextmenu-item @click="diskFeatureControl('info')" :disabled="moreThanOneSelect">属性</contextmenu-item>
 						</template>
 					</contextmenu>
-
-					<!-- <loading :loading="loading" :length="diskData.length"></loading> -->
-
-					<div id="draggingFile" :style="draggingFilesStyle">
-						<div class="icon sf-icon-file">
-							<span>{{ diskInfo.selectFiles.length }}</span>
-						</div>
-					</div>
 				</div>
-
 				<div class="cloud-disk-content" v-if="navType === 'trans'">
 					<transferList type="upload" :data="uploadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 					<transferList type="download" :data="downloadList" :category="diskInfo.categoryType" @remove="removeTrans" @update="updateCount"></transferList>
 				</div>
-
-				<!-- <ectdIndex v-if="navType === 'ectd'" :diskInfo="diskInfo"></ectdIndex> -->
+			</div>
+			<div class="right" v-else>
+				<!-- 数据台 -->
+				<!-- <reportHandle></reportHandle>  -->
+				<!-- 控制台 -->
+				<!-- <disabledHandle></disabledHandle> -->
+				<!-- 字体弹幕 -->
+				<typefaceHandle></typefaceHandle>
 			</div>
 		</section>
 
@@ -177,6 +139,11 @@ import '../components/contextmenu/styles/index.css';
 import { directive, Contextmenu, ContextmenuItem } from '../components/contextmenu';
 
 import loading from '../components/loading';
+
+// 控制台页面
+import reportHandle from '../components/reportHandle'
+import disabledHandle from '../components/disabledHandle';
+import typefaceHandle from '../components/typefaceHandle'
 let shareWin = null;
 
 export default {
@@ -196,14 +163,17 @@ export default {
 		Contextmenu,
 
 		ContextmenuItem,
-		loading
+		loading,
+		disabledHandle,
+		reportHandle,
+		typefaceHandle
 	},
 
 	data() {
 		return {
 			navType: 'disk',
 			diskData: [],
-			isCollapse:true,
+			isCollapse: false,
 			isTure: true,
 
 			diskInfo: {
@@ -334,45 +304,65 @@ export default {
 				'255, 189, 89',
 				'255, 145, 77',
 			],
-			tagArr:{
-				'产品文案':['绝绝子','绝绝子','绝绝子绝绝子','绝绝子绝绝子绝绝子绝绝子绝绝子绝绝子','第四个','绝绝子','绝绝子','第四个','第五个','第四个','第五个','第五个','第四个','第五个'],
-				'分类文案':['第二个'],
-				'标签文案':['第三个'],
-				'其他文案':['第四个','第五个']
+			tagArr: {
+				产品文案: [
+					'绝绝子',
+					'绝绝子',
+					'绝绝子绝绝子',
+					'绝绝子绝绝子绝绝子绝绝子绝绝子绝绝子',
+					'第四个',
+					'绝绝子',
+					'绝绝子',
+					'第四个',
+					'第五个',
+					'第四个',
+					'第五个',
+					'第五个',
+					'第四个',
+					'第五个',
+				],
+				分类文案: ['第二个'],
+				标签文案: ['第三个'],
+				其他文案: ['第四个', '第五个'],
 			},
-			tableData: [{
-          id: '12987122',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987123',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987125',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987126',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }],
+			tableData: [
+				{
+					id: '12987122',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333',
+				},
+				{
+					id: '12987123',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333',
+				},
+				{
+					id: '12987125',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333',
+				},
+				{
+					id: '12987126',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333',
+				},
+			],
 			loading: true,
 
 			/*拖拽选择参数*/
@@ -601,35 +591,33 @@ export default {
 	},
 
 	methods: {
-		handleIsCollapse(v){
+		handleIsCollapse(v) {
 			this.isCollapse = v;
 		},
 		navControl(type) {
 			this.diskNavigationControl(type);
 		},
-		urlInfo(e,index,cindex){
-			this.templateList[index][cindex].h =  e.target.height
-			this.templateList[index][cindex].w =  e.target.width
+		urlInfo(e, index, cindex) {
+			this.templateList[index][cindex].h = e.target.height;
+			this.templateList[index][cindex].w = e.target.width;
 		},
-		handleTag(item,index){
-			this.templateList[this.templateIdx].push(
-				{
-						rand: '1',
-						fScale: '1', //缩放度
-						type: 'text', // 类型
-						name: item, //
-						fColor: '0,0,0', // 颜色
-						fSize: 20, // 字号
-						fFamily: 'cursive', // 字体
-						fWeight: '400', // 宽度
-						fStyle: 'inherit', // 倾斜度
-						fMode: 'inherit', // 横竖
-						fAlign: 'center', // 居中
-						fOpcity: 100, // 透明度
-						fShadow: '', // 阴影
-						familyText: '第一个', //
-					},
-			)
+		handleTag(item, index) {
+			this.templateList[this.templateIdx].push({
+				rand: '1',
+				fScale: '1', //缩放度
+				type: 'text', // 类型
+				name: item, //
+				fColor: '0,0,0', // 颜色
+				fSize: 20, // 字号
+				fFamily: 'cursive', // 字体
+				fWeight: '400', // 宽度
+				fStyle: 'inherit', // 倾斜度
+				fMode: 'inherit', // 横竖
+				fAlign: 'center', // 居中
+				fOpcity: 100, // 透明度
+				fShadow: '', // 阴影
+				familyText: '第一个', //
+			});
 		},
 		handleTemplateIndex(index) {
 			this.templateIdx = index;
@@ -637,8 +625,8 @@ export default {
 		handleDragEnter(e) {
 			console.log(e);
 		},
-		actionControl(commend,type) {
-			this.diskFeatureControl(commend,type);
+		actionControl(commend, type) {
+			this.diskFeatureControl(commend, type);
 		},
 		handleMainScale(e) {
 			console.log(this.toChinesNum(1), '1212');
@@ -689,8 +677,8 @@ export default {
 			data.y = y;
 		},
 		onResize(data, x, y, width, height, index, cindex) {
-			var dom_width = data.w ||this.$refs[data.rand][0].clientWidth;
-			var dom_height = data.h ||this.$refs[data.rand][0].clientHeight;
+			var dom_width = data.w || this.$refs[data.rand][0].clientWidth;
+			var dom_height = data.h || this.$refs[data.rand][0].clientHeight;
 			// console.log(data,dom_height,"cdcd")
 			this.$set(this.templateList[index][cindex], 'fScale', `scale(${width / dom_width},${height / dom_height})`);
 			this.$refs[data.rand][0].style.transform = `scale(${width / dom_width},${height / dom_height})`;
@@ -1029,7 +1017,6 @@ export default {
 
 				this.diskInfo.count = rs.data.count;
 				this.diskData = [...this.diskData, ...rs.data.rows];
-				console.log(JSON.stringify(this.diskData), 'diskDatadiskData');
 			});
 		},
 
@@ -1572,7 +1559,7 @@ export default {
 			}
 		},
 
-		diskFeatureControl(commend,type) {
+		diskFeatureControl(commend, type) {
 			let isDragMove = this.draggingFilesStyle.display === 'flex';
 
 			switch (commend) {
@@ -1597,7 +1584,7 @@ export default {
 						},
 					});
 
-				break;
+					break;
 				case 'quick-open':
 					if (this.diskData[0]) {
 						this.$set(this.diskData[0], 'active', true);
@@ -1653,7 +1640,6 @@ export default {
 						this.diskInfo.navData.push(item);
 					} else {
 						if (item.openType === 'image') {
-						
 							this.openFileHandle(item);
 						}
 					}
@@ -2564,22 +2550,23 @@ export default {
 </script>
 
 <style scoped lang="scss">
-::v-deep .el-collapse-item__content{
+::v-deep .el-collapse-item__content {
 	padding: 0 0 10px 0;
 }
-::v-deep .el-collapse-item__content{
+::v-deep .el-collapse-item__content {
 	padding: 0 0 10px 0;
 }
-::v-deep .el-form-item{
+::v-deep .el-form-item {
 	margin-bottom: 0;
 }
-::v-deep .el-table td{
+::v-deep .el-table td {
 	padding: 6px 0;
 }
-::v-deep .el-form-item__content, ::v-deep .el-form-item__label{
+::v-deep .el-form-item__content,
+::v-deep .el-form-item__label {
 	line-height: 30px;
 }
-::v-deep .el-table__expanded-cell[class*=cell]{
+::v-deep .el-table__expanded-cell[class*='cell'] {
 	padding: 10px 50px;
 }
 .my-active-class {
@@ -2649,8 +2636,8 @@ export default {
 .cloud-disk-main {
 	width: 100%;
 
-	height: calc(100% - 60px);
-
+	height: calc(100% - 56px);
+	overflow: hidden;
 	display: flex;
 
 	justify-content: space-between;
@@ -2664,17 +2651,15 @@ export default {
 		width: 100%;
 
 		height: 100%;
-
+		overflow: scroll;
 		display: flex;
 
 		flex-direction: column;
 
 		flex: 1px;
 
-		background-color: white;
-
 		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
-		margin:15px;
+		margin: 15px;
 		box-sizing: border-box;
 
 		.cloud-disk-content {
@@ -2732,6 +2717,23 @@ export default {
 
 			color: #fff;
 		}
+	}
+	.right::-webkit-scrollbar {
+		/*滚动条整体样式*/
+		width: 6px; /*高宽分别对应横竖滚动条的尺寸*/
+		height: 1px;
+	}
+	.right::-webkit-scrollbar-thumb {
+		/*滚动条里面小方块*/
+		border-radius: 6px;
+		-webkit-box-shadow: inset 0 0 5px rgb(14, 22, 48);
+		background: #535353;
+	}
+	.right::-webkit-scrollbar-track {
+		/*滚动条里面轨道*/
+		-webkit-box-shadow: inset 0 0 5px white;
+		border-radius: 6px;
+		background: #ededed;
 	}
 }
 

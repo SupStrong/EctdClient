@@ -1428,7 +1428,6 @@ export default {
 
 				this.diskInfo.count = rs.data.count;
 				this.diskData = [...this.diskData, ...rs.data.rows];
-				console.log(JSON.stringify(this.diskData), 'diskDatadiskData');
 			});
 		},
 

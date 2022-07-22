@@ -83,7 +83,7 @@
 							<button class="btn remove" :disabled="cleanDisabled" @click="cleanTrash">清空</button>
 							<button class="btn default" :disabled="cleanDisabled" @click="actionControl('restore')">全部还原</button>
 						</template>
-						<template v-else-if="data.categoryType === 'picture'">
+						<template v-else-if="data.categoryType === 'picture' || data.categoryType === 'share' || data.categoryType === 'disshare'">
 							<button class="btn primary" :disabled="!$parent.diskData.length" @click="actionControl('quick-open')">
 								<span class="icon sf-icon-images"></span>
 								查看
